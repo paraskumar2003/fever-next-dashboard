@@ -11,7 +11,7 @@ import { useRouter } from 'next/navigation';
 import Swal from 'sweetalert2';
 import Notiflix from 'notiflix';
 // import API from "../../services/api";
-import axios from 'axios';
+// import axios from 'axios';
 
 // Define the structure of the login response
 interface LoginResponse {
@@ -51,6 +51,7 @@ export default function Login() {
         }),
         onSubmit: async (values) => {
             try {
+                console.log(values);
                 Notiflix.Loading.init({ svgColor: Loader_Color });
                 //const response = await axios.post(`${process.env.baseUrl}/auth/login`, values);
                 // const response = await API.AuthAPI.login(values); // Call API from auth.ts
@@ -66,7 +67,7 @@ export default function Login() {
                         role: "super_admin"
                     }
                 }
-               }
+               } as LoginResponse;
                 // console.log("Login successful:", response);
                 if (loginResponse.status === true) {
                     Notiflix.Loading.remove();

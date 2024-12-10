@@ -3,11 +3,11 @@ import * as React from "react";
 import { useState, useEffect } from "react";
 import { GridColDef } from "@mui/x-data-grid";
 import Notiflix from "notiflix";
-import Api from "@/services/api";
+// import Api from "@/services/api";
 import TableComponent from "@/components/shared/dataGrid";
-import CommonButton from "@/components/Common/button";
+// import CommonButton from "@/components/Common/button";
 import BreadCrumb from "@/components/Common/breadCrumb";
-import { useRouter } from "next/navigation";
+// import { useRouter } from "next/navigation";
 
 interface Vendor {
     id: number;
@@ -28,8 +28,8 @@ interface VendorData {
     contestType:string;
     contestPayment: string | null;
     status: string;
-    createdAt: string;
-    updatedAt: string;
+    createdAt: Date;
+    updatedAt: Date;
 }
 
 const columns: GridColDef[] = [
@@ -43,7 +43,7 @@ const columns: GridColDef[] = [
     { field: "updatedAt", headerName: "Updated At", width: 150 }
 ];
 
-const page = () => {
+const Page = () => {
     const Loader_Color = "rgba(241,230,230,0.985)";
 
     // Notiflix.Loading.init({ svgColor: Loader_Color }); // Initialize loader configuration
@@ -51,9 +51,7 @@ const page = () => {
     const [page, setPage] = useState<number>(1);
     const [size, setSize] = useState<number>(10);
     const [pagination, setPagination] = useState<number>(0);
-    const [filterStatus, setFilterStatus] = useState<string>("");
-    const [isExporting, setIsExporting] = useState(false); // State to manage xport button disabled
-    const router = useRouter()
+    const [filterStatus] = useState<string>("");
 
     const getTransactions = async () => {
         Notiflix.Loading.init({ svgColor: Loader_Color });
@@ -220,4 +218,4 @@ const page = () => {
     );
 };
 
-export default page;
+export default Page;

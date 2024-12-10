@@ -4,13 +4,13 @@ import DynamicForm from "@/components/shared/form";
 import * as Yup from "yup";
 import { useRouter } from "next/navigation";
 import { RdIcon } from "@/components/shared/icons";
-import useVendorRegistration from '@/components/apiServices/vendorService';  // Import the custom hook
-import { getToken } from "@/lib/utils";
+// import useVendorRegistration from '@/components/apiServices/vendorService';  // Import the custom hook
+// import { getToken } from "@/lib/utils";
 import BreadCrumb from "@/components/Common/breadCrumb";
 
 const Client_Registration = () => {
     const router = useRouter();
-    const { registerVendor } = useVendorRegistration();  // Using the custom hook
+    // const { registerVendor } = useVendorRegistration();  // Using the custom hook
 
     const formFields = [
         {
@@ -110,23 +110,24 @@ const Client_Registration = () => {
     };
 
     const handleSubmit = (values: Record<string, string>) => {
-        const requestData = {
-            contact_person_name: values.contact_person_name,
-            organization_name: values.organization_name,
-            organization_pan_number: values.organization_pan_number,
-            website_link: values.website_link,
-            phone_number: values.phone_number ? values.phone_number.toString() : "",
-            technical_contact_number: values.technical_contact_number ? values.technical_contact_number.toString() : "",
-            business_contact_number: values.business_contact_number ? values.business_contact_number.toString() : "",
-            email: values.email,
-            password: values.password,
-        };
+        console.log(values);
+        // const requestData = {
+        //     contact_person_name: values.contact_person_name,
+        //     organization_name: values.organization_name,
+        //     organization_pan_number: values.organization_pan_number,
+        //     website_link: values.website_link,
+        //     phone_number: values.phone_number ? values.phone_number.toString() : "",
+        //     technical_contact_number: values.technical_contact_number ? values.technical_contact_number.toString() : "",
+        //     business_contact_number: values.business_contact_number ? values.business_contact_number.toString() : "",
+        //     email: values.email,
+        //     password: values.password,
+        // };
 
-        // Call the registerVendor function from the custom hook
-        const token = getToken();
-        if (token) {
-            //registerVendor(requestData); // Pass request data and token to the service
-        }
+        // // Call the registerVendor function from the custom hook
+        // const token = getToken();
+        // if (token) {
+        //     //registerVendor(requestData); // Pass request data and token to the service
+        // }
     };
 
     const handleToBack = () => {

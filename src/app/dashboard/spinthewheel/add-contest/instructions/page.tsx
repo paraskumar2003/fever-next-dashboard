@@ -1,7 +1,7 @@
 "use client";
 import React, { useState } from "react";
 // import DynamicForm from "@/components/shared/form";
-import * as Yup from "yup";
+// import * as Yup from "yup";
 import { useRouter } from "next/navigation";
 import { RdIcon } from "@/components/shared/icons";
 // import useVendorRegistration from '@/components/apiServices/vendorService';  // Import the custom hook

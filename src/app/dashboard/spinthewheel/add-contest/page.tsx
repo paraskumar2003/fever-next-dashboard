@@ -111,6 +111,7 @@ const Client_Registration = () => {
 
     const handleSubmit = (values: Record<string, string>) => {
         console.log(values);
+        router.push("add-contest/instructions");
         // const requestData = {
         //     contact_person_name: values.contact_person_name,
         //     organization_name: values.organization_name,
@@ -137,7 +138,7 @@ const Client_Registration = () => {
     return (
         <>
             <BreadCrumb name='Spin The Wheel Contest Add' buttonText='Back' symbolIcon={<RdIcon iconName="backPage" />} onClick={handleToBack}></BreadCrumb>
-            <DynamicForm fields={formFields} initialValues={initialValues} onSubmit={handleSubmit} />
+            <DynamicForm fields={formFields} submitButtonName={"ADD & NEXT"} initialValues={initialValues} onSubmit={handleSubmit} />
         </>
     );
 };

@@ -16,25 +16,26 @@ interface FormField {
 
 interface DynamicFormProps {
     fields: FormField[];
+    submitButtonName?:string;
     initialValues: Record<string, string>;
     onSubmit: (values: Record<string, string>) => void;
 }
 
-const DynamicForm: React.FC<DynamicFormProps> = ({ fields, initialValues, onSubmit }) => {
+const DynamicForm: React.FC<DynamicFormProps> = ({ fields,submitButtonName="Submit", initialValues, onSubmit }) => {
     // Build Yup validation schema dynamically
-    const validationSchema = Yup.object(
-        fields.reduce((schema, field) => {
-            if (field.validation) {
-                schema[field.name] = field.validation;
-            }
-            return schema;
-        }, {} as Record<string, Yup.AnySchema>)
-    );
+    // const validationSchema = Yup.object(
+    //     fields.reduce((schema, field) => {
+    //         if (field.validation) {
+    //             schema[field.name] = field.validation;
+    //         }
+    //         return schema;
+    //     }, {} as Record<string, Yup.AnySchema>)
+    // );
 
     return (
         <Formik
             initialValues={initialValues}
-            validationSchema={validationSchema}
+            // validationSchema={validationSchema}
             onSubmit={onSubmit}
         >
             {({ isSubmitting }) => (
@@ -87,7 +88,7 @@ const DynamicForm: React.FC<DynamicFormProps> = ({ fields, initialValues, onSubm
                             className="px-6 py-2 text-white w-[50%] bg-orange-600 rounded-md hover:bg-orange-700 disabled:opacity-50"
                             disabled={isSubmitting}
                         >
-                            {isSubmitting ? "Submitting..." : "Submit"}
+                            {isSubmitting ? "Submitting..." : submitButtonName}
                         </Button>
                     </div>
                 </Form>

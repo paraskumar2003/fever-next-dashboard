@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from "react";
-import DynamicForm from "@/components/shared/form";
+// import DynamicForm from "@/components/shared/form";
 import * as Yup from "yup";
 import { useRouter } from "next/navigation";
 import { RdIcon } from "@/components/shared/icons";
@@ -21,102 +21,102 @@ const Client_Registration = () => {
     { title: "", description: "" },
   ]);
 
-  const formFields = [
-    {
-      name: "name",
-      label: "Contest Name",
-      type: "text",
-      placeholder: "Enter Contest Name",
-      validation: Yup.string()
-        .trim()
-        .matches(/^[^0-9]*$/, "Name cannot contain Numbers")
-        .required("Name is required"),
-    },
-    {
-      name: "rewards",
-      label: "Reward Name",
-      type: "text",
-      placeholder: "Enter Rewards",
-      validation: Yup.string().required("Rewards are required"),
-    },
-    {
-      name: "startDate",
-      label: "Start Date",
-      type: "date",
-      placeholder: "Select Start Date",
-      validation: Yup.date().required("Start Date is required"),
-    },
-    {
-      name: "endDate",
-      label: "End Date",
-      type: "date",
-      placeholder: "Select End Date",
-      validation: Yup.date()
-        .required("End Date is required")
-        .min(Yup.ref("startDate"), "End Date cannot be before Start Date"),
-    },
-    {
-      name: "contestType",
-      label: "Contest Type",
-      type: "select",
-      placeholder: "Enter Contest Type",
-      selectOptions: [
-        { value: "FREE", label: "FREE" },
-        { value: "PIAD", label: "PIAD" },
-      ],
-      validation: Yup.string().required("Contest Type is required"),
-    },
-    {
-      name: "contestFee",
-      label: "Contest Fee",
-      type: "number",
-      placeholder: "Enter Contest Fee",
-      validation: Yup.number()
-        .required("Contest Fee is required")
-        .positive("Fee must be positive"),
-    },
-    {
-      name: "contestTypeName",
-      label: "Contest Type Name",
-      type: "select",
-      placeholder: "Enter Contest Type Name",
-      selectOptions: [
-        { value: "MAHA_BONANZA", label: "MAHA BONANZA" },
-        { value: "REGULAR", label: "REGULAR" },
-      ],
-      validation: Yup.string().required("Contest Type Name is required"),
-    },
-    {
-      name: "sponsored_name",
-      label: "Sponsor Name",
-      type: "text",
-      placeholder: "Enter Sponsor Name",
-      validation: Yup.string().trim().required("Sponsor Name is required"),
-    },
-    {
-      name: "sponsored_logo",
-      label: "Sponsor Logo",
-      type: "file",
-      placeholder: "Upload Sponsor Logo",
-      validation: Yup.mixed().required("Sponsor Logo is required"),
-    },
-    {
-      name: "thumbnail",
-      label: "Thumbnail",
-      type: "file",
-      placeholder: "Upload Thumbnail",
-      validation: Yup.mixed().required("Thumbnail is required"),
-    },
-    {
-      name: "contestImage",
-      label: "Contest Image",
-      type: "file",
-      placeholder: "Upload Contest Image",
-      validation: Yup.mixed().required("Contest Image is required"),
-    },
+  //   const formFields = [
+  //     {
+  //       name: "name",
+  //       label: "Contest Name",
+  //       type: "text",
+  //       placeholder: "Enter Contest Name",
+  //       validation: Yup.string()
+  //         .trim()
+  //         .matches(/^[^0-9]*$/, "Name cannot contain Numbers")
+  //         .required("Name is required"),
+  //     },
+  //     {
+  //       name: "rewards",
+  //       label: "Reward Name",
+  //       type: "text",
+  //       placeholder: "Enter Rewards",
+  //       validation: Yup.string().required("Rewards are required"),
+  //     },
+  //     {
+  //       name: "startDate",
+  //       label: "Start Date",
+  //       type: "date",
+  //       placeholder: "Select Start Date",
+  //       validation: Yup.date().required("Start Date is required"),
+  //     },
+  //     {
+  //       name: "endDate",
+  //       label: "End Date",
+  //       type: "date",
+  //       placeholder: "Select End Date",
+  //       validation: Yup.date()
+  //         .required("End Date is required")
+  //         .min(Yup.ref("startDate"), "End Date cannot be before Start Date"),
+  //     },
+  //     {
+  //       name: "contestType",
+  //       label: "Contest Type",
+  //       type: "select",
+  //       placeholder: "Enter Contest Type",
+  //       selectOptions: [
+  //         { value: "FREE", label: "FREE" },
+  //         { value: "PIAD", label: "PIAD" },
+  //       ],
+  //       validation: Yup.string().required("Contest Type is required"),
+  //     },
+  //     {
+  //       name: "contestFee",
+  //       label: "Contest Fee",
+  //       type: "number",
+  //       placeholder: "Enter Contest Fee",
+  //       validation: Yup.number()
+  //         .required("Contest Fee is required")
+  //         .positive("Fee must be positive"),
+  //     },
+  //     {
+  //       name: "contestTypeName",
+  //       label: "Contest Type Name",
+  //       type: "select",
+  //       placeholder: "Enter Contest Type Name",
+  //       selectOptions: [
+  //         { value: "MAHA_BONANZA", label: "MAHA BONANZA" },
+  //         { value: "REGULAR", label: "REGULAR" },
+  //       ],
+  //       validation: Yup.string().required("Contest Type Name is required"),
+  //     },
+  //     {
+  //       name: "sponsored_name",
+  //       label: "Sponsor Name",
+  //       type: "text",
+  //       placeholder: "Enter Sponsor Name",
+  //       validation: Yup.string().trim().required("Sponsor Name is required"),
+  //     },
+  //     {
+  //       name: "sponsored_logo",
+  //       label: "Sponsor Logo",
+  //       type: "file",
+  //       placeholder: "Upload Sponsor Logo",
+  //       validation: Yup.mixed().required("Sponsor Logo is required"),
+  //     },
+  //     {
+  //       name: "thumbnail",
+  //       label: "Thumbnail",
+  //       type: "file",
+  //       placeholder: "Upload Thumbnail",
+  //       validation: Yup.mixed().required("Thumbnail is required"),
+  //     },
+  //     {
+  //       name: "contestImage",
+  //       label: "Contest Image",
+  //       type: "file",
+  //       placeholder: "Upload Contest Image",
+  //       validation: Yup.mixed().required("Contest Image is required"),
+  //     },
 
-    // Add more fields as needed
-  ];
+  //     // Add more fields as needed
+  //   ];
 
   const initialValues = {
     email: "",
@@ -166,15 +166,15 @@ const Client_Registration = () => {
     }
   };
 
-  const handleInputChange = (
-    index: number,
-    field: keyof DynamicField,
-    value: string
-  ) => {
-    const updatedFields = [...dynamicFields];
-    updatedFields[index][field] = value; // Safe access
-    setDynamicFields(updatedFields);
-  };
+  //   const handleInputChange = (
+  //     index: number,
+  //     field: keyof DynamicField,
+  //     value: string
+  //   ) => {
+  //     const updatedFields = [...dynamicFields];
+  //     updatedFields[index][field] = value; // Safe access
+  //     setDynamicFields(updatedFields);
+  //   };
 
   const handleToBack = () => {
     router.push("/dashboard/spinthewheel");

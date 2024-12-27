@@ -1,7 +1,7 @@
 "use client";
 import React, { useState } from "react";
-import DynamicForm from "@/components/shared/form";
-import * as Yup from "yup";
+// import DynamicForm from "@/components/shared/form";
+// import * as Yup from "yup";
 import { useRouter } from "next/navigation";
 import { RdIcon } from "@/components/shared/icons";
 // import useVendorRegistration from '@/components/apiServices/vendorService';  // Import the custom hook
@@ -93,15 +93,15 @@ const Client_Registration = () => {
     }
   };
 
-  const handleInputChange = (
-    index: number,
-    field: keyof DynamicField,
-    value: string
-  ) => {
-    const updatedFields = [...dynamicFields];
-    updatedFields[index][field] = value; // Safe access
-    setDynamicFields(updatedFields);
-  };
+  // const handleInputChange = (
+  //   index: number,
+  //   field: keyof DynamicField,
+  //   value: string
+  // ) => {
+  //   const updatedFields = [...dynamicFields];
+  //   updatedFields[index][field] = value; // Safe access
+  //   setDynamicFields(updatedFields);
+  // };
 
   const handleToBack = () => {
     router.push("/dashboard/spinthewheel");

@@ -6,7 +6,8 @@ export const metadata: Metadata = {
 };
 
 const UserList = () => {
-  return <></>;
+  return <>
+  </>;
 };
 
 export default UserList;

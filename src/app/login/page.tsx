@@ -37,7 +37,7 @@ export default function Login() {
           "url(https://source.unsplash.com/1920x1080/?abstract,technology)",
       }}
     >
-      <div className="w-96 rounded-2xl border border-white/20 bg-white bg-opacity-10 p-8 shadow-xl backdrop-blur-lg">
+      <div className="w-96 rounded-2xl border border-black/20 bg-white bg-opacity-10 p-8 shadow-xl backdrop-blur-lg">
         <h2 className="mb-6 text-center text-3xl font-bold">Login</h2>
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Username Input */}
@@ -49,7 +49,7 @@ export default function Login() {
               value={form.username}
               onChange={handleChange}
               required
-              className="peer w-full rounded-lg border border-white/30 bg-transparent px-3 pb-2 pt-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="peer w-full rounded-lg border border-black/30 bg-transparent px-3 pb-2 pt-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder={form.username ? "" : "Username"}
             />
           </div>
@@ -63,7 +63,7 @@ export default function Login() {
               value={form.password}
               onChange={handleChange}
               required
-              className="peer w-full rounded-lg border border-white/30 bg-transparent px-3 pb-2 pt-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="peer w-full rounded-lg border border-black/30 bg-transparent px-3 pb-2 pt-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder={form.password ? "" : "Password"}
             />
           </div>

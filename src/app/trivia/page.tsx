@@ -89,7 +89,6 @@ const TriviaPage = () => {
 
   const handleContestSave = async () => {
     try {
-      console.log(formData);
       const form = buildContestFormData(formData);
       const { data } = await ContestServices.createContest(form);
       if (data && data.data) {
@@ -129,14 +128,23 @@ const TriviaPage = () => {
     fd.append("contestTypeName", formData.contest_type_name || "");
     fd.append("sponsored_name", formData.sponsor_name || "");
 
-    if (formData.sponsor_logo) {
-      fd.append("sponsored_logo", formData.sponsor_logo);
+    // Append files with proper checking
+    if (formData.sponsor_logo instanceof File) {
+      fd.append(
+        "sponsored_logo",
+        formData.sponsor_logo,
+        formData.sponsor_logo.name,
+      );
     }
-    if (formData.thumbnail) {
-      fd.append("thumbnail", formData.thumbnail);
+    if (formData.thumbnail instanceof File) {
+      fd.append("thumbnail", formData.thumbnail, formData.thumbnail.name);
     }
-    if (formData.contest_image) {
-      fd.append("contestImage", formData.contest_image);
+    if (formData.contest_image instanceof File) {
+      fd.append(
+        "contestImage",
+        formData.contest_image,
+        formData.contest_image.name,
+      );
     }
     console.log({ fd, formData });
     return fd;

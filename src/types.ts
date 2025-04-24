@@ -43,6 +43,7 @@ export interface TambolaPrizeCatalogue {
 }
 
 export interface Question {
+  id?: string;
   question: string;
   option1: string;
   option2: string;
@@ -65,9 +66,13 @@ export interface ContestFormData {
   contest_variant_name?: string;
   sponsor_name: string;
   sponsor_logo: string;
+  sponsor_logo_preview: string;
   thumbnail: string;
+  thumbnail_preview: string;
   contest_image: string;
+  contest_image_preview: string;
   contest_hero_logo: string;
+  contest_hero_logo_preview: string;
   game_proceed: GameProceed;
   instructions?: Instruction[];
   prize_catalogue: PrizeCatalogue[];

@@ -32,7 +32,7 @@ const FormSection: React.FC<FormSectionProps> = ({
           <Button
             variant="success"
             size="sm"
-            type="button"
+            type="submit"
             onClick={() => onSave?.()}
           >
             Save

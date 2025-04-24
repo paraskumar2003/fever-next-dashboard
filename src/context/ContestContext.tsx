@@ -43,10 +43,54 @@ export const ContestProvider: React.FC<{ children: ReactNode }> = ({
   });
 
   const updateFormData = (data: Partial<ContestFormData>) => {
-    console.log(data);
-    setFormData((prev) => ({ ...prev, ...data }));
-  };
+    const handleImageChange = (
+      field: keyof ContestFormData,
+      base64: string,
+    ) => {
+      // Convert base64 to File object
+      const byteString = atob(base64.split(",")[1]);
+      const mimeString = base64.split(",")[0].split(":")[1].split(";")[0];
+      const ab = new ArrayBuffer(byteString.length);
+      const ia = new Uint8Array(ab);
+      for (let i = 0; i < byteString.length; i++) {
+        ia[i] = byteString.charCodeAt(i);
+      }
+      const file = new File([ab], `${field}.${mimeString.split("/")[1]}`, {
+        type: mimeString,
+      });
+      setFormData((prev) => ({
+        ...prev,
+        [field]: file,
+        [`${field}_preview`]: base64,
+      }));
+    };
 
+    if (
+      data.contest_hero_logo ||
+      data.contest_image ||
+      data.sponsor_logo ||
+      data.thumbnail
+    ) {
+      // Handle each image field separately
+      if (
+        data.contest_hero_logo &&
+        typeof data.contest_hero_logo === "string"
+      ) {
+        handleImageChange("contest_hero_logo", data.contest_hero_logo);
+      }
+      if (data.contest_image && typeof data.contest_image === "string") {
+        handleImageChange("contest_image", data.contest_image);
+      }
+      if (data.sponsor_logo && typeof data.sponsor_logo === "string") {
+        handleImageChange("sponsor_logo", data.sponsor_logo);
+      }
+      if (data.thumbnail && typeof data.thumbnail === "string") {
+        handleImageChange("thumbnail", data.thumbnail);
+      }
+    } else {
+      setFormData((prev) => ({ ...prev, ...data }));
+    }
+  };
   const tambolaupdateFormData = (data: Partial<TambolaFormData>) => {
     console.log(data);
     setTambolaFormData((prev) => ({ ...prev, ...data }));

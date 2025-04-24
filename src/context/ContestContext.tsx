@@ -43,12 +43,12 @@ export const ContestProvider: React.FC<{ children: ReactNode }> = ({
   });
 
   const updateFormData = (data: Partial<ContestFormData>) => {
-    console.log({ data });
+    console.log(data);
     setFormData((prev) => ({ ...prev, ...data }));
   };
 
   const tambolaupdateFormData = (data: Partial<TambolaFormData>) => {
-    console.log({ data });
+    console.log(data);
     setTambolaFormData((prev) => ({ ...prev, ...data }));
   };
 
@@ -76,7 +76,7 @@ export const ContestProvider: React.FC<{ children: ReactNode }> = ({
   };
 
   useEffect(() => {
-    console.log({ formData });
+    console.log(formData);
   }, [formData]);
 
   return (

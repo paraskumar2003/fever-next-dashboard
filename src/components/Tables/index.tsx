@@ -26,7 +26,7 @@ const Table = <T,>({ rows, columns, totalCount }: DataTableProps<T>) => {
         columns={columns}
         rowCount={totalCount}
         pagination
-        paginationMode="server"
+        paginationMode="client"
         paginationModel={paginationModel}
         onPaginationModelChange={setPaginationModel}
         pageSizeOptions={[5, 10, 25, 50]}

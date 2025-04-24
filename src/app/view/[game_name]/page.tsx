@@ -2,71 +2,110 @@
 
 import { PageLayout } from "@/components";
 import { Table } from "@/components/Tables";
-import { useParams } from "next/navigation";
-import { useState } from "react";
-
-const columns = [
-  { field: "id", headerName: "ID", width: 30 },
-  { field: "contest_name", headerName: "Contest Name", flex: 1 },
-  { field: "contest_fee", headerName: "Contest Fee", flex: 1 },
-  {
-    field: "contest_sponsor_logo",
-    headerName: "Contest Sponsor Logo",
-    flex: 1,
-  },
-  { field: "contest_time", headerName: "Contest Time", flex: 1 },
-  { field: "contest_date", headerName: "Contest Date", flex: 1 },
-];
-
-const tempRows = [
-  {
-    id: 1,
-    contest_name: "Tambola Mega Jackpot",
-    contest_fee: 100,
-    contest_sponsor_logo: "https://example.com/logo1.png",
-    contest_date: "2024-07-10",
-    contest_time: "18:30",
-  },
-  {
-    id: 2,
-    contest_name: "Weekend Housie Bonanza",
-    contest_fee: 50,
-    contest_sponsor_logo: "https://example.com/logo2.png",
-    contest_date: "2024-07-13",
-    contest_time: "20:00",
-  },
-  {
-    id: 3,
-    contest_name: "Super Saturday Tambola",
-    contest_fee: 75,
-    contest_sponsor_logo: "https://example.com/logo3.png",
-    contest_date: "2024-07-20",
-    contest_time: "19:00",
-  },
-  {
-    id: 4,
-    contest_name: "Festival Special Housie",
-    contest_fee: 120,
-    contest_sponsor_logo: "https://example.com/logo4.png",
-    contest_date: "2024-07-25",
-    contest_time: "21:00",
-  },
-  {
-    id: 5,
-    contest_name: "Daily Fun Tambola",
-    contest_fee: 30,
-    contest_sponsor_logo: "https://example.com/logo5.png",
-    contest_date: "2024-07-30",
-    contest_time: "17:00",
-  },
-];
+import { TriviaServices } from "@/services";
+import { Contest } from "@/types/contest";
+import { useParams, useRouter } from "next/navigation";
+import moment from "moment";
+import { useEffect, useState } from "react";
+import Button from "@/components/Button";
 
 export default function ViewContest() {
+  const router = useRouter();
+  const params = useParams();
+
+  const handleAction = (
+    action: "view" | "edit" | "delete",
+    contest_id: string | number,
+  ) => {
+    if (action == "view") router.push(`/${params.game_name}/${contest_id}`);
+    if (action == "edit") router.push(`/${params.game_name}/${contest_id}`);
+  };
+
+  const columns = [
+    { field: "seq_no", headerName: "ID", width: 30 },
+    { field: "contest_name", headerName: "Contest Name", flex: 1 },
+    { field: "contest_fee", headerName: "Contest Fee", flex: 1 },
+    {
+      field: "contest_sponsor_logo",
+      headerName: "Contest Sponsor Logo",
+      flex: 1,
+    },
+    { field: "contest_time", headerName: "Contest Time", flex: 1 },
+    { field: "contest_date", headerName: "Contest Date", flex: 1 },
+    { field: "contest_type", headerName: "Contest Type", flex: 1 },
+    { field: "sponsored_name", headerName: "Sponsor Name", flex: 1 },
+    {
+      field: "actions",
+      headerName: "Actions",
+      flex: 2,
+      sortable: false,
+      filterable: false,
+      disableColumnMenu: true,
+      renderCell: (params: { row: Contest }) => (
+        <div className="flex h-full items-center justify-center gap-2">
+          <Button
+            variant="primary"
+            color="primary"
+            size="sm"
+            onClick={() => handleAction("view", params.row.id as string)}
+          >
+            View
+          </Button>
+          <Button
+            variant="secondary"
+            color="secondary"
+            size="sm"
+            onClick={() => handleAction("edit", params.row.id as string)}
+          >
+            Edit
+          </Button>
+          <Button
+            variant="danger"
+            color="error"
+            size="sm"
+            onClick={() => handleAction("delete", params.row.id)}
+          >
+            Delete
+          </Button>
+        </div>
+      ),
+    },
+  ];
+
   const { game_name } = useParams();
+  const [rows, setRows] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  console.log(game_name);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const { data } = await TriviaServices.getContests();
+        if (data.data) {
+          setRows(
+            data.data.map((e: Contest, index: number) => ({
+              seq_no: index + 1,
+              id: e.id,
+              contest_name: e.name,
+              contest_fee: e.contestFee,
+              contest_sponsor_logo: e.sponsored_logo,
+              contest_date: moment(new Date(e.createdAt)).format("YYYY-MM-DD"),
+              contest_time: moment(new Date(e.createdAt)).format("HH:mm"),
+              sponsored_name: e.sponsored_name,
+              contest_type: e.contestTypeName,
+            })),
+          );
+        }
+      } catch (error) {
+        console.error("Error fetching contests:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  const [rows, setRows] = useState<any>(tempRows);
+    fetchData();
+  }, []);
+
+  if (loading) return <div>Loading...</div>;
 
   return (
     <PageLayout>

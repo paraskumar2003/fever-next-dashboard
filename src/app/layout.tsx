@@ -5,7 +5,6 @@ import "@/css/satoshi.css";
 import "@/css/style.css";
 import React, { useEffect, useState } from "react";
 import { ContestProvider } from "@/context/ContestContext";
-import { Header } from "../components";
 
 export default function RootLayout({
   children,

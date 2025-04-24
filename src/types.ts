@@ -24,6 +24,7 @@ export interface PrizeCatalogue {
   fever_bucks?: number;
   rewards?: string;
   coupon_type?: string;
+  prize_type?: "reward" | "fever_bucks" | "voucher";
 }
 
 export interface TambolaPrizeCatalogue {
@@ -48,6 +49,7 @@ export interface Question {
   option3: string;
   option4: string;
   correctOption: "option1" | "option2" | "option3" | "option4";
+  timer: string;
 }
 
 export interface ContestFormData {

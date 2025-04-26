@@ -71,4 +71,24 @@ export class TriviaServices extends ApiServices {
       return { data: null, err: err.message, response: err?.response?.data };
     }
   }
+
+  static async getQuestionById(question_id: string): Promise<any> {
+    try {
+      const response = await this.get<T>(`/v1/trivia/questions/${question_id}`);
+      return response;
+    } catch (err: any) {
+      return { data: null, err: err.message, response: err?.response?.data };
+    }
+  }
+
+  static async getInstructionByContestId(contest_id: string): Promise<any> {
+    try {
+      const response = await this.get<T>(
+        `/v1/trivia/instructions/${contest_id}`,
+      );
+      return response;
+    } catch (err: any) {
+      return { data: null, err: err.message, response: err?.response?.data };
+    }
+  }
 }

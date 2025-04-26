@@ -1,24 +1,35 @@
 "use client";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Eye, Save } from "lucide-react";
 import { useContest } from "@/context/ContestContext";
-import Button from "@/components/Button";
 import { PageLayout } from "@/components";
 import { ContestServices, TriviaServices } from "@/services";
 import moment from "moment";
-import { Helpers } from "@/general";
-import OnlyQuestionForm from "@/components/Forms/OnlyQuestion";
-import OnlyInstructionForm from "@/components/Forms/OnlyInstructionForm";
 import OnlyContestForm from "@/components/Forms/OnlyContestForm";
+import QuestionModal from "@/components/Modal/QuestionModal";
+import { useModal } from "@/hooks/useModal";
+import InstructionModal from "@/components/Modal/InstructionModal";
+import InstructionSection from "@/components/Section/InstructionSection";
+import QuestionSection from "@/components/Section/QuestionSection";
 
 const TriviaPage = () => {
-  const { push } = useRouter();
   const router = useSearchParams();
-  const { formData, updateFormData } = useContest();
+  const { push } = useRouter();
   const contest_id = router.get("contest_id");
 
+  const { formData, updateFormData } = useContest();
+  const [questions, setQuestions] = useState([]);
+
+  /* -- States for Instructions -- */
+  const [instructions, setInstructions] = useState([]);
+  const [selectedInstruction, setSelectedInstruction] = useState(null);
+  const instructionModal = useModal();
+
   const fd = new FormData();
+  const modal = useModal();
+
+  const [selectedQuestion, setSelectedQuestion] = useState<any>(null);
+  const [isViewMode, setIsViewMode] = useState(false);
 
   // const handleSubmit = (e: React.FormEvent) => {
   //   e.preventDefault();
@@ -61,8 +72,8 @@ const TriviaPage = () => {
   const fetchQuestions = async (contest_id: string) => {
     try {
       const { data } = await TriviaServices.getQuestionsByContestId(contest_id);
-      console.log({ data });
       if (data?.data?.contest?.questions) {
+        setQuestions(data.data.contest.questions);
         const questions = data.data.contest.questions.map((q: any) => ({
           question: q.question,
           option1: q.answers[0].answer,
@@ -73,6 +84,7 @@ const TriviaPage = () => {
           timer: q.timer,
           status: q.status,
         }));
+
         updateFormData({ questions });
       }
     } catch (error) {
@@ -84,6 +96,7 @@ const TriviaPage = () => {
     if (contest_id) {
       fetchContestDetails(contest_id as string);
       fetchQuestions(contest_id as string);
+      fetchInstructions(contest_id as string);
     }
   }, [contest_id]);
 
@@ -146,9 +159,103 @@ const TriviaPage = () => {
         formData.contest_image.name,
       );
     }
-    console.log({ fd, formData });
     return fd;
   }
+
+  const fetchQuestionDetails = async (id: number) => {
+    try {
+      const { data } = await TriviaServices.getQuestionById(id.toString());
+      if (data?.data) {
+        const question = data.data;
+        const formattedQuestion = {
+          id: question.id,
+          question: question.question,
+          option1: question.answers[0].answer,
+          option2: question.answers[1].answer,
+          option3: question.answers[2].answer,
+          option4: question.answers[3].answer,
+          correctOption: `option${question.answers.findIndex((a: any) => a.is_correct) + 1}`,
+          timer: question.timer || 10000,
+          status: question.status,
+        };
+        setSelectedQuestion(formattedQuestion);
+      }
+    } catch (err) {
+      console.error("Error fetching question details:", err);
+    } finally {
+    }
+  };
+
+  const handleQuestionView = async (question: any) => {
+    setIsViewMode(true);
+    await fetchQuestionDetails(question.id);
+    modal.open();
+  };
+
+  const handleQuestionEdit = async (question: any) => {
+    setIsViewMode(false);
+    await fetchQuestionDetails(question.id);
+    modal.open();
+  };
+
+  const handleQuestionDelete = async (id: number) => {
+    try {
+      await TriviaServices.deleteQuestion(id.toString());
+      if (contest_id) {
+        fetchQuestions(contest_id);
+      }
+    } catch (err) {
+      console.error("Error deleting question:", err);
+    }
+  };
+
+  const handleStatusChange = async (id: number, status: number) => {
+    try {
+      // await TriviaServices.updateQuestionStatus(id.toString(), status);
+      if (contest_id) {
+        fetchQuestions(contest_id);
+      }
+    } catch (err) {
+      console.error("Error updating question status:", err);
+    }
+  };
+
+  const fetchInstructions = async (contest_id: string) => {
+    try {
+      const { data } =
+        await TriviaServices.getInstructionByContestId(contest_id);
+      if (data?.data) {
+        setInstructions(data.data);
+      }
+    } catch (err) {
+      console.error("Error fetching instructions:", err);
+    } finally {
+    }
+  };
+
+  // Instruction handlers
+  const handleInstructionView = (instruction: any) => {
+    setIsViewMode(true);
+    setSelectedInstruction(instruction);
+    instructionModal.open();
+  };
+
+  const handleInstructionEdit = (instruction: any) => {
+    setIsViewMode(false);
+    setSelectedInstruction(instruction);
+    instructionModal.open();
+  };
+
+  const handleInstructionDelete = async (id: string) => {
+    try {
+      // Add your delete instruction API call here
+      if (contest_id) {
+        fetchInstructions(contest_id);
+      }
+    } catch (err) {
+      console.error("Error deleting instruction:", err);
+    }
+  };
 
   return (
     <PageLayout>
@@ -163,8 +270,57 @@ const TriviaPage = () => {
             updateFormData={updateFormData}
             onSave={handleContestSave}
           />
-          <OnlyQuestionForm />
-          <OnlyInstructionForm />
+          <QuestionSection
+            questions={questions}
+            onView={handleQuestionView}
+            onEdit={handleQuestionEdit}
+            onDelete={handleQuestionDelete}
+            onStatusChange={handleStatusChange}
+            onSave={async () => {
+              if (contest_id) {
+                await fetchQuestions(contest_id);
+              }
+            }}
+          />
+          <QuestionModal
+            isOpen={modal.isOpen}
+            onClose={modal.close}
+            questionData={selectedQuestion}
+            isViewMode={isViewMode}
+            onSave={async () => {
+              if (contest_id) {
+                await fetchQuestions(contest_id);
+              }
+              modal.close();
+            }}
+          />
+
+          <InstructionSection
+            instructions={instructions}
+            onView={handleInstructionView}
+            onEdit={handleInstructionEdit}
+            onDelete={handleInstructionDelete}
+            onSave={async () => {
+              if (contest_id) {
+                await fetchInstructions(contest_id);
+              }
+            }}
+          />
+
+          <InstructionModal
+            isOpen={instructionModal.isOpen}
+            onClose={instructionModal.close}
+            instructionData={selectedInstruction}
+            isViewMode={isViewMode}
+            onSave={async () => {
+              if (contest_id) {
+                await fetchInstructions(contest_id);
+              }
+              instructionModal.close();
+            }}
+          />
+
+          {/* <OnlyInstructionForm /> */}
         </div>
       </div>
     </PageLayout>

@@ -1,12 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Plus, Trash2, Save } from "lucide-react";
 import Button from "../Button";
 import FormInput from "../FormInput";
 import FormSelect from "../FormSelect";
 import FormTextarea from "../FormTextarea";
-import FormSection from "../FormSection";
-import { useContest } from "@/context/ContestContext";
-import { Question } from "@/types";
 import { TriviaServices } from "@/services";
 
 interface QuestionData {
@@ -21,86 +18,79 @@ interface QuestionData {
   status: number;
 }
 
-const OnlyQuestionForm = () => {
-  const { formData, updateFormData } = useContest();
+interface OnlyQuestionFormProps {
+  readOnly?: boolean;
+  questionData?: QuestionData;
+  onSave?: (formData: QuestionData) => Promise<void>;
+}
+
+const OnlyQuestionForm: React.FC<OnlyQuestionFormProps> = ({
+  readOnly = false,
+  questionData,
+  onSave,
+}) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const [formState, setFormState] = useState<QuestionData>({
+    question: "",
+    option1: "",
+    option2: "",
+    option3: "",
+    option4: "",
+    correctOption: "option1",
+    timer: 10000,
+    status: 1,
+  });
 
-  const questions = formData.questions || [];
+  useEffect(() => {
+    if (questionData) {
+      setFormState(questionData);
+    }
+  }, [questionData]);
 
   const handleInputChange = (
-    index: number,
     e: React.ChangeEvent<
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
     >,
   ) => {
+    if (readOnly) return;
+
     const { name, value } = e.target;
-    const updatedQuestions = [...questions];
-    updatedQuestions[index] = {
-      ...updatedQuestions[index],
+    setFormState((prev) => ({
+      ...prev,
       [name]: value,
-    };
-    updateFormData({ questions: updatedQuestions });
-  };
-
-  const addQuestion = () => {
-    const newQuestion: Question = {
-      question: "",
-      option1: "",
-      option2: "",
-      option3: "",
-      option4: "",
-      correctOption: "option1",
-      timer: "10000",
-    };
-    updateFormData({ questions: [...questions, newQuestion] });
-  };
-
-  const removeQuestion = async (index: number) => {
-    if (questions.length > 1) {
-      const questionToRemove = questions[index];
-
-      try {
-        if (questionToRemove.id) {
-          await TriviaServices.deleteQuestion(questionToRemove.id);
-        }
-
-        const updatedQuestions = questions.filter((_, i) => i !== index);
-        updateFormData({ questions: updatedQuestions });
-
-        setSuccess(true);
-        setTimeout(() => setSuccess(false), 3000);
-      } catch (err) {
-        setError("Failed to delete question. Please try again.");
-        setTimeout(() => setError(null), 3000);
-      }
-    }
+    }));
   };
 
   const validateForm = () => {
-    for (let i = 0; i < questions.length; i++) {
-      const q = questions[i];
-      if (!q.question?.trim()) {
-        setError(`Question ${i + 1}: Question text is required`);
-        return false;
-      }
+    const errors: string[] = [];
 
-      if (
-        !q.option1?.trim() ||
-        !q.option2?.trim() ||
-        !q.option3?.trim() ||
-        !q.option4?.trim()
-      ) {
-        setError(`Question ${i + 1}: All answer options are required`);
-        return false;
-      }
+    if (!formState.question?.trim()) {
+      errors.push("Question text is required");
     }
+
+    if (
+      !formState.option1?.trim() ||
+      !formState.option2?.trim() ||
+      !formState.option3?.trim() ||
+      !formState.option4?.trim()
+    ) {
+      errors.push("All answer options are required");
+    }
+
+    if (errors.length > 0) {
+      setError(errors.join(", "));
+      return false;
+    }
+
     return true;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (readOnly) return;
+
     if (!validateForm()) return;
 
     setLoading(true);
@@ -108,134 +98,137 @@ const OnlyQuestionForm = () => {
     setSuccess(false);
 
     try {
-      // Your question submission logic here
+      if (onSave) {
+        await onSave(formState);
+      }
       setSuccess(true);
 
-      // Reset form after successful submission
-      updateFormData({
-        questions: [
-          {
-            question: "",
-            option1: "",
-            option2: "",
-            option3: "",
-            option4: "",
-            correctOption: "option1",
-            timer: "10000",
-          },
-        ],
-      });
+      if (!questionData) {
+        // Reset form only for new questions
+        setFormState({
+          question: "",
+          option1: "",
+          option2: "",
+          option3: "",
+          option4: "",
+          correctOption: "option1",
+          timer: 10000,
+          status: 1,
+        });
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred");
-      console.error("Error submitting questions:", err);
+      console.error("Error submitting question:", err);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <FormSection title="Questions">
+    <form onSubmit={handleSubmit} className="space-y-6">
       {error && (
         <div className="mb-4 rounded-md border border-red-500 bg-red-500/20 p-4 text-red-200">
           {error}
         </div>
       )}
 
-      {success && (
+      {success && !readOnly && (
         <div className="mb-4 rounded-md border border-green-500 bg-green-500/20 p-4 text-green-200">
-          Questions saved successfully!
+          Question saved successfully!
         </div>
       )}
 
-      {questions.map((questionData, index) => (
-        <div
-          key={index}
-          className="mb-4 rounded-md border border-white/10 bg-white/5 p-4"
-        >
-          <div className="mb-2 flex items-center justify-between">
-            <h3 className="font-medium ">Question #{index + 1}</h3>
-            {questions.length > 1 && (
-              <Button
-                type="button"
-                variant="danger"
-                size="sm"
-                onClick={() => removeQuestion(index)}
-              >
-                <Trash2 className="mr-2 h-4 w-4" />
-                Remove Question
-              </Button>
-            )}
-          </div>
+      <div className="space-y-4">
+        <FormTextarea
+          label="Question"
+          name="question"
+          value={formState.question}
+          onChange={handleInputChange}
+          placeholder="Enter your question"
+          rows={3}
+          required
+          disabled={readOnly}
+        />
 
-          <FormTextarea
-            label="Question"
-            name="question"
-            value={questionData.question || ""}
-            onChange={(e) => handleInputChange(index, e)}
-            placeholder="Enter your question"
-            rows={3}
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <FormInput
+            label="Option 1"
+            name="option1"
+            value={formState.option1}
+            onChange={handleInputChange}
+            placeholder="Enter option 1"
             required
+            disabled={readOnly}
           />
-
-          <div className="space-y-4">
-            <h3 className="font-medium ">Answer Options</h3>
-            {["option1", "option2", "option3", "option4"].map(
-              (option, optionIndex) => (
-                <FormInput
-                  key={option}
-                  label={`Option ${optionIndex + 1}`}
-                  name={option}
-                  value={
-                    (questionData[
-                      option as keyof typeof questionData
-                    ] as string) || ""
-                  }
-                  onChange={(e) => handleInputChange(index, e)}
-                  placeholder={`Enter option ${optionIndex + 1}`}
-                  required
-                />
-              ),
-            )}
-
-            <FormSelect
-              label="Correct Answer"
-              name="correctOption"
-              value={questionData.correctOption || "option1"}
-              onChange={(e) => handleInputChange(index, e)}
-              options={[
-                { value: "option1", label: "Option 1" },
-                { value: "option2", label: "Option 2" },
-                { value: "option3", label: "Option 3" },
-                { value: "option4", label: "Option 4" },
-              ]}
-            />
-
-            <FormInput
-              label="Timer (milliseconds)"
-              name="timer"
-              type="number"
-              value={questionData.timer || 10000}
-              onChange={(e) => handleInputChange(index, e)}
-              min="1000"
-              step="1000"
-              required
-            />
-          </div>
+          <FormInput
+            label="Option 2"
+            name="option2"
+            value={formState.option2}
+            onChange={handleInputChange}
+            placeholder="Enter option 2"
+            required
+            disabled={readOnly}
+          />
+          <FormInput
+            label="Option 3"
+            name="option3"
+            value={formState.option3}
+            onChange={handleInputChange}
+            placeholder="Enter option 3"
+            required
+            disabled={readOnly}
+          />
+          <FormInput
+            label="Option 4"
+            name="option4"
+            value={formState.option4}
+            onChange={handleInputChange}
+            placeholder="Enter option 4"
+            required
+            disabled={readOnly}
+          />
         </div>
-      ))}
 
-      <div className="flex items-center justify-between">
-        <Button type="button" variant="secondary" onClick={addQuestion}>
-          <Plus className="mr-2 h-4 w-4" />
-          Add Another Question
-        </Button>
+        <FormSelect
+          label="Correct Answer"
+          name="correctOption"
+          value={formState.correctOption}
+          onChange={handleInputChange}
+          options={[
+            { value: "option1", label: "Option 1" },
+            { value: "option2", label: "Option 2" },
+            { value: "option3", label: "Option 3" },
+            { value: "option4", label: "Option 4" },
+          ]}
+          disabled={readOnly}
+        />
 
-        <Button type="submit" disabled={loading} onClick={handleSubmit}>
-          <Save className="mr-2 h-4 w-4" />
-          {loading ? "Saving..." : "Save Questions"}
-        </Button>
+        <FormInput
+          label="Timer (milliseconds)"
+          name="timer"
+          type="number"
+          value={formState.timer}
+          onChange={handleInputChange}
+          min="1000"
+          step="1000"
+          required
+          disabled={readOnly}
+        />
       </div>
-    </FormSection>
+
+      {!readOnly && (
+        <div className="flex justify-end">
+          <Button type="submit" disabled={loading}>
+            <Save className="mr-2 h-4 w-4" />
+            {loading
+              ? "Saving..."
+              : questionData
+                ? "Update Question"
+                : "Save Question"}
+          </Button>
+        </div>
+      )}
+    </form>
   );
 };
 

@@ -255,6 +255,7 @@ const ContestForm: React.FC = () => {
       option3: "",
       option4: "",
       correctOption: "option1",
+      timer: "10000",
     };
 
     updateFormData({

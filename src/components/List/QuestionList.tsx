@@ -1,6 +1,4 @@
-import React, { useState } from "react";
-import { Eye, Pencil, Trash2 } from "lucide-react";
-import Button from "../Button";
+import React from "react";
 import QuestionRow from "./QuestionRow";
 
 interface Answer {
@@ -33,6 +31,8 @@ const QuestionList: React.FC<QuestionListProps> = ({
   onView,
   onStatusChange,
 }) => {
+  console.log({ questions });
+
   return (
     <div className="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-lg">
       <div className="overflow-x-auto">
@@ -57,9 +57,10 @@ const QuestionList: React.FC<QuestionListProps> = ({
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200">
-            {questions.map((question) => (
+            {questions.map((question, index) => (
               <QuestionRow
                 key={question.id}
+                index={index}
                 question={question}
                 onView={onView}
                 onEdit={onEdit}

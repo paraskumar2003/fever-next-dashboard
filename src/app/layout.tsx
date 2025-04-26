@@ -3,7 +3,7 @@ import "jsvectormap/dist/jsvectormap.css";
 import "flatpickr/dist/flatpickr.min.css";
 import "@/css/satoshi.css";
 import "@/css/style.css";
-import React, { useEffect, useState } from "react";
+import React, { Suspense, useEffect, useState } from "react";
 import { ContestProvider } from "@/context/ContestContext";
 
 export default function RootLayout({
@@ -21,14 +21,16 @@ export default function RootLayout({
   }, []);
 
   return (
-    <html lang="en">
-      <body suppressHydrationWarning={true}>
-        <ContestProvider>
-          <div className="h-screen dark:bg-boxdark-2 dark:text-bodydark">
-            {children}
-          </div>
-        </ContestProvider>
-      </body>
-    </html>
+    <Suspense fallback={<div>Loading...</div>}>
+      <html lang="en">
+        <body suppressHydrationWarning={true}>
+          <ContestProvider>
+            <div className="h-screen dark:bg-boxdark-2 dark:text-bodydark">
+              {children}
+            </div>
+          </ContestProvider>
+        </body>
+      </html>
+    </Suspense>
   );
 }

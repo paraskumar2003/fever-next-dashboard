@@ -19,6 +19,7 @@ interface Question {
 
 interface QuestionRowProps {
   question: Question;
+  index: number;
   onEdit?: (question: Question) => void;
   onDelete?: (id: number) => void;
   onView?: (question: Question) => void;
@@ -27,6 +28,7 @@ interface QuestionRowProps {
 
 const QuestionRow: React.FC<QuestionRowProps> = ({
   question,
+  index,
   onEdit,
   onDelete,
   onView,
@@ -46,7 +48,7 @@ const QuestionRow: React.FC<QuestionRowProps> = ({
 
   return (
     <tr className="transition-colors hover:bg-gray-50">
-      <td className="px-4 py-3 text-sm text-gray-600">#{question.id}</td>
+      <td className="px-4 py-3 text-sm text-gray-600">#{index + 1}</td>
       <td className="px-4 py-3 text-sm text-gray-600">
         <div className="max-w-md truncate">{question.question}</div>
       </td>

@@ -17,8 +17,10 @@ export default function ViewContest() {
     action: "view" | "edit" | "delete",
     contest_id: string | number,
   ) => {
-    if (action == "view") router.push(`/${params.game_name}/${contest_id}`);
-    if (action == "edit") router.push(`/${params.game_name}/${contest_id}`);
+    if (action == "view")
+      router.push(`/${params.game_name}?contest_id=${contest_id}`);
+    if (action == "edit")
+      router.push(`/${params.game_name}?contest_id=${contest_id}`);
   };
 
   const columns = [

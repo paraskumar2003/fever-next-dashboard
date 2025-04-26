@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Plus, Trash2, Save } from "lucide-react";
+import { Save } from "lucide-react";
 import Button from "../Button";
 import FormInput from "../FormInput";
 import FormSelect from "../FormSelect";
@@ -98,9 +98,43 @@ const OnlyQuestionForm: React.FC<OnlyQuestionFormProps> = ({
     setSuccess(false);
 
     try {
+      // Create the payload in the required format
+      const payload = {
+        question: formState.question,
+        status: formState.status,
+        answers: [
+          {
+            answer: formState.option1,
+            isCorrect: formState.correctOption === "option1",
+          },
+          {
+            answer: formState.option2,
+            isCorrect: formState.correctOption === "option2",
+          },
+          {
+            answer: formState.option3,
+            isCorrect: formState.correctOption === "option3",
+          },
+          {
+            answer: formState.option4,
+            isCorrect: formState.correctOption === "option4",
+          },
+        ],
+        timer: formState.timer.toString(),
+      };
+
+      // If it's a new question, create it
+      if (!questionData) {
+        await TriviaServices.createQuestion(payload);
+      } else {
+        if (questionData.id)
+          await TriviaServices.updateQuestion(payload, questionData.id);
+      }
+
       if (onSave) {
         await onSave(formState);
       }
+
       setSuccess(true);
 
       if (!questionData) {

@@ -19,6 +19,9 @@ const TriviaPage = () => {
 
   const { formData, updateFormData } = useContest();
   const [questions, setQuestions] = useState([]);
+  const [contestQuestionIds, setContestQuestionIds] = useState<number[] | null>(
+    null,
+  );
 
   /* -- States for Instructions -- */
   const [instructions, setInstructions] = useState([]);
@@ -69,23 +72,43 @@ const TriviaPage = () => {
     }
   };
 
-  const fetchQuestions = async (contest_id: string) => {
+  const fetchContestQuestions = async (contest_id: string): Promise<any> => {
     try {
       const { data } = await TriviaServices.getQuestionsByContestId(contest_id);
       if (data?.data?.contest?.questions) {
-        setQuestions(data.data.contest.questions);
-        const questions = data.data.contest.questions.map((q: any) => ({
-          question: q.question,
-          option1: q.answers[0].answer,
-          option2: q.answers[1].answer,
-          option3: q.answers[2].answer,
-          option4: q.answers[3].answer,
-          correctOption: `option${q.answers.findIndex((a: any) => a.is_correct) + 1}`,
-          timer: q.timer,
-          status: q.status,
-        }));
+        const questionIds = data.data.contest.questions.map((q: any) => q.id);
+        setContestQuestionIds((prevIds) => questionIds);
+      }
+      return true;
+    } catch (err) {
+      console.error("Error fetching contest questions:", err);
+    }
+  };
 
-        updateFormData({ questions });
+  const fetchQuestions = async () => {
+    try {
+      if (contestQuestionIds) {
+        const { data } = await TriviaServices.getAllQuestions();
+        if (data?.data?.questions) {
+          setQuestions(
+            data.data.questions.map((q: any) => ({
+              ...q,
+              status: contestQuestionIds.includes(q.id) ? 1 : 0,
+            })),
+          );
+
+          const questions = data.data.questions.map((q: any) => ({
+            question: q.question,
+            option1: q.answers[0].answer,
+            option2: q.answers[1].answer,
+            option3: q.answers[2].answer,
+            option4: q.answers[3].answer,
+            correctOption: `option${q.answers.findIndex((a: any) => a.is_correct) + 1}`,
+            timer: q.timer,
+            status: contestQuestionIds.includes(q.id) ? 1 : 0,
+          }));
+          updateFormData({ questions });
+        }
       }
     } catch (error) {
       console.error("Error fetching questions:", error);
@@ -95,10 +118,14 @@ const TriviaPage = () => {
   useEffect(() => {
     if (contest_id) {
       fetchContestDetails(contest_id as string);
-      fetchQuestions(contest_id as string);
+      fetchContestQuestions(contest_id as string);
       fetchInstructions(contest_id as string);
     }
   }, [contest_id]);
+
+  useEffect(() => {
+    if (contestQuestionIds) fetchQuestions();
+  }, [contestQuestionIds]);
 
   const handleContestSave = async () => {
     try {
@@ -202,18 +229,37 @@ const TriviaPage = () => {
     try {
       await TriviaServices.deleteQuestion(id.toString());
       if (contest_id) {
-        fetchQuestions(contest_id);
+        fetchQuestions();
       }
     } catch (err) {
       console.error("Error deleting question:", err);
     }
   };
 
-  const handleStatusChange = async (id: number, status: number) => {
+  const handleStatusChange = async (id: number, statusToChanged: number) => {
     try {
-      // await TriviaServices.updateQuestionStatus(id.toString(), status);
+      // Update the contestQuestionIds based on the status
+      if (contestQuestionIds) {
+        setContestQuestionIds((prevIds) => {
+          if (statusToChanged === 0) {
+            // Remove the id if status is 0
+            if (prevIds)
+              return prevIds.filter((questionId) => questionId !== id);
+          } else if (statusToChanged === 1) {
+            // Add the id if status is 1 and it's not already present
+            if (prevIds)
+              return prevIds.includes(id) ? prevIds : [...prevIds, id];
+          }
+          return prevIds; // Default case (no change)
+        });
+      }
+
       if (contest_id) {
-        fetchQuestions(contest_id);
+        await TriviaServices.updateContestQuestions(
+          contestQuestionIds || [],
+          Number(contest_id),
+        );
+        await fetchContestQuestions(contest_id);
       }
     } catch (err) {
       console.error("Error updating question status:", err);
@@ -278,7 +324,7 @@ const TriviaPage = () => {
             onStatusChange={handleStatusChange}
             onSave={async () => {
               if (contest_id) {
-                await fetchQuestions(contest_id);
+                await fetchQuestions();
               }
             }}
           />
@@ -289,7 +335,7 @@ const TriviaPage = () => {
             isViewMode={isViewMode}
             onSave={async () => {
               if (contest_id) {
-                await fetchQuestions(contest_id);
+                await fetchQuestions();
               }
               modal.close();
             }}

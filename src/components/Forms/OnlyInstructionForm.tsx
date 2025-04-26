@@ -3,6 +3,8 @@ import { Save } from "lucide-react";
 import Button from "../Button";
 import FormInput from "../FormInput";
 import FormTextarea from "../FormTextarea";
+import { TriviaServices } from "@/services";
+import { useSearchParams } from "next/navigation";
 
 interface InstructionData {
   id?: string;
@@ -21,6 +23,8 @@ const OnlyInstructionForm: React.FC<OnlyInstructionFormProps> = ({
   instructionData,
   onSave,
 }) => {
+  const searchParams = useSearchParams();
+  const contest_id = searchParams.get("contest_id");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
@@ -58,6 +62,10 @@ const OnlyInstructionForm: React.FC<OnlyInstructionFormProps> = ({
       errors.push("Description is required");
     }
 
+    if (!contest_id) {
+      errors.push("Contest ID is required");
+    }
+
     if (errors.length > 0) {
       setError(errors.join(", "));
       return false;
@@ -77,9 +85,22 @@ const OnlyInstructionForm: React.FC<OnlyInstructionFormProps> = ({
     setSuccess(false);
 
     try {
+      // Create the payload in the required format
+      const payload = {
+        contestId: contest_id!,
+        title: formState.title,
+        description: formState.description,
+      };
+
+      // If it's a new instruction, create it
+      if (!instructionData) {
+        await TriviaServices.createInstruction(payload);
+      }
+
       if (onSave) {
         await onSave(formState);
       }
+
       setSuccess(true);
 
       if (!instructionData) {

@@ -13,6 +13,7 @@ interface Instruction {
 
 interface InstructionRowProps {
   instruction: Instruction;
+  index: number;
   onEdit?: (instruction: Instruction) => void;
   onDelete?: (id: string) => void;
   onView?: (instruction: Instruction) => void;
@@ -20,13 +21,14 @@ interface InstructionRowProps {
 
 const InstructionRow: React.FC<InstructionRowProps> = ({
   instruction,
+  index,
   onEdit,
   onDelete,
   onView,
 }) => {
   return (
     <tr className="transition-colors hover:bg-gray-50">
-      <td className="px-4 py-3 text-sm text-gray-600">#{instruction.id}</td>
+      <td className="px-4 py-3 text-sm text-gray-600">#{index + 1}</td>
       <td className="px-4 py-3 text-sm text-gray-600">
         <div className="max-w-[200px] truncate">{instruction.title}</div>
       </td>

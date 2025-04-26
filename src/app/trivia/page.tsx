@@ -34,21 +34,13 @@ const TriviaPage = () => {
   const [selectedQuestion, setSelectedQuestion] = useState<any>(null);
   const [isViewMode, setIsViewMode] = useState(false);
 
-  // const handleSubmit = (e: React.FormEvent) => {
-  //   e.preventDefault();
-  //   handleContestSave();
-  // };
-
-  const handlePreview = () => {
-    push("/preview");
-  };
-
   const fetchContestDetails = async (contest_id: string) => {
     try {
       const { data } = await ContestServices.getContestById(contest_id);
       if (data?.data) {
         const details = data.data;
-        updateFormData({
+        console.log(details);
+        console.log({
           ...formData,
           contest_name: details.name,
           reward_name: details?.rewards?.prize,
@@ -65,6 +57,24 @@ const TriviaPage = () => {
           thumbnail: details?.thumbnail,
           contest_image: details?.contestImage,
           contest_hero_logo: details?.contestHeroLogo,
+        });
+        updateFormData({
+          ...formData,
+          contest_name: details.name,
+          reward_name: details?.rewards?.prize,
+          start_date: moment(details?.startDate).format("YYYY-MM-DD"),
+          end_date: moment(details?.endDate).format("YYYY-MM-DD"),
+          start_time: moment(details?.startDate).format("HH:mm"),
+          end_time: moment(details?.endDate).format("HH:mm"),
+          contest_type: details?.contestType as "FREE" | "PAID",
+          contest_fee: details?.contestFee,
+          contest_type_name: details?.contestTypeName,
+          contest_variant_name: details?.contestVariantName,
+          sponsor_name: details?.sponsored_name,
+          sponsor_logo_preview: details?.sponsored_logo,
+          thumbnail_preview: details?.thumbnail,
+          contest_image_preview: details?.contestImage,
+          contest_hero_logo_preview: details?.contestHeroLogo,
         });
       }
     } catch (error) {

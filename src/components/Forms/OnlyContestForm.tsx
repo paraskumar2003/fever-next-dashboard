@@ -127,22 +127,26 @@ const OnlyContestForm: React.FC<OnlyContestFormProps> = ({
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
         <ImageUpload
           label="Sponsor Logo"
-          value={formData.sponsor_logo_preview || ""}
+          value={formData.sponsor_logo_preview || formData.sponsor_logo || ""}
           onChange={(base64) => updateFormData({ sponsor_logo: base64 })}
         />
         <ImageUpload
           label="Thumbnail"
-          value={formData.thumbnail_preview || ""}
+          value={formData.thumbnail_preview || formData.thumbnail || ""}
           onChange={(base64) => updateFormData({ thumbnail: base64 })}
         />
         <ImageUpload
           label="Contest Image"
-          value={formData.contest_image_preview || ""}
+          value={formData.contest_image_preview || formData.contest_image || ""}
           onChange={(base64) => updateFormData({ contest_image: base64 })}
         />
         <ImageUpload
           label="Contest Hero Logo"
-          value={formData.contest_hero_logo_preview || ""}
+          value={
+            formData.contest_hero_logo_preview ||
+            formData.contest_hero_logo ||
+            ""
+          }
           onChange={(base64) => updateFormData({ contest_hero_logo: base64 })}
         />
       </div>

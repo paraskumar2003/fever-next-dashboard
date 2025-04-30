@@ -1,190 +1,115 @@
-'use client'
-import React, { useState } from 'react';
-import Image from 'next/image';
-import images from "../../utils/constants/images";
-import { Button } from '@/components/ui/button'
-import { RdIcon } from '@/components/shared/icons';
-import { useFormik } from 'formik';
-import * as Yup from 'yup';
-import Cookies from "js-cookie";
-import { useRouter } from 'next/navigation';
-import Swal from 'sweetalert2';
-import Notiflix from 'notiflix';
-// import API from "../../services/api";
-// import axios from 'axios';
-
-// Define the structure of the login response
-interface LoginResponse {
-    status: boolean;
-    message: string;
-    data: {
-        token: string;
-        payload: {
-            role: string;
-        };
-    };
-}
-
+"use client";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function Login() {
+  const [form, setForm] = useState({
+    username: "",
+    password: "",
+    remember: false,
+  });
+  const [showModal, setShowModal] = useState(false);
+  const { push } = useRouter();
 
-    const Loader_Color = 'rgba(241,230,230,0.985)'
-    const router = useRouter();
-    const [showPassword, setShowPassword] = useState(false);
+  const handleChange = (e: any) => {
+    const { name, value, type, checked } = e.target;
+    setForm({ ...form, [name]: type === "checkbox" ? checked : value });
+  };
 
-    const togglePasswordVisibility = () => {
-        setShowPassword((prev) => !prev);
-    };
+  const handleSubmit = (e: any) => {
+    e.preventDefault();
 
-    const formik = useFormik({
-        initialValues: {
-            email: '',
-            password: '',
-        },
-        validationSchema: Yup.object({
-            email: Yup.string()
-                .email('Invalid email format')
-                .required('Email is required'),
-            password: Yup.string()
-                .min(6, 'Password must be at least 6 characters')
-                .required('Password is required'),
-        }),
-        onSubmit: async (values) => {
-            try {
-                console.log(values);
-                Notiflix.Loading.init({ svgColor: Loader_Color });
-                //const response = await axios.post(`${process.env.baseUrl}/auth/login`, values);
-                // const response = await API.AuthAPI.login(values); // Call API from auth.ts
-                // const response = await axios.post(`https://trapi.vouch.club/auth/login`, values)
-               // const loginResponse = response.data as LoginResponse;
+    // Static token
+    localStorage.setItem("token", "dummy_token_123");
 
-               const loginResponse = {
-                status: true,
-                message: "Successfull Login",
-                data: {
-                    token: "4353534534",
-                    payload: {
-                        role: "super_admin"
-                    }
-                }
-               } as LoginResponse;
-                // console.log("Login successful:", response);
-                if (loginResponse.status === true) {
-                    Notiflix.Loading.remove();
-                    Swal.fire({
-                        title: '',
-                        text: (loginResponse?.message),
-                        icon: 'success',
-                        confirmButtonColor: '#333333',
-                    });
-                    // Store token and role directly as strings
-                    const { token, payload: { role } } = loginResponse.data;
-                    localStorage.setItem("accessToken", JSON.stringify(token));
-                    localStorage.setItem("role", JSON.stringify(role));
-                    localStorage.setItem("data", JSON.stringify(loginResponse.data)); // Convert object to string
-                    Cookies.set("accessToken", token);
-                    Cookies.set("role", role);
-                    Cookies.set("data", JSON.stringify(loginResponse.data)); // Convert object to string for Cookies
-                    router.push("/dashboard")
-                } else {
-                    Notiflix.Loading.remove();
-                    Swal.fire({
-                        title: 'error',
-                        text: (loginResponse?.message),
-                        icon: 'error',
-                        confirmButtonColor: '#333333',
-                    });
-                }
-            } catch (error) {
-                console.error("Login failed:", error);
-                Notiflix.Loading.remove();
-                console.error("Login failed:", error);
-                Swal.fire({
-                    title: 'Error',
-                    text: 'Something went wrong. Please try again.',
-                    icon: 'error',
-                    confirmButtonColor: '#333333',
-                });
-            }
-        },
-    });
+    // Show modal
+    setShowModal(true);
 
-    return (
-        <>
-            <div
-                className="flex flex-col md:flex-row lg:flex-row lg:justify-between h-screen p-5 md:p-0 lg:p-0 overflow-hidden   bg-gradient-to-b from-[#11025a] to-[#0a003b]"
+    // Auto redirect after 5 seconds
+    setTimeout(() => push("/wheel-of-fortune"), 5000);
+  };
+
+  return (
+    <div
+      className="flex min-h-screen items-center justify-center bg-cover bg-center bg-no-repeat"
+      style={{
+        backgroundImage:
+          "url(https://source.unsplash.com/1920x1080/?abstract,technology)",
+      }}
+    >
+      <div className="w-96 rounded-2xl border border-black/20 bg-white bg-opacity-10 p-8 shadow-xl backdrop-blur-lg">
+        <h2 className="mb-6 text-center text-3xl font-bold">Login</h2>
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Username Input */}
+          <div className="relative">
+            <input
+              type="text"
+              id="username"
+              name="username"
+              value={form.username}
+              onChange={handleChange}
+              required
+              className="peer w-full rounded-lg border border-black/30 bg-transparent px-3 pb-2 pt-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder={form.username ? "" : "Username"}
+            />
+          </div>
+
+          {/* Password Input */}
+          <div className="relative">
+            <input
+              type="password"
+              id="password"
+              name="password"
+              value={form.password}
+              onChange={handleChange}
+              required
+              className="peer w-full rounded-lg border border-black/30 bg-transparent px-3 pb-2 pt-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder={form.password ? "" : "Password"}
+            />
+          </div>
+
+          {/* Remember Me */}
+          <div className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              id="remember"
+              name="remember"
+              checked={form.remember}
+              onChange={handleChange}
+              className="h-4 w-4 accent-blue-500"
+            />
+            <label htmlFor="remember" className="text-sm">
+              Remember Me
+            </label>
+          </div>
+
+          {/* Login Button */}
+          <button
+            type="submit"
+            className="w-full rounded-lg bg-blue-600 p-3 font-semibold text-white shadow-md transition hover:bg-blue-700"
+          >
+            Login
+          </button>
+        </form>
+      </div>
+
+      {/* Success Modal */}
+      {showModal && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="rounded-lg bg-white p-6 text-center shadow-lg">
+            <div className="text-4xl text-green-500">✔</div>
+            <h2 className="mt-2 text-xl font-semibold">
+              Successfully Logged In!
+            </h2>
+            <button
+              onClick={() => push("/wheel-of-fortune")}
+              className="mt-4 rounded-lg bg-blue-600 px-4 py-2 text-white transition hover:bg-blue-700"
             >
-                {/* Left section for the image */}
-                <div className="relative sm:w-full lg:w-[50%] h-[50%] md:h-screen lg:h-screen">
-                    <div className="absolute inset-0 flex items-center justify-center z-10 p-8 lg:p-16">
-                        <Image
-                            src={images.loginLogo}
-                            alt="logo"
-                            width={200}
-                            height={200}
-                            className="mb-4 lg:mb-10"
-                        />
-                    </div>
-                </div>
-
-                {/* Right section for the login form */}
-                <div className="w-full lg:w-[50%] h-[500px] md:h-screen lg:h-screen flex flex-col justify-center p-4 lg:p-5 rounded-md  bg-white">
-                    <div className="flex flex-col justify-center self-center w-full sm:w-[85%] md:w-[80%] lg:w-[60%] gap-1">
-                        <span className="text-[20px]  lg:text-[30px] font-extralight">Proceed With your</span>
-                        <span className="text-[24px]  lg:text-[26px] font-semibold">Login</span>
-                        <form onSubmit={formik.handleSubmit} className="w-full">
-                            <input
-                                type="email"
-                                id="email"
-                                name="email"
-                                className={`p-2 mt-2 rounded-md border-2 w-full h-12 lg:h-11 mb-2 focus:border-[#062f62] focus:outline-none `}
-                                placeholder="Enter Email Id"
-                                value={formik.values.email}
-                                onChange={formik.handleChange}
-                                onBlur={formik.handleBlur}
-                            />
-                            {formik.touched.email && formik.errors.email ? (
-                                <div className="text-red-500 text-sm">{formik.errors.email}</div>
-                            ) : null}
-
-                            <div className="relative w-full">
-                                <input
-                                    type={showPassword ? "text" : "password"}
-                                    id="password"
-                                    name="password"
-                                    className="p-2 mt-2 rounded-md border-2 w-full h-12 lg:h-11 mb-2 focus:border-[#062f62] focus:outline-none"
-                                    placeholder="Enter Password"
-                                    value={formik.values.password}
-                                    onChange={formik.handleChange}
-                                    onBlur={formik.handleBlur}
-                                />
-                                <span
-                                    onClick={togglePasswordVisibility}
-                                    className="absolute inset-y-0 right-0.5 flex items-center cursor-pointer text-red-800 pr-2"
-                                >
-                                    {showPassword ? <RdIcon iconName="open-eye" iconclasses={["text-orange-700", "text-[24px]"]}
-                                    /> : <RdIcon iconName="eye-off" iconclasses={["text-orange-700 ", "text-[24px]"]}
-                                    />}
-                                </span>
-                                {formik.touched.password && formik.errors.password ? (
-                                    <div className="text-red-500 text-sm">{formik.errors.password}</div>
-                                ) : null}
-                            </div>
-                            <Button
-                                type='submit'
-                                // buttonName="Login"
-                                dynamicSize="h-12 px-8"
-                                onClick={() => console.log("Button clicked")}
-                                maxLength={10}
-                                color="white"
-                                className='bg-gradient-to-b from-[#f800fc] to-[#c900cc] text-2xl w-full'
-                                variant="outline"
-                                size="lg"
-                            >Login</Button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </>
-    );
+              OK
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
 }

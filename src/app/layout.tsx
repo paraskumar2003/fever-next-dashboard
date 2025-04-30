@@ -1,39 +1,34 @@
-import type { Metadata } from "next";
-import localFont from "next/font/local";
-import { Poppins } from "next/font/google";
-import "./globals.css";
-import { config } from "@/utils/constants/config";
-const poppins = Poppins({
-  subsets: ["latin"],
-  variable: "--font-poppins",
-  weight: ["100", "500"],
-});
-const geistSans = localFont({
-  src: "./fonts/GeistVF.woff",
-  variable: "--font-poppins",
-  weight: "100 500",
-});
-
-export const metadata: Metadata = {
-  title: config.application_name,
-  description: config.description,
-};
+"use client";
+import "jsvectormap/dist/jsvectormap.css";
+import "flatpickr/dist/flatpickr.min.css";
+import "@/css/satoshi.css";
+import "@/css/style.css";
+import React, { useEffect, useState } from "react";
+import { ContestProvider } from "@/context/ContestContext";
 
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [loading, setLoading] = useState<boolean>(true);
+
+  // const pathname = usePathname();
+
+  useEffect(() => {
+    setTimeout(() => setLoading(false), 1000);
+  }, []);
+
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${poppins.variable} antialiased`}
-      >
-        {children}
+      <body suppressHydrationWarning={true}>
+        <ContestProvider>
+          <div className="h-screen dark:bg-boxdark-2 dark:text-bodydark">
+            {children}
+          </div>
+        </ContestProvider>
       </body>
     </html>
   );
 }
-
-
-

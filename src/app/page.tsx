@@ -1,15 +1,13 @@
-"use client"
+import { redirect } from "next/navigation";
+import { Metadata } from "next";
 
-import Login from "./login/page";
+export const metadata: Metadata = {
+  title: "Fever | Control Panel",
+  description: "",
+};
+
 export default function Home() {
-  return (
-    <>
-      <Login />
-    </>
-  );
+  redirect("/login"); // Redirect to login page
+
+  return null; // Prevent rendering anything
 }
-
-
-
-
-

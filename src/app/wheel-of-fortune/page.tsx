@@ -254,6 +254,7 @@ const ContestForm: React.FC = () => {
       option2: "",
       option3: "",
       option4: "",
+      timer: "",
       correctOption: "option1",
     };
 

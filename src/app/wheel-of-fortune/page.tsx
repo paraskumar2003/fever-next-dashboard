@@ -300,7 +300,7 @@ const ContestForm: React.FC = () => {
 
   return (
     <PageLayout>
-      <div className="mx-auto max-w-4xl py-8">
+      <div className="mx-auto  py-8">
         <div className="mb-6 flex items-center justify-between">
           <h1 className="push text-3xl font-bold">
             Create Contest ( Wheel of Fortune )

@@ -30,7 +30,7 @@ const QuestionModal: React.FC<QuestionModalProps> = ({
         p: 2,
       }}
     >
-      <div className="max-h-[90vh] w-full max-w-4xl overflow-y-auto rounded-lg bg-white shadow-xl">
+      <div className="max-h-[90vh] w-full  overflow-y-auto rounded-lg bg-white shadow-xl">
         <div className="border-b border-gray-200 px-6 py-4">
           <h2
             className="text-xl font-semibold text-gray-800"

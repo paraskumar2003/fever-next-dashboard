@@ -21,16 +21,16 @@ export default function RootLayout({
   }, []);
 
   return (
-    // <Suspense fallback={<div>Loading...</div>}>
-    <html lang="en">
-      <body suppressHydrationWarning={true}>
-        <ContestProvider>
-          <div className="h-screen dark:bg-boxdark-2 dark:text-bodydark">
-            {children}
-          </div>
-        </ContestProvider>
-      </body>
-    </html>
-    // </Suspense>
+    <Suspense fallback={<div>Loading...</div>}>
+      <html lang="en">
+        <body suppressHydrationWarning={true}>
+          <ContestProvider>
+            <div className="h-screen dark:bg-boxdark-2 dark:text-bodydark">
+              {children}
+            </div>
+          </ContestProvider>
+        </body>
+      </html>
+    </Suspense>
   );
 }

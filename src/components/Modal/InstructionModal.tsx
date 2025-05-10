@@ -1,7 +1,7 @@
 import React from "react";
 import { Modal } from "@mui/material";
 import Button from "../Button";
-import OnlyInstructionForm from "../Forms/OnlyInstructionForm";
+import { OnlyInstructionForm } from "../Forms/OnlyInstructionForm";
 
 interface InstructionModalProps {
   isOpen: boolean;
@@ -45,7 +45,7 @@ const InstructionModal: React.FC<InstructionModalProps> = ({
         </div>
 
         <div className="p-6">
-          <OnlyInstructionForm
+          {/* <OnlyInstructionForm
             readOnly={isViewMode}
             instructionData={instructionData}
             onSave={async (formData: any) => {
@@ -54,7 +54,7 @@ const InstructionModal: React.FC<InstructionModalProps> = ({
               }
               onClose();
             }}
-          />
+          /> */}
         </div>
 
         <div className="flex justify-end border-t border-gray-200 px-6 py-4">

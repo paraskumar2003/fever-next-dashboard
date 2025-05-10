@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useContest } from "@/context/ContestContext";
-import { PageLayout } from "@/components";
+import { PageLayout, SearchBar } from "@/components";
 import { ContestServices, TriviaServices } from "@/services";
 import moment from "moment";
 import OnlyContestForm from "@/components/Forms/OnlyContestForm";
@@ -315,6 +315,8 @@ const TriviaPage = () => {
 
   return (
     <PageLayout>
+      <SearchBar value="" onChange={() => {}} />
+
       <div className="mx-auto  py-8">
         <div className="mb-6 flex items-center justify-between">
           <h1 className="text-3xl font-bold">Create Contest (Trivia)</h1>

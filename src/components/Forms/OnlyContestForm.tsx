@@ -5,6 +5,7 @@ import FormInput from "@/components/FormInput";
 import FormSelect from "@/components/FormSelect";
 import ImageUpload from "@/components/ImageUpload";
 import { ContestFormData } from "@/types";
+import { SubscriptionBadge } from "../GliderOverlay";
 
 interface OnlyContestFormProps {
   formData: Partial<ContestFormData>;
@@ -19,6 +20,10 @@ const OnlyContestForm: React.FC<OnlyContestFormProps> = ({
 }) => {
   return (
     <FormSection title="Contest Details" onSave={() => onSave(formData)}>
+      {formData.contest_type_name === "MAHABONANZA" && (
+        <SubscriptionBadge text="Maha Bonanza" level="premium" />
+      )}
+
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <FormInput
           label="Contest Name"
@@ -26,14 +31,13 @@ const OnlyContestForm: React.FC<OnlyContestFormProps> = ({
           value={formData.contest_name || ""}
           onChange={(e) => updateFormData({ contest_name: e.target.value })}
         />
-        <FormInput
+        {/* <FormInput
           label="Reward Name"
           placeholder="Enter reward name"
           value={formData.reward_name || ""}
           onChange={(e) => updateFormData({ reward_name: e.target.value })}
-        />
+        /> */}
       </div>
-
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <div>
           <FormInput
@@ -52,7 +56,6 @@ const OnlyContestForm: React.FC<OnlyContestFormProps> = ({
           />
         </div>
       </div>
-
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <div>
           <FormInput
@@ -71,7 +74,6 @@ const OnlyContestForm: React.FC<OnlyContestFormProps> = ({
           />
         </div>
       </div>
-
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <FormSelect
           label="Contest Type"
@@ -97,39 +99,41 @@ const OnlyContestForm: React.FC<OnlyContestFormProps> = ({
           />
         )}
       </div>
-
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-        <FormInput
-          label="Contest Type Name (Optional)"
-          placeholder="E.g., Premium, Standard"
-          value={formData.contest_type_name || ""}
+        <FormSelect
+          label="Contest Type"
+          options={[
+            { value: "NORMAL", label: "Normal" },
+            { value: "MAHABONANZA", label: "Maha Bonanza" },
+          ]}
+          value={formData.contest_type_name || "NORMAL"}
           onChange={(e) =>
-            updateFormData({ contest_type_name: e.target.value })
+            updateFormData({
+              contest_type_name: e.target.value as "MAHABONANZA" | "NORMAL",
+            })
           }
         />
-        <FormInput
+        {/* <FormInput
           label="Contest Variant Name (Optional)"
           placeholder="E.g., Summer Edition"
           value={formData.contest_variant_name || ""}
           onChange={(e) =>
             updateFormData({ contest_variant_name: e.target.value })
           }
-        />
+        /> */}
       </div>
-
-      <FormInput
+      {/* <FormInput
         label="Sponsor Name"
         placeholder="Enter sponsor name"
         value={formData.sponsor_name || ""}
         onChange={(e) => updateFormData({ sponsor_name: e.target.value })}
-      />
-
+      /> */}
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-        <ImageUpload
+        {/* <ImageUpload
           label="Sponsor Logo"
           value={formData.sponsor_logo_preview || formData.sponsor_logo || ""}
           onChange={(base64) => updateFormData({ sponsor_logo: base64 })}
-        />
+        /> */}
         <ImageUpload
           label="Thumbnail"
           value={formData.thumbnail_preview || formData.thumbnail || ""}

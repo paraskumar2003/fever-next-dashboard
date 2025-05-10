@@ -30,6 +30,7 @@ export const ContestProvider: React.FC<{ children: ReactNode }> = ({
     instructions: [],
     prize_catalogue: [],
     questions: [],
+    winners: [],
   });
   const [tambolaFormData, setTambolaFormData] = useState<
     Partial<TambolaFormData>

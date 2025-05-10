@@ -53,6 +53,20 @@ export interface Question {
   timer: string;
 }
 
+export interface QuestionSet {
+  id: string;
+  name: string;
+  questions: Question[];
+}
+
+export type RewardType = "PHYSICAL" | "COUPON_PDF" | "CODE";
+
+export interface WinnerReward {
+  reward_type: RewardType;
+  reward_image?: string; // base64
+  reward_file?: string; // base64 for PDFs or string for code
+}
+
 export interface ContestFormData {
   contest_name: string;
   reward_name: string;
@@ -74,11 +88,19 @@ export interface ContestFormData {
   contest_hero_logo: string;
   contest_hero_logo_preview: string;
   game_proceed: GameProceed;
-  instructions?: Instruction[];
+  instructions: Instruction[];
   prize_catalogue: PrizeCatalogue[];
   questions: Question[];
   title: string;
   description: string;
+  winners: WinnerReward[];
+  mega_prize_name: string;
+  game_timer: string;
+  game_time_level: "GAME" | "QUESTION";
+  flip_allowed: "YES" | "NO";
+  flip_count: number;
+  flip_fee: number;
+  flip_set: { name: string; questions: Question[] };
 }
 
 export interface TambolaFormData {

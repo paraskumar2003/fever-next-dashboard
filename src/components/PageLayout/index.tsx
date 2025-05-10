@@ -19,7 +19,7 @@ export function PageLayout({ children }: { children: React.ReactNode }) {
       {/* Header */}
       <Header
         onHambugerClick={() => {
-          setSidebar({ ...sidebar, show: true, menuItems: menuItems });
+          // setSidebar({ ...sidebar, show: true, menuItems: menuItems });
         }}
       />
 
@@ -28,7 +28,7 @@ export function PageLayout({ children }: { children: React.ReactNode }) {
         menuItems={menuItems}
         isOpen={sidebar.show}
         onClose={() => {
-          setSidebar({ ...sidebar, show: false });
+          // setSidebar({ ...sidebar, show: false });
         }}
       />
       <main className="content flex-1 overflow-scroll p-4">{children}</main>

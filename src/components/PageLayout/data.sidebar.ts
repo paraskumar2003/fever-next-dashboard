@@ -17,13 +17,18 @@ export const menuItems = [
     id: "home",
     label: "Home",
     icon: Home,
-    path: "/",
+    path: "/home",
   },
   {
     id: "trivia",
     label: "Trivia",
     icon: Brain,
     children: [
+      {
+        id: "create-contests",
+        label: "Create Contests",
+        path: "/test-view",
+      },
       {
         id: "upcoming-contests",
         label: "Upcoming Contests",

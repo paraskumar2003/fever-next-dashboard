@@ -2,8 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Menu, LogOut, ChevronDown, Home, Settings } from "lucide-react";
-import { DropdownMenu } from "./DropDownMenu";
+import { Menu, LogOut } from "lucide-react";
 import { HeaderProps } from "./types";
 
 export function Header({ onHambugerClick }: HeaderProps) {
@@ -30,23 +29,23 @@ export function Header({ onHambugerClick }: HeaderProps) {
       <div className="flex items-center justify-end">
         {/* Dropdown Menu */}
 
-        <DropdownMenu
+        {/* <DropdownMenu
           title="View Contest"
           items={[
             { label: "Wheel of Fortune", path: "/view/wheel-of-fortune" },
             { label: "Tambola", path: "/view/tambola" },
             { label: "Trivia", path: "/view/trivia" },
           ]}
-        />
+        /> */}
 
-        <DropdownMenu
+        {/* <DropdownMenu
           title="Create Contest"
           items={[
             { label: "Wheel of Fortune", path: "/wheel-of-fortune" },
             { label: "Tambola", path: "/tambola" },
             { label: "Trivia", path: "/trivia" },
           ]}
-        />
+        /> */}
         <button
           onClick={() => {
             handleLogout();

@@ -25,6 +25,11 @@ export const menuItems = [
     icon: Brain,
     children: [
       {
+        id: "questionaire",
+        label: "Questionaire",
+        path: "/trivia/questionaire",
+      },
+      {
         id: "create-contests",
         label: "Create Contests",
         path: "/test-view",

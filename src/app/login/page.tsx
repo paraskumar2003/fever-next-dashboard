@@ -26,7 +26,7 @@ export default function Login() {
     setShowModal(true);
 
     // Auto redirect after 5 seconds
-    setTimeout(() => push("/wheel-of-fortune"), 5000);
+    setTimeout(() => push("/home"), 5000);
   };
 
   return (

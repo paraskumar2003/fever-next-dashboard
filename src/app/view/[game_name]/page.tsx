@@ -1,6 +1,6 @@
 "use client";
 
-import { PageLayout } from "@/components";
+import { PageLayout, SearchBar } from "@/components";
 import { Table } from "@/components/Tables";
 import { TriviaServices } from "@/services";
 import { Contest } from "@/types/contest";
@@ -17,8 +17,10 @@ export default function ViewContest() {
     action: "view" | "edit" | "delete",
     contest_id: string | number,
   ) => {
-    if (action == "view") router.push(`/${params.game_name}/${contest_id}`);
-    if (action == "edit") router.push(`/${params.game_name}/${contest_id}`);
+    if (action == "view")
+      router.push(`/${params.game_name}?contest_id=${contest_id}`);
+    if (action == "edit")
+      router.push(`/${params.game_name}?contest_id=${contest_id}`);
   };
 
   const columns = [
@@ -105,6 +107,12 @@ export default function ViewContest() {
     fetchData();
   }, []);
 
+  const [search, setSearch] = useState("");
+
+  const handleSearch = () => {
+    console.log("Search term:", search);
+  };
+
   if (loading) return <div>Loading...</div>;
 
   return (
@@ -116,6 +124,13 @@ export default function ViewContest() {
             String(game_name).slice(1).toLowerCase()}
           &nbsp;)
         </h1>
+        <SearchBar
+          value={search}
+          onChange={setSearch}
+          onSubmit={handleSearch}
+          placeholder="Search items..."
+        />
+        <div className="py-2"></div>
         <Table rows={rows} columns={columns} totalCount={rows.length} />
       </div>
     </PageLayout>

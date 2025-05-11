@@ -41,7 +41,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
     <div className="mb-4">
       <label className="mb-1  block text-sm font-medium">{label}</label>
       <div className="rounded-md border border-dashed border-black/20 bg-white/5 p-4">
-        <div className="flex flex-col items-center justify-center">
+        <div className="relative flex flex-col items-center justify-center">
           {value ? (
             <div className="relative w-full">
               <img
@@ -52,7 +52,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
               <button
                 type="button"
                 onClick={() => onChange("")}
-                className="absolute right-0 top-0 -translate-y-1/2  translate-x-1/2 transform rounded-full bg-red-500 p-1"
+                className="absolute right-0 top-0 -translate-y-1/2  translate-x-1/2 transform rounded-md bg-red-500 p-1 px-3 text-white"
               >
                 ×
               </button>

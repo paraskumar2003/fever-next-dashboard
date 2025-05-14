@@ -313,7 +313,7 @@ const TriviaPage = () => {
   };
 
   return (
-    <PageLayout>
+    <>
       <SearchBar value="" onChange={() => {}} />
 
       <div className="mx-auto  py-8">
@@ -380,7 +380,7 @@ const TriviaPage = () => {
           {/* <OnlyInstructionForm /> */}
         </div>
       </div>
-    </PageLayout>
+    </>
   );
 };
 

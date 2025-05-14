@@ -2,16 +2,16 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Plus, Trash2, Save, Eye } from "lucide-react";
-import { useContest } from "../../context/ContestContext";
-import FormSection from "../../components/FormSection";
-import FormInput from "../../components/FormInput";
-import FormSelect from "../../components/FormSelect";
-import FormTextarea from "../../components/FormTextarea";
-import Button from "../../components/Button";
-import ColorPicker from "../../components/ColorPicker";
-import ImageUpload from "../../components/ImageUpload";
-import { TambolaPrizeCatalogue, Instruction } from "../../types";
-import SuccessModal from "../../components/SuccessPopup";
+import { useContest } from "../../../context/ContestContext";
+import FormSection from "../../../components/FormSection";
+import FormInput from "../../../components/FormInput";
+import FormSelect from "../../../components/FormSelect";
+import FormTextarea from "../../../components/FormTextarea";
+import Button from "../../../components/Button";
+import ColorPicker from "../../../components/ColorPicker";
+import ImageUpload from "../../../components/ImageUpload";
+import { TambolaPrizeCatalogue, Instruction } from "../../../types";
+import SuccessModal from "../../../components/SuccessPopup";
 import { PageLayout } from "@/components";
 
 const TambolaContestForm: React.FC = () => {

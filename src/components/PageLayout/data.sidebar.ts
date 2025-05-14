@@ -32,27 +32,27 @@ export const menuItems = [
       {
         id: "create-contests",
         label: "Create Contests",
-        path: "/test-view",
+        path: "/trivia",
       },
       {
         id: "upcoming-contests",
         label: "Upcoming Contests",
-        path: "/view/trivia",
+        path: "/view/trivia?category=upcoming",
       },
       {
         id: "live-contests",
         label: "Live Contests",
-        path: "/view/trivia",
+        path: "/view/trivia?category=live",
       },
       {
         id: "old-contests",
         label: "Old Contests",
-        path: "/view/trivia",
+        path: "/view/trivia?category=old",
       },
       {
         id: "draft-contests",
         label: "Draft Contests",
-        path: "/view/trivia",
+        path: "/view/trivia?category=draft",
       },
     ],
   },

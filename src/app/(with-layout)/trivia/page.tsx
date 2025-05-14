@@ -8,7 +8,6 @@ import {
   OnlyInstructionForm,
   OnlyQuestionForm,
   OnlyWinnersForm,
-  PageLayout,
   StepNavigation,
   TriviaGamePlay,
 } from "@/components";
@@ -173,21 +172,19 @@ export default function CreateContest() {
   };
 
   return (
-    <PageLayout>
-      <div className="mx-auto p-6">
-        <Breadcrumb
-          currentStep={currentStep}
-          steps={steps}
-          onClick={(e) => goToStep(e)}
-        />
-        {renderStep()}
-        <StepNavigation
-          currentStep={currentStep}
-          totalSteps={steps.length}
-          onNext={goNext}
-          onPrev={goPrev}
-        />
-      </div>
-    </PageLayout>
+    <div className="mx-auto p-6">
+      <Breadcrumb
+        currentStep={currentStep}
+        steps={steps}
+        onClick={(e) => goToStep(e)}
+      />
+      {renderStep()}
+      <StepNavigation
+        currentStep={currentStep}
+        totalSteps={steps.length}
+        onNext={goNext}
+        onPrev={goPrev}
+      />
+    </div>
   );
 }

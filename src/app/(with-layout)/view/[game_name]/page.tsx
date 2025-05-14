@@ -4,7 +4,7 @@ import { PageLayout, SearchBar } from "@/components";
 import { Table } from "@/components/Tables";
 import { TriviaServices } from "@/services";
 import { Contest } from "@/types/contest";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import moment from "moment";
 import { useEffect, useState } from "react";
 import Button from "@/components/Button";
@@ -12,6 +12,7 @@ import Button from "@/components/Button";
 export default function ViewContest() {
   const router = useRouter();
   const params = useParams();
+  const searchParams = useSearchParams();
 
   const handleAction = (
     action: "view" | "edit" | "delete",
@@ -81,7 +82,9 @@ export default function ViewContest() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const { data } = await TriviaServices.getContests();
+        let filter: Record<string, any> = {};
+        filter.category = searchParams.get("category") ?? undefined;
+        const { data } = await TriviaServices.getContests(filter);
         if (data.data) {
           setRows(
             data.data.map((e: Contest, index: number) => ({
@@ -105,7 +108,7 @@ export default function ViewContest() {
     };
 
     fetchData();
-  }, []);
+  }, [searchParams]);
 
   const [search, setSearch] = useState("");
 
@@ -116,23 +119,21 @@ export default function ViewContest() {
   if (loading) return <div>Loading...</div>;
 
   return (
-    <PageLayout>
-      <div className="min-h-screen p-8">
-        <h1 className="mb-8 text-xl">
-          Contest Overview - (&nbsp;
-          {String(game_name).charAt(0).toUpperCase() +
-            String(game_name).slice(1).toLowerCase()}
-          &nbsp;)
-        </h1>
-        <SearchBar
-          value={search}
-          onChange={setSearch}
-          onSubmit={handleSearch}
-          placeholder="Search items..."
-        />
-        <div className="py-2"></div>
-        <Table rows={rows} columns={columns} totalCount={rows.length} />
-      </div>
-    </PageLayout>
+    <div className="min-h-screen p-8">
+      <h1 className="mb-8 text-xl">
+        Contest Overview - (&nbsp;
+        {String(game_name).charAt(0).toUpperCase() +
+          String(game_name).slice(1).toLowerCase()}
+        &nbsp;)
+      </h1>
+      <SearchBar
+        value={search}
+        onChange={setSearch}
+        onSubmit={handleSearch}
+        placeholder="Search items..."
+      />
+      <div className="py-2"></div>
+      <Table rows={rows} columns={columns} totalCount={rows.length} />
+    </div>
   );
 }

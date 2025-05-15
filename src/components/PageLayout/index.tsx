@@ -17,20 +17,10 @@ export function PageLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="layout-container">
       {/* Header */}
-      <Header
-        onHambugerClick={() => {
-          // setSidebar({ ...sidebar, show: true, menuItems: menuItems });
-        }}
-      />
+      <Header onHambugerClick={() => {}} />
 
       {/* Main Content Layout */}
-      <Sidebar
-        menuItems={menuItems}
-        isOpen={sidebar.show}
-        onClose={() => {
-          // setSidebar({ ...sidebar, show: false });
-        }}
-      />
+      <Sidebar menuItems={menuItems} isOpen={sidebar.show} onClose={() => {}} />
       <main className="content flex-1 overflow-scroll p-4">{children}</main>
     </div>
   );

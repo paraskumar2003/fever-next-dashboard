@@ -24,6 +24,9 @@ interface UpdateContestQuestionPayload {
   questionIds: number[];
 }
 
+interface ContestSearchFilter {
+  category?: string;
+}
 interface T extends AxiosResponse<any, any> {}
 export class TriviaServices extends ApiServices {
   static async fetchQuestions(contest_id: string, game_slug: string) {
@@ -64,9 +67,12 @@ export class TriviaServices extends ApiServices {
     }
   }
 
-  static async getContests(): Promise<any> {
+  static async getContests(filter?: ContestSearchFilter): Promise<any> {
     try {
-      const response = await this.get<T>(`/v1/trivia/contests`);
+      const queryString = filter
+        ? `?${new URLSearchParams(filter as any).toString()}`
+        : "";
+      const response = await this.get<T>(`/v1/trivia/contests${queryString}`);
       return response;
     } catch (err: any) {
       return { data: null, err: err.message, response: err?.response?.data };

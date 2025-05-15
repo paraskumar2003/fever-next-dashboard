@@ -3,7 +3,17 @@ import { ChevronDown, ChevronRight } from "lucide-react";
 import Link from "next/link";
 import { MenuItem, SidebarProps } from "./types";
 
-const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, menuItems }) => {
+interface SideBarProps {
+  isOpen: boolean;
+  onClose?: () => void;
+  menuItems: MenuItem[];
+}
+
+const Sidebar: React.FC<SidebarProps> = ({
+  isOpen,
+  onClose,
+  menuItems,
+}: SideBarProps) => {
   const [expandedItems, setExpandedItems] = useState<string[]>([]);
 
   const toggleExpand = (itemId: string) => {

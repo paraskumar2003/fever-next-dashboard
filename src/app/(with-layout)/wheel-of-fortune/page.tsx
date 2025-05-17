@@ -13,7 +13,6 @@ import ColorPicker from "@/components/ColorPicker";
 import ImageUpload from "@/components/ImageUpload";
 import { PrizeCatalogue, Question, Instruction } from "@/types";
 import SuccessModal from "@/components/SuccessPopup";
-import { PageLayout } from "@/components";
 
 const ContestForm: React.FC = () => {
   const { push } = useRouter();
@@ -299,564 +298,550 @@ const ContestForm: React.FC = () => {
   };
 
   return (
-    <PageLayout>
-      <div className="mx-auto  py-8">
-        <div className="mb-6 flex items-center justify-between">
-          <h1 className="push text-3xl font-bold">
-            Create Contest ( Wheel of Fortune )
-          </h1>
-          <div className="flex gap-2">
-            <Button onClick={handlePreview} variant="secondary">
-              <Eye className="mr-2 h-4 w-4" />
-              Preview
-            </Button>
-            <Button onClick={handleSubmit}>
-              <Save className="mr-2 h-4 w-4" />
-              Save & Continue
-            </Button>
-          </div>
+    <div className="mx-auto  py-8">
+      <div className="mb-6 flex items-center justify-between">
+        <h1 className="push text-3xl font-bold">
+          Create Contest ( Wheel of Fortune )
+        </h1>
+        <div className="flex gap-2">
+          <Button onClick={handlePreview} variant="secondary">
+            <Eye className="mr-2 h-4 w-4" />
+            Preview
+          </Button>
+          <Button onClick={handleSubmit}>
+            <Save className="mr-2 h-4 w-4" />
+            Save & Continue
+          </Button>
         </div>
+      </div>
 
-        {Object.keys(errors).length > 0 && (
-          <div className="mb-6 rounded-md border border-red-500 bg-red-500/20 p-4">
-            <h3 className="mb-2 font-semibold text-red-300">
-              Please fix the following errors:
-            </h3>
-            <ul className="list-disc pl-5 text-red-500">
-              {Object.values(errors).map((error, index) => (
-                <li key={index}>{error}</li>
-              ))}
-            </ul>
+      {Object.keys(errors).length > 0 && (
+        <div className="mb-6 rounded-md border border-red-500 bg-red-500/20 p-4">
+          <h3 className="mb-2 font-semibold text-red-300">
+            Please fix the following errors:
+          </h3>
+          <ul className="list-disc pl-5 text-red-500">
+            {Object.values(errors).map((error, index) => (
+              <li key={index}>{error}</li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      <form onSubmit={handleSubmit}>
+        <FormSection title="Basic Information">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <FormInput
+              label="Contest Name"
+              placeholder="Enter contest name"
+              value={formData.contest_name || ""}
+              onChange={(e) => updateFormData({ contest_name: e.target.value })}
+              error={errors.contest_name}
+            />
+            <FormInput
+              label="Reward Name"
+              placeholder="Enter reward name"
+              value={formData.reward_name || ""}
+              onChange={(e) => updateFormData({ reward_name: e.target.value })}
+              error={errors.reward_name}
+            />
           </div>
-        )}
 
-        <form onSubmit={handleSubmit}>
-          <FormSection title="Basic Information">
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <div>
               <FormInput
-                label="Contest Name"
-                placeholder="Enter contest name"
-                value={formData.contest_name || ""}
-                onChange={(e) =>
-                  updateFormData({ contest_name: e.target.value })
-                }
-                error={errors.contest_name}
+                label="Start Date"
+                type="date"
+                value={formData.start_date || ""}
+                onChange={(e) => updateFormData({ start_date: e.target.value })}
+                error={errors.start_date}
               />
+            </div>
+            <div>
               <FormInput
-                label="Reward Name"
-                placeholder="Enter reward name"
-                value={formData.reward_name || ""}
-                onChange={(e) =>
-                  updateFormData({ reward_name: e.target.value })
-                }
-                error={errors.reward_name}
+                label="Start Time"
+                type="time"
+                value={formData.start_time || ""}
+                onChange={(e) => updateFormData({ start_time: e.target.value })}
+                error={errors.start_time}
               />
             </div>
+          </div>
 
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-              <div>
-                <FormInput
-                  label="Start Date"
-                  type="date"
-                  value={formData.start_date || ""}
-                  onChange={(e) =>
-                    updateFormData({ start_date: e.target.value })
-                  }
-                  error={errors.start_date}
-                />
-              </div>
-              <div>
-                <FormInput
-                  label="Start Time"
-                  type="time"
-                  value={formData.start_time || ""}
-                  onChange={(e) =>
-                    updateFormData({ start_time: e.target.value })
-                  }
-                  error={errors.start_time}
-                />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-              <div>
-                <FormInput
-                  label="End Date"
-                  type="date"
-                  value={formData.end_date || ""}
-                  onChange={(e) => updateFormData({ end_date: e.target.value })}
-                  error={errors.end_date}
-                />
-              </div>
-              <div>
-                <FormInput
-                  label="End Time"
-                  type="time"
-                  value={formData.end_time || ""}
-                  onChange={(e) => updateFormData({ end_time: e.target.value })}
-                  error={errors.end_time}
-                />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-              <FormSelect
-                label="Contest Type"
-                options={[
-                  { value: "FREE", label: "Free" },
-                  { value: "PAID", label: "Paid" },
-                ]}
-                value={formData.contest_type || "FREE"}
-                onChange={(e) =>
-                  updateFormData({
-                    contest_type: e.target.value as "FREE" | "PAID",
-                  })
-                }
-              />
-              {formData.contest_type === "PAID" && (
-                <FormInput
-                  label="Contest Fee"
-                  type="number"
-                  min="1"
-                  placeholder="Enter contest fee"
-                  value={formData.contest_fee?.toString() || ""}
-                  onChange={(e) =>
-                    updateFormData({ contest_fee: parseInt(e.target.value) })
-                  }
-                  error={errors.contest_fee}
-                />
-              )}
-            </div>
-
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <div>
               <FormInput
-                label="Contest Type Name (Optional)"
-                placeholder="E.g., Premium, Standard"
-                value={formData.contest_type_name || ""}
-                onChange={(e) =>
-                  updateFormData({ contest_type_name: e.target.value })
-                }
+                label="End Date"
+                type="date"
+                value={formData.end_date || ""}
+                onChange={(e) => updateFormData({ end_date: e.target.value })}
+                error={errors.end_date}
               />
+            </div>
+            <div>
               <FormInput
-                label="Contest Variant Name (Optional)"
-                placeholder="E.g., Summer Edition"
-                value={formData.contest_variant_name || ""}
-                onChange={(e) =>
-                  updateFormData({ contest_variant_name: e.target.value })
-                }
+                label="End Time"
+                type="time"
+                value={formData.end_time || ""}
+                onChange={(e) => updateFormData({ end_time: e.target.value })}
+                error={errors.end_time}
               />
             </div>
+          </div>
 
-            <FormInput
-              label="Sponsor Name"
-              placeholder="Enter sponsor name"
-              value={formData.sponsor_name || ""}
-              onChange={(e) => updateFormData({ sponsor_name: e.target.value })}
-              error={errors.sponsor_name}
-            />
-          </FormSection>
-
-          <FormSection title="Images">
-            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-              <ImageUpload
-                label="Sponsor Logo"
-                value={formData.sponsor_logo || ""}
-                onChange={(base64) => updateFormData({ sponsor_logo: base64 })}
-                error={errors.sponsor_logo}
-              />
-              <ImageUpload
-                label="Thumbnail"
-                value={formData.thumbnail || ""}
-                onChange={(base64) => updateFormData({ thumbnail: base64 })}
-                error={errors.thumbnail}
-              />
-              <ImageUpload
-                label="Contest Image"
-                value={formData.contest_image || ""}
-                onChange={(base64) => updateFormData({ contest_image: base64 })}
-                error={errors.contest_image}
-              />
-              <ImageUpload
-                label="Contest Hero Logo"
-                value={formData.contest_hero_logo || ""}
-                onChange={(base64) =>
-                  updateFormData({ contest_hero_logo: base64 })
-                }
-                error={errors.contest_hero_logo}
-              />
-            </div>
-          </FormSection>
-
-          <FormSection title="Game Settings">
-            <FormInput
-              label="Proceed Button Text"
-              placeholder="E.g., Proceed to Game"
-              value={formData.game_proceed?.submitBtn || "Proceed to Game"}
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <FormSelect
+              label="Contest Type"
+              options={[
+                { value: "FREE", label: "Free" },
+                { value: "PAID", label: "Paid" },
+              ]}
+              value={formData.contest_type || "FREE"}
               onChange={(e) =>
                 updateFormData({
-                  game_proceed: {
-                    submitBtn: e.target.value || "Proceed to Game", // 🛠 Ensure submitBtn is never undefined
-                    Tnc: formData.game_proceed?.Tnc || "", // Preserve existing Tnc value
-                  },
+                  contest_type: e.target.value as "FREE" | "PAID",
                 })
               }
-              error={errors.game_proceed_submitBtn}
             />
+            {formData.contest_type === "PAID" && (
+              <FormInput
+                label="Contest Fee"
+                type="number"
+                min="1"
+                placeholder="Enter contest fee"
+                value={formData.contest_fee?.toString() || ""}
+                onChange={(e) =>
+                  updateFormData({ contest_fee: parseInt(e.target.value) })
+                }
+                error={errors.contest_fee}
+              />
+            )}
+          </div>
 
-            <FormTextarea
-              label="Terms & Conditions (Optional)"
-              placeholder="Enter terms and conditions"
-              value={formData.game_proceed?.Tnc || ""}
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <FormInput
+              label="Contest Type Name (Optional)"
+              placeholder="E.g., Premium, Standard"
+              value={formData.contest_type_name || ""}
               onChange={(e) =>
-                updateFormData({
-                  game_proceed: {
-                    submitBtn:
-                      formData.game_proceed?.submitBtn || "Proceed to Game", // 🛠 Preserve submitBtn value
-                    Tnc: e.target.value,
-                  },
-                })
+                updateFormData({ contest_type_name: e.target.value })
               }
-              rows={4}
             />
-          </FormSection>
+            <FormInput
+              label="Contest Variant Name (Optional)"
+              placeholder="E.g., Summer Edition"
+              value={formData.contest_variant_name || ""}
+              onChange={(e) =>
+                updateFormData({ contest_variant_name: e.target.value })
+              }
+            />
+          </div>
 
-          <FormSection title="Instructions (Optional)">
-            {(formData.instructions || []).map(
-              (instruction: any, index: number) => (
-                <div
-                  key={index}
-                  className="mb-4 rounded-md border border-white/10 bg-white/5 p-4"
-                >
-                  <div className="mb-2 flex items-center justify-between">
-                    <h3 className="push font-medium">
-                      Instruction #{index + 1}
-                    </h3>
-                    <Button
-                      type="button"
-                      variant="danger"
-                      size="sm"
-                      onClick={() => removeInstruction(index)}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
-                  <FormInput
-                    label="Title"
-                    placeholder="Enter instruction title"
-                    value={instruction.title || ""}
-                    onChange={(e) =>
-                      updateInstruction(index, { title: e.target.value })
-                    }
-                  />
-                  <FormTextarea
-                    label="Description"
-                    placeholder="Enter instruction description"
-                    value={instruction.description || ""}
-                    onChange={(e) =>
-                      updateInstruction(index, { description: e.target.value })
-                    }
-                    rows={3}
-                  />
-                </div>
-              ),
-            )}
-            <Button type="button" variant="secondary" onClick={addInstruction}>
-              <Plus className="mr-2 h-4 w-4" />
-              Add Instruction
-            </Button>
-          </FormSection>
+          <FormInput
+            label="Sponsor Name"
+            placeholder="Enter sponsor name"
+            value={formData.sponsor_name || ""}
+            onChange={(e) => updateFormData({ sponsor_name: e.target.value })}
+            error={errors.sponsor_name}
+          />
+        </FormSection>
 
-          <FormSection title="Prize Catalogue">
-            {errors.prize_catalogue && (
-              <div className="mb-4 rounded-md border border-red-500 bg-red-500/20 p-3">
-                <p className="text-red-300">{errors.prize_catalogue}</p>
-              </div>
-            )}
+        <FormSection title="Images">
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+            <ImageUpload
+              label="Sponsor Logo"
+              value={formData.sponsor_logo || ""}
+              onChange={(base64) => updateFormData({ sponsor_logo: base64 })}
+              error={errors.sponsor_logo}
+            />
+            <ImageUpload
+              label="Thumbnail"
+              value={formData.thumbnail || ""}
+              onChange={(base64) => updateFormData({ thumbnail: base64 })}
+              error={errors.thumbnail}
+            />
+            <ImageUpload
+              label="Contest Image"
+              value={formData.contest_image || ""}
+              onChange={(base64) => updateFormData({ contest_image: base64 })}
+              error={errors.contest_image}
+            />
+            <ImageUpload
+              label="Contest Hero Logo"
+              value={formData.contest_hero_logo || ""}
+              onChange={(base64) =>
+                updateFormData({ contest_hero_logo: base64 })
+              }
+              error={errors.contest_hero_logo}
+            />
+          </div>
+        </FormSection>
 
-            {(formData.prize_catalogue || []).map(
-              (prize: any, index: number) => (
-                <div key={index} className="mb-4 rounded-md border  p-4">
-                  <div className="mb-2 flex items-center justify-between">
-                    <h3 className="push font-medium">Prize #{index + 1}</h3>
-                    <Button
-                      type="button"
-                      variant="danger"
-                      size="sm"
-                      onClick={() => removePrize(index)}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
+        <FormSection title="Game Settings">
+          <FormInput
+            label="Proceed Button Text"
+            placeholder="E.g., Proceed to Game"
+            value={formData.game_proceed?.submitBtn || "Proceed to Game"}
+            onChange={(e) =>
+              updateFormData({
+                game_proceed: {
+                  submitBtn: e.target.value || "Proceed to Game", // 🛠 Ensure submitBtn is never undefined
+                  Tnc: formData.game_proceed?.Tnc || "", // Preserve existing Tnc value
+                },
+              })
+            }
+            error={errors.game_proceed_submitBtn}
+          />
 
-                  <FormInput
-                    label="Prize Name"
-                    placeholder="Enter prize name"
-                    value={prize.prize_name || ""}
-                    onChange={(e) =>
-                      updatePrize(index, { prize_name: e.target.value })
-                    }
-                    error={errors[`prize_name_${index}`]}
-                  />
+          <FormTextarea
+            label="Terms & Conditions (Optional)"
+            placeholder="Enter terms and conditions"
+            value={formData.game_proceed?.Tnc || ""}
+            onChange={(e) =>
+              updateFormData({
+                game_proceed: {
+                  submitBtn:
+                    formData.game_proceed?.submitBtn || "Proceed to Game", // 🛠 Preserve submitBtn value
+                  Tnc: e.target.value,
+                },
+              })
+            }
+            rows={4}
+          />
+        </FormSection>
 
-                  <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                    <ColorPicker
-                      label="Text Color"
-                      value={prize.text_color || "#FFFFFF"}
-                      onChange={(color) =>
-                        updatePrize(index, { text_color: color })
-                      }
-                    />
-                    <ColorPicker
-                      label="Background Color"
-                      value={prize.background_color || "#1F2937"}
-                      onChange={(color) =>
-                        updatePrize(index, { background_color: color })
-                      }
-                    />
-                  </div>
-
-                  <div className="mb-2 mt-4">
-                    <label className="push mb-1 block text-sm font-medium">
-                      Gradient Color
-                    </label>
-                    <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-                      <FormSelect
-                        label="Direction"
-                        options={[
-                          { value: "to-right", label: "To Right" },
-                          { value: "to-left", label: "To Left" },
-                          { value: "to-top", label: "To Top" },
-                          { value: "to-bottom", label: "To Bottom" },
-                        ]}
-                        value={prize.gradient_color?.direction || "to-right"}
-                        onChange={(e) =>
-                          updatePrize(index, {
-                            gradient_color: {
-                              ...prize.gradient_color,
-                              direction: e.target.value as
-                                | "to-right"
-                                | "to-left"
-                                | "to-top"
-                                | "to-bottom",
-                            },
-                          })
-                        }
-                      />
-                      <ColorPicker
-                        label="Start Color"
-                        value={prize.gradient_color?.start || "#6366F1"}
-                        onChange={(color) =>
-                          updatePrize(index, {
-                            gradient_color: {
-                              ...prize.gradient_color,
-                              start: color,
-                            },
-                          })
-                        }
-                      />
-                      <ColorPicker
-                        label="End Color"
-                        value={prize.gradient_color?.end || "#8B5CF6"}
-                        onChange={(color) =>
-                          updatePrize(index, {
-                            gradient_color: {
-                              ...prize.gradient_color,
-                              end: color,
-                            },
-                          })
-                        }
-                      />
-                    </div>
-                  </div>
-
-                  <ImageUpload
-                    label="Prize Image"
-                    value={prize.image || ""}
-                    onChange={(base64) => updatePrize(index, { image: base64 })}
-                  />
-
-                  <FormInput
-                    label="Quantity"
-                    type="number"
-                    min="0"
-                    placeholder="Enter quantity"
-                    value={prize.quantity?.toString() || "0"}
-                    onChange={(e) =>
-                      updatePrize(index, { quantity: parseInt(e.target.value) })
-                    }
-                  />
-
-                  <div className="mb-2 mt-4">
-                    <label className="push mb-1 block text-sm font-medium">
-                      Reward Type (Choose one)
-                    </label>
-                    <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-                      <FormInput
-                        label="Fever Bucks"
-                        type="number"
-                        min="0"
-                        placeholder="Enter fever bucks"
-                        value={prize.fever_bucks?.toString() || ""}
-                        onChange={(e) =>
-                          updatePrize(index, {
-                            fever_bucks: parseInt(e.target.value),
-                            rewards: undefined,
-                            coupon_type: undefined,
-                          })
-                        }
-                      />
-                      <FormInput
-                        label="Rewards"
-                        placeholder="Enter rewards"
-                        value={prize.rewards || ""}
-                        onChange={(e) =>
-                          updatePrize(index, {
-                            rewards: e.target.value,
-                            fever_bucks: undefined,
-                            coupon_type: undefined,
-                          })
-                        }
-                      />
-                      <FormInput
-                        label="Coupon Type"
-                        placeholder="Enter coupon type"
-                        value={prize.coupon_type || ""}
-                        onChange={(e) =>
-                          updatePrize(index, {
-                            coupon_type: e.target.value,
-                            fever_bucks: undefined,
-                            rewards: undefined,
-                          })
-                        }
-                      />
-                    </div>
-                  </div>
-                </div>
-              ),
-            )}
-
-            <Button type="button" variant="secondary" onClick={addPrize}>
-              <Plus className="mr-2 h-4 w-4" />
-              Add Prize
-            </Button>
-          </FormSection>
-
-          <FormSection title="Questions">
-            {errors.questions && (
-              <div className="mb-4 rounded-md border border-red-500 bg-red-500/20 p-3">
-                <p className="text-red-300">{errors.questions}</p>
-              </div>
-            )}
-
-            {(formData.questions || []).map((question: any, index: number) => (
+        <FormSection title="Instructions (Optional)">
+          {(formData.instructions || []).map(
+            (instruction: any, index: number) => (
               <div
                 key={index}
                 className="mb-4 rounded-md border border-white/10 bg-white/5 p-4"
               >
                 <div className="mb-2 flex items-center justify-between">
-                  <h3 className="push font-medium">Question #{index + 1}</h3>
+                  <h3 className="push font-medium">Instruction #{index + 1}</h3>
                   <Button
                     type="button"
                     variant="danger"
                     size="sm"
-                    onClick={() => removeQuestion(index)}
+                    onClick={() => removeInstruction(index)}
                   >
                     <Trash2 className="h-4 w-4" />
                   </Button>
                 </div>
-
-                <FormTextarea
-                  label="Question"
-                  placeholder="Enter your question"
-                  value={question.question || ""}
+                <FormInput
+                  label="Title"
+                  placeholder="Enter instruction title"
+                  value={instruction.title || ""}
                   onChange={(e) =>
-                    updateQuestion(index, { question: e.target.value })
+                    updateInstruction(index, { title: e.target.value })
                   }
-                  error={errors[`question_${index}`]}
-                  rows={2}
                 />
-
-                <div className="mt-2 grid grid-cols-1 gap-4 md:grid-cols-2">
-                  <FormInput
-                    label="Option 1"
-                    placeholder="Enter option 1"
-                    value={question.option1 || ""}
-                    onChange={(e) =>
-                      updateQuestion(index, { option1: e.target.value })
-                    }
-                    error={errors[`option1_${index}`]}
-                  />
-                  <FormInput
-                    label="Option 2"
-                    placeholder="Enter option 2"
-                    value={question.option2 || ""}
-                    onChange={(e) =>
-                      updateQuestion(index, { option2: e.target.value })
-                    }
-                    error={errors[`option2_${index}`]}
-                  />
-                  <FormInput
-                    label="Option 3"
-                    placeholder="Enter option 3"
-                    value={question.option3 || ""}
-                    onChange={(e) =>
-                      updateQuestion(index, { option3: e.target.value })
-                    }
-                    error={errors[`option3_${index}`]}
-                  />
-                  <FormInput
-                    label="Option 4"
-                    placeholder="Enter option 4"
-                    value={question.option4 || ""}
-                    onChange={(e) =>
-                      updateQuestion(index, { option4: e.target.value })
-                    }
-                    error={errors[`option4_${index}`]}
-                  />
-                </div>
-
-                <FormSelect
-                  label="Correct Option"
-                  options={[
-                    { value: "option1", label: "Option 1" },
-                    { value: "option2", label: "Option 2" },
-                    { value: "option3", label: "Option 3" },
-                    { value: "option4", label: "Option 4" },
-                  ]}
-                  value={question.correctOption || "option1"}
+                <FormTextarea
+                  label="Description"
+                  placeholder="Enter instruction description"
+                  value={instruction.description || ""}
                   onChange={(e) =>
-                    updateQuestion(index, {
-                      correctOption: e.target.value as
-                        | "option1"
-                        | "option2"
-                        | "option3"
-                        | "option4",
-                    })
+                    updateInstruction(index, { description: e.target.value })
+                  }
+                  rows={3}
+                />
+              </div>
+            ),
+          )}
+          <Button type="button" variant="secondary" onClick={addInstruction}>
+            <Plus className="mr-2 h-4 w-4" />
+            Add Instruction
+          </Button>
+        </FormSection>
+
+        <FormSection title="Prize Catalogue">
+          {errors.prize_catalogue && (
+            <div className="mb-4 rounded-md border border-red-500 bg-red-500/20 p-3">
+              <p className="text-red-300">{errors.prize_catalogue}</p>
+            </div>
+          )}
+
+          {(formData.prize_catalogue || []).map((prize: any, index: number) => (
+            <div key={index} className="mb-4 rounded-md border  p-4">
+              <div className="mb-2 flex items-center justify-between">
+                <h3 className="push font-medium">Prize #{index + 1}</h3>
+                <Button
+                  type="button"
+                  variant="danger"
+                  size="sm"
+                  onClick={() => removePrize(index)}
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </div>
+
+              <FormInput
+                label="Prize Name"
+                placeholder="Enter prize name"
+                value={prize.prize_name || ""}
+                onChange={(e) =>
+                  updatePrize(index, { prize_name: e.target.value })
+                }
+                error={errors[`prize_name_${index}`]}
+              />
+
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                <ColorPicker
+                  label="Text Color"
+                  value={prize.text_color || "#FFFFFF"}
+                  onChange={(color) =>
+                    updatePrize(index, { text_color: color })
+                  }
+                />
+                <ColorPicker
+                  label="Background Color"
+                  value={prize.background_color || "#1F2937"}
+                  onChange={(color) =>
+                    updatePrize(index, { background_color: color })
                   }
                 />
               </div>
-            ))}
 
-            <Button type="button" variant="secondary" onClick={addQuestion}>
-              <Plus className="mr-2 h-4 w-4" />
-              Add Question
-            </Button>
-          </FormSection>
+              <div className="mb-2 mt-4">
+                <label className="push mb-1 block text-sm font-medium">
+                  Gradient Color
+                </label>
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+                  <FormSelect
+                    label="Direction"
+                    options={[
+                      { value: "to-right", label: "To Right" },
+                      { value: "to-left", label: "To Left" },
+                      { value: "to-top", label: "To Top" },
+                      { value: "to-bottom", label: "To Bottom" },
+                    ]}
+                    value={prize.gradient_color?.direction || "to-right"}
+                    onChange={(e) =>
+                      updatePrize(index, {
+                        gradient_color: {
+                          ...prize.gradient_color,
+                          direction: e.target.value as
+                            | "to-right"
+                            | "to-left"
+                            | "to-top"
+                            | "to-bottom",
+                        },
+                      })
+                    }
+                  />
+                  <ColorPicker
+                    label="Start Color"
+                    value={prize.gradient_color?.start || "#6366F1"}
+                    onChange={(color) =>
+                      updatePrize(index, {
+                        gradient_color: {
+                          ...prize.gradient_color,
+                          start: color,
+                        },
+                      })
+                    }
+                  />
+                  <ColorPicker
+                    label="End Color"
+                    value={prize.gradient_color?.end || "#8B5CF6"}
+                    onChange={(color) =>
+                      updatePrize(index, {
+                        gradient_color: {
+                          ...prize.gradient_color,
+                          end: color,
+                        },
+                      })
+                    }
+                  />
+                </div>
+              </div>
 
-          <div className="mt-8 flex justify-end gap-4">
-            <Button type="button" variant="secondary" onClick={handlePreview}>
-              <Eye className="mr-2 h-4 w-4" />
-              Preview
-            </Button>
-            <Button type="submit">
-              <Save className="mr-2 h-4 w-4" />
-              Save & Continue
-            </Button>
-          </div>
-        </form>
-        <SuccessModal isOpen={isModalOpen} onClose={handleCloseModal} />
-      </div>
-    </PageLayout>
+              <ImageUpload
+                label="Prize Image"
+                value={prize.image || ""}
+                onChange={(base64) => updatePrize(index, { image: base64 })}
+              />
+
+              <FormInput
+                label="Quantity"
+                type="number"
+                min="0"
+                placeholder="Enter quantity"
+                value={prize.quantity?.toString() || "0"}
+                onChange={(e) =>
+                  updatePrize(index, { quantity: parseInt(e.target.value) })
+                }
+              />
+
+              <div className="mb-2 mt-4">
+                <label className="push mb-1 block text-sm font-medium">
+                  Reward Type (Choose one)
+                </label>
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+                  <FormInput
+                    label="Fever Bucks"
+                    type="number"
+                    min="0"
+                    placeholder="Enter fever bucks"
+                    value={prize.fever_bucks?.toString() || ""}
+                    onChange={(e) =>
+                      updatePrize(index, {
+                        fever_bucks: parseInt(e.target.value),
+                        rewards: undefined,
+                        coupon_type: undefined,
+                      })
+                    }
+                  />
+                  <FormInput
+                    label="Rewards"
+                    placeholder="Enter rewards"
+                    value={prize.rewards || ""}
+                    onChange={(e) =>
+                      updatePrize(index, {
+                        rewards: e.target.value,
+                        fever_bucks: undefined,
+                        coupon_type: undefined,
+                      })
+                    }
+                  />
+                  <FormInput
+                    label="Coupon Type"
+                    placeholder="Enter coupon type"
+                    value={prize.coupon_type || ""}
+                    onChange={(e) =>
+                      updatePrize(index, {
+                        coupon_type: e.target.value,
+                        fever_bucks: undefined,
+                        rewards: undefined,
+                      })
+                    }
+                  />
+                </div>
+              </div>
+            </div>
+          ))}
+
+          <Button type="button" variant="secondary" onClick={addPrize}>
+            <Plus className="mr-2 h-4 w-4" />
+            Add Prize
+          </Button>
+        </FormSection>
+
+        <FormSection title="Questions">
+          {errors.questions && (
+            <div className="mb-4 rounded-md border border-red-500 bg-red-500/20 p-3">
+              <p className="text-red-300">{errors.questions}</p>
+            </div>
+          )}
+
+          {(formData.questions || []).map((question: any, index: number) => (
+            <div
+              key={index}
+              className="mb-4 rounded-md border border-white/10 bg-white/5 p-4"
+            >
+              <div className="mb-2 flex items-center justify-between">
+                <h3 className="push font-medium">Question #{index + 1}</h3>
+                <Button
+                  type="button"
+                  variant="danger"
+                  size="sm"
+                  onClick={() => removeQuestion(index)}
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </div>
+
+              <FormTextarea
+                label="Question"
+                placeholder="Enter your question"
+                value={question.question || ""}
+                onChange={(e) =>
+                  updateQuestion(index, { question: e.target.value })
+                }
+                error={errors[`question_${index}`]}
+                rows={2}
+              />
+
+              <div className="mt-2 grid grid-cols-1 gap-4 md:grid-cols-2">
+                <FormInput
+                  label="Option 1"
+                  placeholder="Enter option 1"
+                  value={question.option1 || ""}
+                  onChange={(e) =>
+                    updateQuestion(index, { option1: e.target.value })
+                  }
+                  error={errors[`option1_${index}`]}
+                />
+                <FormInput
+                  label="Option 2"
+                  placeholder="Enter option 2"
+                  value={question.option2 || ""}
+                  onChange={(e) =>
+                    updateQuestion(index, { option2: e.target.value })
+                  }
+                  error={errors[`option2_${index}`]}
+                />
+                <FormInput
+                  label="Option 3"
+                  placeholder="Enter option 3"
+                  value={question.option3 || ""}
+                  onChange={(e) =>
+                    updateQuestion(index, { option3: e.target.value })
+                  }
+                  error={errors[`option3_${index}`]}
+                />
+                <FormInput
+                  label="Option 4"
+                  placeholder="Enter option 4"
+                  value={question.option4 || ""}
+                  onChange={(e) =>
+                    updateQuestion(index, { option4: e.target.value })
+                  }
+                  error={errors[`option4_${index}`]}
+                />
+              </div>
+
+              <FormSelect
+                label="Correct Option"
+                options={[
+                  { value: "option1", label: "Option 1" },
+                  { value: "option2", label: "Option 2" },
+                  { value: "option3", label: "Option 3" },
+                  { value: "option4", label: "Option 4" },
+                ]}
+                value={question.correctOption || "option1"}
+                onChange={(e) =>
+                  updateQuestion(index, {
+                    correctOption: e.target.value as
+                      | "option1"
+                      | "option2"
+                      | "option3"
+                      | "option4",
+                  })
+                }
+              />
+            </div>
+          ))}
+
+          <Button type="button" variant="secondary" onClick={addQuestion}>
+            <Plus className="mr-2 h-4 w-4" />
+            Add Question
+          </Button>
+        </FormSection>
+
+        <div className="mt-8 flex justify-end gap-4">
+          <Button type="button" variant="secondary" onClick={handlePreview}>
+            <Eye className="mr-2 h-4 w-4" />
+            Preview
+          </Button>
+          <Button type="submit">
+            <Save className="mr-2 h-4 w-4" />
+            Save & Continue
+          </Button>
+        </div>
+      </form>
+      <SuccessModal isOpen={isModalOpen} onClose={handleCloseModal} />
+    </div>
   );
 };
 

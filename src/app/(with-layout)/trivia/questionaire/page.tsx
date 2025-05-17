@@ -1,20 +1,16 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { useContest } from "@/context/ContestContext";
-import { PageLayout, SearchBar } from "@/components";
+import { SearchBar } from "@/components";
 import { ContestServices, TriviaServices } from "@/services";
 import moment from "moment";
-import OnlyContestForm from "@/components/Forms/OnlyContestForm";
 import QuestionModal from "@/components/Modal/QuestionModal";
 import { useModal } from "@/hooks/useModal";
-import InstructionModal from "@/components/Modal/InstructionModal";
-import InstructionSection from "@/components/Section/InstructionSection";
 import QuestionSection from "@/components/Section/QuestionSection";
 
 const TriviaPage = () => {
   const router = useSearchParams();
-  const { push } = useRouter();
   const contest_id = router.get("contest_id");
 
   const { formData, updateFormData } = useContest();
@@ -37,25 +33,6 @@ const TriviaPage = () => {
       const { data } = await ContestServices.getContestById(contest_id);
       if (data?.data) {
         const details = data.data;
-        console.log(details);
-        console.log({
-          ...formData,
-          contest_name: details.name,
-          reward_name: details?.rewards?.prize,
-          start_date: moment(details?.startDate).format("YYYY-MM-DD"),
-          end_date: moment(details?.endDate).format("YYYY-MM-DD"),
-          start_time: moment(details?.startDate).format("HH:mm"),
-          end_time: moment(details?.endDate).format("HH:mm"),
-          contest_type: details?.contestType as "FREE" | "PAID",
-          contest_fee: details?.contestFee,
-          contest_type_name: details?.contestTypeName,
-          contest_variant_name: details?.contestVariantName,
-          sponsor_name: details?.sponsored_name,
-          sponsor_logo: details?.sponsored_logo,
-          thumbnail: details?.thumbnail,
-          contest_image: details?.contestImage,
-          contest_hero_logo: details?.contestHeroLogo,
-        });
         updateFormData({
           ...formData,
           contest_name: details.name,
@@ -132,71 +109,8 @@ const TriviaPage = () => {
   }, [contest_id]);
 
   useEffect(() => {
-    console.log(fetchQuestions);
     fetchQuestions();
   }, []);
-
-  const handleContestSave = async () => {
-    try {
-      const form = buildContestFormData(formData);
-      const { data } = await ContestServices.createContest(form);
-      if (data && data.data) {
-        push("/contests");
-      }
-    } catch (error: any) {
-      console.error("Error saving contest:", error);
-    }
-  };
-
-  function buildContestFormData(formData: any): FormData {
-    fd.append("name", formData.contest_name || "");
-    fd.append("rewards", formData.reward_name || "");
-
-    const startDateTime =
-      formData.start_date && formData.start_time
-        ? new Date(
-            `${formData.start_date}T${formData.start_time}:00Z`,
-          ).toISOString()
-        : "";
-    const endDateTime =
-      formData.end_date && formData.end_time
-        ? new Date(
-            `${formData.end_date}T${formData.end_time}:00Z`,
-          ).toISOString()
-        : "";
-
-    fd.append("startDate", startDateTime);
-    fd.append("endDate", endDateTime);
-    fd.append("contestType", formData.contest_type || "FREE");
-    fd.append(
-      "contestFee",
-      formData.contest_type === "PAID"
-        ? String(formData.contest_fee || 0)
-        : "0",
-    );
-    fd.append("contestTypeName", formData.contest_type_name || "");
-    fd.append("sponsored_name", formData.sponsor_name || "");
-
-    // Append files with proper checking
-    if (formData.sponsor_logo instanceof File) {
-      fd.append(
-        "sponsored_logo",
-        formData.sponsor_logo,
-        formData.sponsor_logo.name,
-      );
-    }
-    if (formData.thumbnail instanceof File) {
-      fd.append("thumbnail", formData.thumbnail, formData.thumbnail.name);
-    }
-    if (formData.contest_image instanceof File) {
-      fd.append(
-        "contestImage",
-        formData.contest_image,
-        formData.contest_image.name,
-      );
-    }
-    return fd;
-  }
 
   const fetchQuestionDetails = async (id: number) => {
     try {
@@ -351,33 +265,6 @@ const TriviaPage = () => {
               modal.close();
             }}
           />
-
-          {/* <InstructionSection
-            instructions={instructions}
-            onView={handleInstructionView}
-            onEdit={handleInstructionEdit}
-            onDelete={handleInstructionDelete}
-            onSave={async () => {
-              if (contest_id) {
-                await fetchInstructions(contest_id);
-              }
-            }}
-          />
-
-          <InstructionModal
-            isOpen={instructionModal.isOpen}
-            onClose={instructionModal.close}
-            instructionData={selectedInstruction}
-            isViewMode={isViewMode}
-            onSave={async () => {
-              if (contest_id) {
-                await fetchInstructions(contest_id);
-              }
-              instructionModal.close();
-            }}
-          /> */}
-
-          {/* <OnlyInstructionForm /> */}
         </div>
       </div>
     </>

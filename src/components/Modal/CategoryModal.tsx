@@ -1,20 +1,21 @@
 import React from "react";
 import { Modal } from "@mui/material";
 import Button from "../Button";
-import OnlyQuestionForm from "../Forms/OnlyQuestion";
+import CategoryForm from "../Forms/CategoryForm";
+import { CategoryFormData } from "@/types/category";
 
-interface QuestionModalProps {
+interface CategoryModalProps {
   isOpen: boolean;
   onClose: () => void;
-  questionData?: any;
+  categoryData?: any;
   isViewMode?: boolean;
-  onSave?: () => Promise<void>;
+  onSave?: (formData: CategoryFormData) => Promise<void>;
 }
 
-const QuestionModal: React.FC<QuestionModalProps> = ({
+const CategoryModal: React.FC<CategoryModalProps> = ({
   isOpen,
   onClose,
-  questionData,
+  categoryData,
   isViewMode = false,
   onSave,
 }) => {
@@ -22,7 +23,7 @@ const QuestionModal: React.FC<QuestionModalProps> = ({
     <Modal
       open={isOpen}
       onClose={onClose}
-      aria-labelledby="question-modal-title"
+      aria-labelledby="category-modal-title"
       sx={{
         display: "flex",
         alignItems: "center",
@@ -30,27 +31,28 @@ const QuestionModal: React.FC<QuestionModalProps> = ({
         p: 2,
       }}
     >
-      <div className="max-h-[90vh] w-full max-w-5xl  overflow-y-auto rounded-lg bg-white shadow-xl">
+      <div className="max-h-[90vh] w-full max-w-md overflow-y-auto rounded-lg bg-white shadow-xl">
         <div className="border-b border-gray-200 px-6 py-4">
           <h2
             className="text-xl font-semibold text-gray-800"
-            id="question-modal-title"
+            id="category-modal-title"
           >
             {isViewMode
-              ? "View Question"
-              : questionData
-                ? "Edit Question"
-                : "Add Question"}
+              ? "View Category"
+              : categoryData
+                ? "Edit Category"
+                : "Add Category"}
           </h2>
         </div>
 
         <div className="p-6">
-          <OnlyQuestionForm
+          <CategoryForm
             readOnly={isViewMode}
-            questionData={questionData}
+            categoryData={categoryData}
             onSave={async (formData: any) => {
-              if (onSave) {
-                await onSave();
+              console.log({ formData });
+              if (onSave && formData) {
+                await onSave(formData);
               }
               onClose();
             }}
@@ -62,4 +64,4 @@ const QuestionModal: React.FC<QuestionModalProps> = ({
   );
 };
 
-export default QuestionModal;
+export default CategoryModal;

@@ -3,59 +3,34 @@ import React, { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { useContest } from "@/context/ContestContext";
 import { SearchBar } from "@/components";
-import { ContestServices, TriviaServices } from "@/services";
-import moment from "moment";
+import { TriviaServices } from "@/services";
 import QuestionModal from "@/components/Modal/QuestionModal";
 import { useModal } from "@/hooks/useModal";
 import QuestionSection from "@/components/Section/QuestionSection";
+
+type fetchQuestionAgrs =
+  | { q?: string; page?: number; limit?: number }
+  | undefined;
 
 const TriviaPage = () => {
   const router = useSearchParams();
   const contest_id = router.get("contest_id");
 
-  const { formData, updateFormData } = useContest();
+  const { updateFormData } = useContest();
   const [questions, setQuestions] = useState([]);
+  const [rowCount, setRowCount] = useState(0);
+  const [paginationModel, setPaginationModel] = useState({
+    page: 1,
+    limit: 10,
+  });
   const [contestQuestionIds, setContestQuestionIds] = useState<number[]>([]);
 
-  /* -- States for Instructions -- */
-  const [instructions, setInstructions] = useState([]);
-  const [selectedInstruction, setSelectedInstruction] = useState(null);
-  const instructionModal = useModal();
+  const [searchString, setSearchString] = useState<string>("");
 
-  const fd = new FormData();
   const modal = useModal();
 
   const [selectedQuestion, setSelectedQuestion] = useState<any>(null);
   const [isViewMode, setIsViewMode] = useState(false);
-
-  const fetchContestDetails = async (contest_id: string) => {
-    try {
-      const { data } = await ContestServices.getContestById(contest_id);
-      if (data?.data) {
-        const details = data.data;
-        updateFormData({
-          ...formData,
-          contest_name: details.name,
-          reward_name: details?.rewards?.prize,
-          start_date: moment(details?.startDate).format("YYYY-MM-DD"),
-          end_date: moment(details?.endDate).format("YYYY-MM-DD"),
-          start_time: moment(details?.startDate).format("HH:mm"),
-          end_time: moment(details?.endDate).format("HH:mm"),
-          contest_type: details?.contestType as "FREE" | "PAID",
-          contest_fee: details?.contestFee,
-          contest_type_name: details?.contestTypeName,
-          contest_variant_name: details?.contestVariantName,
-          sponsor_name: details?.sponsored_name,
-          sponsor_logo_preview: details?.sponsored_logo,
-          thumbnail_preview: details?.thumbnail,
-          contest_image_preview: details?.contestImage,
-          contest_hero_logo_preview: details?.contestHeroLogo,
-        });
-      }
-    } catch (error) {
-      console.error("Error fetching contest details:", error);
-    }
-  };
 
   const fetchContestQuestions = async (contest_id: string): Promise<any> => {
     try {
@@ -70,25 +45,32 @@ const TriviaPage = () => {
     }
   };
 
-  const fetchQuestions = async () => {
+  const fetchQuestions = async (args?: fetchQuestionAgrs) => {
     try {
+      console.log({ args });
       if (contestQuestionIds) {
-        const { data } = await TriviaServices.getAllQuestions();
-        if (data?.data?.questions) {
+        const { data } = await TriviaServices.getAllQuestions({
+          ...args,
+        });
+        console.log({ data });
+        if (data?.data?.rows) {
           setQuestions(
-            data.data.questions.map((q: any) => ({
+            data.data.rows.map((q: any) => ({
               ...q,
               status: contestQuestionIds.includes(q.id) ? 1 : 0,
+              categoryName: q?.category?.name,
+              categoryId: q?.category?.id,
             })),
           );
+          setRowCount(data.data.meta.total);
 
-          const questions = data.data.questions.map((q: any) => ({
+          const questions = data.data.rows.map((q: any) => ({
             question: q.question,
-            option1: q.answers[0].answer,
-            option2: q.answers[1].answer,
-            option3: q.answers[2].answer,
-            option4: q.answers[3].answer,
-            correctOption: `option${q.answers.findIndex((a: any) => a.is_correct) + 1}`,
+            option1: q.questionOptions[0].answer,
+            option2: q.questionOptions[1].answer,
+            option3: q.questionOptions[2].answer,
+            option4: q.questionOptions[3].answer,
+            correctOption: `option${q.questionOptions.findIndex((a: any) => a.is_correct) + 1}`,
             timer: q.timer,
             status: contestQuestionIds.includes(q.id) ? 1 : 0,
           }));
@@ -101,16 +83,18 @@ const TriviaPage = () => {
   };
 
   useEffect(() => {
-    if (contest_id) {
-      fetchContestDetails(contest_id as string);
-      fetchContestQuestions(contest_id as string);
-      fetchInstructions(contest_id as string);
+    if (searchString) {
+      const timerId = setTimeout(() => {
+        fetchQuestions({
+          q: searchString,
+          ...paginationModel,
+        });
+      }, 1000);
+      return () => clearTimeout(timerId);
+    } else {
+      fetchQuestions(paginationModel);
     }
-  }, [contest_id]);
-
-  useEffect(() => {
-    fetchQuestions();
-  }, []);
+  }, [searchString, paginationModel]);
 
   const fetchQuestionDetails = async (id: number) => {
     try {
@@ -120,11 +104,11 @@ const TriviaPage = () => {
         const formattedQuestion = {
           id: question.id,
           question: question.question,
-          option1: question.answers[0].answer,
-          option2: question.answers[1].answer,
-          option3: question.answers[2].answer,
-          option4: question.answers[3].answer,
-          correctOption: `option${question.answers.findIndex((a: any) => a.is_correct) + 1}`,
+          option1: question.questionOptions[0].answer,
+          option2: question.questionOptions[1].answer,
+          option3: question.questionOptions[2].answer,
+          option4: question.questionOptions[3].answer,
+          correctOption: `option${question.questionOptions.findIndex((a: any) => a.is_correct) + 1}`,
           timer: question.timer || 10000,
           status: question.status,
         };
@@ -144,6 +128,7 @@ const TriviaPage = () => {
 
   const handleQuestionEdit = async (question: any) => {
     setIsViewMode(false);
+    console.log({ question });
     await fetchQuestionDetails(question.id);
     modal.open();
   };
@@ -151,9 +136,7 @@ const TriviaPage = () => {
   const handleQuestionDelete = async (id: number) => {
     try {
       await TriviaServices.deleteQuestion(id.toString());
-      if (contest_id) {
-        fetchQuestions();
-      }
+      fetchQuestions();
     } catch (err) {
       console.error("Error deleting question:", err);
     }
@@ -189,46 +172,17 @@ const TriviaPage = () => {
     }
   };
 
-  const fetchInstructions = async (contest_id: string) => {
-    try {
-      const { data } =
-        await TriviaServices.getInstructionByContestId(contest_id);
-      if (data?.data) {
-        setInstructions(data.data);
-      }
-    } catch (err) {
-      console.error("Error fetching instructions:", err);
-    } finally {
-    }
-  };
-
-  // Instruction handlers
-  const handleInstructionView = (instruction: any) => {
-    setIsViewMode(true);
-    setSelectedInstruction(instruction);
-    instructionModal.open();
-  };
-
-  const handleInstructionEdit = (instruction: any) => {
-    setIsViewMode(false);
-    setSelectedInstruction(instruction);
-    instructionModal.open();
-  };
-
-  const handleInstructionDelete = async (id: string) => {
-    try {
-      // Add your delete instruction API call here
-      if (contest_id) {
-        fetchInstructions(contest_id);
-      }
-    } catch (err) {
-      console.error("Error deleting instruction:", err);
-    }
+  const handlePaginationModelChange = (page: number) => {
+    console.log({ page });
+    setPaginationModel({ ...paginationModel, page });
   };
 
   return (
     <>
-      <SearchBar value="" onChange={() => {}} />
+      <SearchBar
+        value={searchString}
+        onChange={(text: string) => setSearchString(text)}
+      />
 
       <div className="mx-auto  py-8">
         <div className="mb-6 flex items-center justify-between">
@@ -236,21 +190,16 @@ const TriviaPage = () => {
         </div>
 
         <div className="space-y-6">
-          {/* <OnlyContestForm
-            formData={formData}
-            updateFormData={updateFormData}
-            onSave={handleContestSave}
-          /> */}
           <QuestionSection
             questions={questions}
             onView={handleQuestionView}
             onEdit={handleQuestionEdit}
             onDelete={handleQuestionDelete}
             onStatusChange={handleStatusChange}
+            onPagninationModelChange={handlePaginationModelChange}
+            rowCount={rowCount}
             onSave={async () => {
-              if (contest_id) {
-                await fetchQuestions();
-              }
+              await fetchQuestions();
             }}
           />
           <QuestionModal
@@ -259,9 +208,7 @@ const TriviaPage = () => {
             questionData={selectedQuestion}
             isViewMode={isViewMode}
             onSave={async () => {
-              if (contest_id) {
-                await fetchQuestions();
-              }
+              await fetchQuestions();
               modal.close();
             }}
           />

@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { Save } from "lucide-react";
+import { Save, X } from "lucide-react";
 import Button from "../Button";
 import FormInput from "../FormInput";
 import FormSelect from "../FormSelect";
 import FormTextarea from "../FormTextarea";
-import { TriviaServices } from "@/services";
+import { CategoryServices, TriviaServices } from "@/services";
+import { Category } from "@/types/category";
 
 interface QuestionData {
   id?: string;
@@ -16,18 +17,21 @@ interface QuestionData {
   correctOption: string;
   timer: number;
   status: number;
+  category_id: number | null;
 }
 
 interface OnlyQuestionFormProps {
   readOnly?: boolean;
   questionData?: QuestionData;
   onSave?: (formData: QuestionData) => Promise<void>;
+  onCancel?: () => void; // Added onCancel prop
 }
 
 const OnlyQuestionForm: React.FC<OnlyQuestionFormProps> = ({
   readOnly = false,
   questionData,
   onSave,
+  onCancel, // Added onCancel prop
 }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -41,11 +45,29 @@ const OnlyQuestionForm: React.FC<OnlyQuestionFormProps> = ({
     correctOption: "option1",
     timer: 10000,
     status: 1,
+    category_id: null,
   });
+  const [categories, setCategories] = useState<Category[]>([]);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const { data } = await CategoryServices.getAllCategories({});
+        if (data?.data) {
+          setCategories(data.data.rows);
+        }
+      } catch (error) {
+        console.error("Error fetching categories:", error);
+      }
+    };
+    fetchCategories();
+  }, []);
 
   useEffect(() => {
     if (questionData) {
       setFormState(questionData);
+      console.log("questionData", questionData);
+      console.log("formState", formState);
     }
   }, [questionData]);
 
@@ -120,6 +142,9 @@ const OnlyQuestionForm: React.FC<OnlyQuestionFormProps> = ({
             isCorrect: formState.correctOption === "option4",
           },
         ],
+        category_id: formState.category_id
+          ? parseInt(formState.category_id.toString())
+          : null,
         timer: formState.timer.toString(),
       };
 
@@ -148,6 +173,7 @@ const OnlyQuestionForm: React.FC<OnlyQuestionFormProps> = ({
           correctOption: "option1",
           timer: 10000,
           status: 1,
+          category_id: null,
         });
       }
     } catch (err) {
@@ -155,6 +181,13 @@ const OnlyQuestionForm: React.FC<OnlyQuestionFormProps> = ({
       console.error("Error submitting question:", err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Handle cancel button click
+  const handleCancel = () => {
+    if (onCancel) {
+      onCancel();
     }
   };
 
@@ -237,6 +270,20 @@ const OnlyQuestionForm: React.FC<OnlyQuestionFormProps> = ({
           disabled={readOnly}
         />
 
+        <FormSelect
+          label="Category"
+          name="category_id"
+          value={formState.category_id || ""}
+          onChange={handleInputChange}
+          options={[{ value: "", label: "" }].concat(
+            categories.map((category) => ({
+              value: category.id,
+              label: `${category.name} - ${category.questions.length} Question`,
+            })),
+          )}
+          disabled={readOnly}
+        />
+
         <FormInput
           label="Timer (milliseconds)"
           name="timer"
@@ -250,8 +297,17 @@ const OnlyQuestionForm: React.FC<OnlyQuestionFormProps> = ({
         />
       </div>
 
-      {!readOnly && (
-        <div className="flex justify-end">
+      <div className="flex justify-end space-x-3">
+        <Button
+          type="button"
+          variant="secondary"
+          onClick={handleCancel}
+          className="bg-gray-100 text-gray-800 hover:bg-gray-200"
+        >
+          <X className="mr-2 h-4 w-4" />
+          Cancel
+        </Button>
+        {!readOnly && (
           <Button type="submit" disabled={loading}>
             <Save className="mr-2 h-4 w-4" />
             {loading
@@ -260,8 +316,8 @@ const OnlyQuestionForm: React.FC<OnlyQuestionFormProps> = ({
                 ? "Update Question"
                 : "Save Question"}
           </Button>
-        </div>
-      )}
+        )}
+      </div>
     </form>
   );
 };

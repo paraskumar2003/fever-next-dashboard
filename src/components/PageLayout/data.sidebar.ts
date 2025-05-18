@@ -10,6 +10,8 @@ import {
   Bell,
   Brain,
   Gamepad2,
+  ChartColumnStacked,
+  CircleHelp,
 } from "lucide-react";
 
 export const menuItems = [
@@ -18,6 +20,18 @@ export const menuItems = [
     label: "Home",
     icon: Home,
     path: "/home",
+  },
+  {
+    id: "category",
+    label: "Category",
+    icon: ChartColumnStacked,
+    path: "/categories",
+  },
+  {
+    id: "questionaire",
+    label: "Questionaire",
+    icon: CircleHelp,
+    path: "/questionaire",
   },
   {
     id: "trivia",

@@ -13,6 +13,12 @@ interface QuestionPayload {
   timer: string; // Assuming this is in milliseconds as a string
 }
 
+interface QuestionFilter {
+  q?: string;
+  page?: number;
+  limit?: number;
+}
+
 interface InstructionPayload {
   contestId: string; // UUID format
   title: string;
@@ -108,7 +114,7 @@ export class TriviaServices extends ApiServices {
   ): Promise<any> {
     try {
       const response = await this.post<T>(
-        `/v1/trivia/update-question/${id}`,
+        `/v1/questions/update-question/${id}`,
         payload,
       );
       return response;
@@ -131,7 +137,9 @@ export class TriviaServices extends ApiServices {
 
   static async getQuestionById(question_id: string): Promise<any> {
     try {
-      const response = await this.get<T>(`/v1/trivia/questions/${question_id}`);
+      const response = await this.get<T>(
+        `/v1/questions/questions/${question_id}`,
+      );
       return response;
     } catch (err: any) {
       return { data: null, err: err.message, response: err?.response?.data };
@@ -161,9 +169,19 @@ export class TriviaServices extends ApiServices {
     }
   }
 
-  static async getAllQuestions() {
+  static async getAllQuestions({
+    page = 1,
+    limit = 10,
+    ...filter
+  }: QuestionFilter) {
     try {
-      const response = await this.get<T>(`/v1/trivia/questions`);
+      const response = await this.get<T>(`/v1/questions/list`, {
+        params: {
+          page: page,
+          limit: limit,
+          ...(filter.q ? { q: filter.q } : {}),
+        },
+      });
       return response;
     } catch (err: any) {
       return { data: null, err: err.message, response: err?.response?.data };

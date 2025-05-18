@@ -1,20 +1,13 @@
 import React, { useState } from "react";
 import { Eye, Pencil, Trash2 } from "lucide-react";
 import Button from "../Button";
+import { Question } from "./QuestionList";
 
 interface Answer {
   id: number;
   answer: string;
   is_correct: boolean;
   status: string;
-}
-
-interface Question {
-  id: number;
-  question: string;
-  correct_answer: string;
-  status: number;
-  answers: Answer[];
 }
 
 interface QuestionRowProps {
@@ -54,6 +47,9 @@ const QuestionRow: React.FC<QuestionRowProps> = ({
       </td>
       <td className="px-4 py-3 text-sm text-gray-600">
         {question.correct_answer}
+      </td>
+      <td className="px-4 py-3 text-sm text-gray-600">
+        {question.categoryName}
       </td>
       <td className="px-4 py-3 text-sm">
         <button

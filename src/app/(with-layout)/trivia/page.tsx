@@ -41,24 +41,6 @@ export default function CreateContest() {
       if (data?.data) {
         const details = data.data;
         console.log(details);
-        console.log({
-          ...formData,
-          contest_name: details.name,
-          reward_name: details?.rewards?.prize,
-          start_date: moment(details?.startDate).format("YYYY-MM-DD"),
-          end_date: moment(details?.endDate).format("YYYY-MM-DD"),
-          start_time: moment(details?.startDate).format("HH:mm"),
-          end_time: moment(details?.endDate).format("HH:mm"),
-          contest_type: details?.contestType as "FREE" | "PAID",
-          contest_fee: details?.contestFee,
-          contest_type_name: details?.contestTypeName,
-          contest_variant_name: details?.contestVariantName,
-          sponsor_name: details?.sponsored_name,
-          sponsor_logo: details?.sponsored_logo,
-          thumbnail: details?.thumbnail,
-          contest_image: details?.contestImage,
-          contest_hero_logo: details?.contestHeroLogo,
-        });
         updateFormData({
           ...formData,
           contest_name: details.name,
@@ -133,7 +115,7 @@ export default function CreateContest() {
         : "0",
     );
     fd.append("contestTypeName", formData.contest_type_name || "");
-    fd.append("sponsored_name", formData.sponsor_name || "");
+    fd.append("sponsored_name", formData.sponsor_name || "DEFAULT");
 
     // Append files with proper checking
     if (formData.sponsor_logo instanceof File) {

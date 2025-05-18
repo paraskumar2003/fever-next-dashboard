@@ -14,7 +14,8 @@ import {
 import OnlyContestForm from "@/components/Forms/OnlyContestForm";
 import { useContest } from "@/context/ContestContext";
 import { ContestServices } from "@/services";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
+import moment from "moment";
 
 const steps = [
   "Contest Details",
@@ -27,13 +28,66 @@ const steps = [
 export default function CreateContest() {
   const fd = new FormData();
   const { push } = useRouter();
+  const searchParams = useSearchParams();
+
+  const contest_id = searchParams.get("contest_id");
 
   const [currentStep, setCurrentStep] = useState(0);
   const { formData, updateFormData } = useContest();
 
+  const fetchContestDetails = async (contest_id: string) => {
+    try {
+      const { data } = await ContestServices.getContestById(contest_id);
+      if (data?.data) {
+        const details = data.data;
+        console.log(details);
+        console.log({
+          ...formData,
+          contest_name: details.name,
+          reward_name: details?.rewards?.prize,
+          start_date: moment(details?.startDate).format("YYYY-MM-DD"),
+          end_date: moment(details?.endDate).format("YYYY-MM-DD"),
+          start_time: moment(details?.startDate).format("HH:mm"),
+          end_time: moment(details?.endDate).format("HH:mm"),
+          contest_type: details?.contestType as "FREE" | "PAID",
+          contest_fee: details?.contestFee,
+          contest_type_name: details?.contestTypeName,
+          contest_variant_name: details?.contestVariantName,
+          sponsor_name: details?.sponsored_name,
+          sponsor_logo: details?.sponsored_logo,
+          thumbnail: details?.thumbnail,
+          contest_image: details?.contestImage,
+          contest_hero_logo: details?.contestHeroLogo,
+        });
+        updateFormData({
+          ...formData,
+          contest_name: details.name,
+          reward_name: details?.rewards?.prize,
+          start_date: moment(details?.startDate).format("YYYY-MM-DD"),
+          end_date: moment(details?.endDate).format("YYYY-MM-DD"),
+          start_time: moment(details?.startDate).format("HH:mm"),
+          end_time: moment(details?.endDate).format("HH:mm"),
+          contest_type: details?.contestType as "FREE" | "PAID",
+          contest_fee: details?.contestFee,
+          contest_type_name: details?.contestTypeName,
+          contest_variant_name: details?.contestVariantName,
+          sponsor_name: details?.sponsored_name,
+          sponsor_logo_preview: details?.sponsored_logo,
+          thumbnail_preview: details?.thumbnail,
+          contest_image_preview: details?.contestImage,
+          contest_hero_logo_preview: details?.contestHeroLogo,
+        });
+      }
+    } catch (error) {
+      console.error("Error fetching contest details:", error);
+    }
+  };
+
   useEffect(() => {
-    console.log({ formData });
-  }, [formData]);
+    if (contest_id) {
+      fetchContestDetails(contest_id);
+    }
+  }, [contest_id]);
 
   const goNext = () =>
     setCurrentStep((prev) => Math.min(prev + 1, steps.length - 1));

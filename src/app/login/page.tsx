@@ -102,7 +102,7 @@ export default function Login() {
               Successfully Logged In!
             </h2>
             <button
-              onClick={() => push("/wheel-of-fortune")}
+              onClick={() => push("/home")}
               className="mt-4 rounded-lg bg-blue-600 px-4 py-2 text-white transition hover:bg-blue-700"
             >
               OK

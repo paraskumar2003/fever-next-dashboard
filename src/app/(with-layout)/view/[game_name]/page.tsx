@@ -87,7 +87,7 @@ export default function ViewContest() {
         const { data } = await TriviaServices.getContests(filter);
         if (data.data) {
           setRows(
-            data.data.map((e: Contest, index: number) => ({
+            data.data.rows.map((e: Contest, index: number) => ({
               seq_no: index + 1,
               id: e.id,
               contest_name: e.name,

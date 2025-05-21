@@ -14,8 +14,9 @@ import {
 import OnlyContestForm from "@/components/Forms/OnlyContestForm";
 import { useContest } from "@/context/ContestContext";
 import { ContestServices } from "@/services";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import moment from "moment";
+import Notiflix from "notiflix";
 
 const steps = [
   "Contest Details",
@@ -26,8 +27,6 @@ const steps = [
 ];
 
 export default function CreateContest() {
-  const fd = new FormData();
-  const { push } = useRouter();
   const searchParams = useSearchParams();
 
   const contest_id = searchParams.get("contest_id");
@@ -40,7 +39,6 @@ export default function CreateContest() {
       const { data } = await ContestServices.getContestById(contest_id);
       if (data?.data) {
         const details = data.data;
-        console.log(details);
         updateFormData({
           ...formData,
           contest_name: details.name,
@@ -71,24 +69,34 @@ export default function CreateContest() {
     }
   }, [contest_id]);
 
-  const goNext = () =>
+  const goNext = async () => {
+    switch (currentStep) {
+      case 0:
+        await handleContestSave();
+        return;
+    }
     setCurrentStep((prev) => Math.min(prev + 1, steps.length - 1));
+  };
+
   const goPrev = () => setCurrentStep((prev) => Math.max(prev - 1, 0));
+
   const goToStep = (e: number) => setCurrentStep((prev) => e);
 
   const handleContestSave = async () => {
+    Notiflix.Loading.circle();
     try {
       const form = buildContestFormData(formData);
-      const { data } = await ContestServices.createContest(form);
-      if (data && data.data) {
-        push("/contests");
-      }
+      await ContestServices.createContest(form);
+      Notiflix.Loading.remove();
     } catch (error: any) {
+      Notiflix.Loading.remove();
       console.error("Error saving contest:", error);
     }
   };
 
   function buildContestFormData(formData: any): FormData {
+    const fd = new FormData();
+
     fd.append("name", formData.contest_name || "");
     fd.append("rewards", formData.reward_name || "");
 

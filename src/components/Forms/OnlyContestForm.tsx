@@ -104,13 +104,13 @@ const OnlyContestForm: React.FC<OnlyContestFormProps> = ({
           label="Contest Type"
           options={[
             { value: "", label: "" },
-            { value: "NORMAL", label: "Normal" },
+            { value: "REGULAR", label: "Regular" },
             { value: "MAHABONANZA", label: "Maha Bonanza" },
           ]}
           value={formData.contest_type_name}
           onChange={(e) =>
             updateFormData({
-              contest_type_name: e.target.value as "MAHABONANZA" | "NORMAL",
+              contest_type_name: e.target.value as "MAHABONANZA" | "REGULAR",
             })
           }
         />

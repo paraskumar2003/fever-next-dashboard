@@ -13,7 +13,11 @@ import {
 } from "@/components";
 import OnlyContestForm from "@/components/Forms/OnlyContestForm";
 import { useContest } from "@/context/ContestContext";
-import { ContestServices } from "@/services";
+import {
+  ContestServices,
+  InstructionPayload,
+  TriviaServices,
+} from "@/services";
 import { useSearchParams } from "next/navigation";
 import moment from "moment";
 import Notiflix from "notiflix";
@@ -70,11 +74,6 @@ export default function CreateContest() {
   }, [contest_id]);
 
   const goNext = async () => {
-    switch (currentStep) {
-      case 0:
-        await handleContestSave();
-        return;
-    }
     setCurrentStep((prev) => Math.min(prev + 1, steps.length - 1));
   };
 
@@ -86,7 +85,8 @@ export default function CreateContest() {
     Notiflix.Loading.circle();
     try {
       const form = buildContestFormData(formData);
-      await ContestServices.createContest(form);
+      let res = await ContestServices.createContest(form);
+      if (res) goNext();
       Notiflix.Loading.remove();
     } catch (error: any) {
       Notiflix.Loading.remove();
@@ -146,6 +146,34 @@ export default function CreateContest() {
     return fd;
   }
 
+  const handleInstructionSave = async () => {
+    Notiflix.Loading.circle();
+    try {
+      const form = buildInstructionFormData(formData);
+      let res = await TriviaServices.createInstruction(form);
+      if (res) goNext();
+      Notiflix.Loading.remove();
+    } catch (error: any) {
+      Notiflix.Loading.remove();
+      console.error("Error saving contest:", error);
+    }
+  };
+
+  function buildInstructionFormData(formData: any) {
+    const fd = new FormData();
+    fd.append("instructions", JSON.stringify(formData.instructions));
+    fd.append("contestId", contest_id || formData.contest_id);
+    fd.append("megaPrizeName", formData.mega_prize_name || "");
+    if (formData.sponsor_logo instanceof File) {
+      fd.append(
+        "sponsored_logo",
+        formData.sponsor_logo,
+        formData.sponsor_logo.name,
+      );
+    }
+    return fd;
+  }
+
   const questions = [
     {
       question_no: 1,
@@ -194,7 +222,9 @@ export default function CreateContest() {
           <OnlyInstructionForm
             formData={formData}
             updateFormData={updateFormData}
-            onSave={() => {}}
+            onSave={() => {
+              handleInstructionSave();
+            }}
           />
         );
       case 3:

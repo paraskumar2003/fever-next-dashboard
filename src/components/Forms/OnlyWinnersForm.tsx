@@ -26,7 +26,6 @@ const OnlyWinnersForm: React.FC<OnlyWinnersFormProps> = ({
 
   const handleWinnerCountChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const count = parseInt(e.target.value);
-    console.log({ count, winners });
     if (winners) {
       const newWinners = Array.from({ length: count }, (_, index) => ({
         reward_type: winners[index]?.reward_type || "PHYSICAL",
@@ -136,14 +135,6 @@ const OnlyWinnersForm: React.FC<OnlyWinnersFormProps> = ({
           ))}
         </div>
       )}
-
-      <div className="mt-6">
-        <ImageUpload
-          label="Sponsor Logo"
-          value={sponsor_logo || ""}
-          onChange={updateSponsorLogo}
-        />
-      </div>
     </FormSection>
   );
 };

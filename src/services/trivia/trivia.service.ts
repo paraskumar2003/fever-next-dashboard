@@ -19,10 +19,11 @@ interface QuestionFilter {
   limit?: number;
 }
 
-interface InstructionPayload {
+export interface InstructionPayload {
   contestId: string; // UUID format
-  title: string;
-  description: string;
+  instructions: string;
+  megaPrizeName: string;
+  sponsored_logo: File;
 }
 
 interface UpdateContestQuestionPayload {
@@ -157,7 +158,7 @@ export class TriviaServices extends ApiServices {
     }
   }
 
-  static async createInstruction(payload: InstructionPayload): Promise<any> {
+  static async createInstruction(payload: any): Promise<any> {
     try {
       const response = await this.post<T>(
         `/v1/trivia/create-instructions`,

@@ -97,6 +97,15 @@ export class TriviaServices extends ApiServices {
     }
   }
 
+  static async postGameQuestionForm(form: any): Promise<any> {
+    try {
+      const response = await this.post<T>(`/v1/trivia/contest-questions`, form);
+      return response;
+    } catch (err: any) {
+      return { data: null, err: err.message, response: err?.response?.data };
+    }
+  }
+
   static async createQuestion(payload: QuestionPayload): Promise<any> {
     try {
       const response = await this.post<T>(

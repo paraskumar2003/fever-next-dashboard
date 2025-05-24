@@ -39,6 +39,19 @@ export class CategoryServices extends ApiServices {
     }
   }
 
+  static async getCategoroiesWithCount(): Promise<any> {
+    try {
+      const response = await this.get<T>("/v1/trivia/questions-sets");
+      return response;
+    } catch (err: any) {
+      return {
+        data: null,
+        err: err.message,
+        response: err?.response?.data,
+      };
+    }
+  }
+
   static async getCategoryById(categoryId: string): Promise<any> {
     try {
       const response = await this.get<T>(

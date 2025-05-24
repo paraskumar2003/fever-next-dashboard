@@ -13,14 +13,16 @@ import {
 } from "@/components";
 import OnlyContestForm from "@/components/Forms/OnlyContestForm";
 import { useContest } from "@/context/ContestContext";
-import {
-  ContestServices,
-  InstructionPayload,
-  TriviaServices,
-} from "@/services";
+import { ContestServices, TriviaServices } from "@/services";
 import { useSearchParams } from "next/navigation";
 import moment from "moment";
 import Notiflix from "notiflix";
+import {
+  buildContestFormData,
+  buildInstructionFormData,
+  buildQuestionFormData,
+  buildQuestionJsonData,
+} from "@/lib/utils";
 
 const steps = [
   "Contest Details",
@@ -84,9 +86,11 @@ export default function CreateContest() {
   const handleContestSave = async () => {
     Notiflix.Loading.circle();
     try {
-      const form = buildContestFormData(formData);
-      let res = await ContestServices.createContest(form);
-      if (res) goNext();
+      const form = buildContestFormData(formData, contest_id);
+      if (!contest_id) {
+        await ContestServices.createContest(form);
+      }
+      goNext();
       Notiflix.Loading.remove();
     } catch (error: any) {
       Notiflix.Loading.remove();
@@ -94,62 +98,10 @@ export default function CreateContest() {
     }
   };
 
-  function buildContestFormData(formData: any): FormData {
-    const fd = new FormData();
-
-    fd.append("name", formData.contest_name || "");
-    fd.append("rewards", formData.reward_name || "");
-
-    const startDateTime =
-      formData.start_date && formData.start_time
-        ? new Date(
-            `${formData.start_date}T${formData.start_time}:00Z`,
-          ).toISOString()
-        : "";
-    const endDateTime =
-      formData.end_date && formData.end_time
-        ? new Date(
-            `${formData.end_date}T${formData.end_time}:00Z`,
-          ).toISOString()
-        : "";
-
-    fd.append("startDate", startDateTime);
-    fd.append("endDate", endDateTime);
-    fd.append("contestType", formData.contest_type || "FREE");
-    fd.append(
-      "contestFee",
-      formData.contest_type === "PAID"
-        ? String(formData.contest_fee || 0)
-        : "0",
-    );
-    fd.append("contestTypeName", formData.contest_type_name || "");
-    fd.append("sponsored_name", formData.sponsor_name || "DEFAULT");
-
-    // Append files with proper checking
-    if (formData.sponsor_logo instanceof File) {
-      fd.append(
-        "sponsored_logo",
-        formData.sponsor_logo,
-        formData.sponsor_logo.name,
-      );
-    }
-    if (formData.thumbnail instanceof File) {
-      fd.append("thumbnail", formData.thumbnail, formData.thumbnail.name);
-    }
-    if (formData.contest_image instanceof File) {
-      fd.append(
-        "contestImage",
-        formData.contest_image,
-        formData.contest_image.name,
-      );
-    }
-    return fd;
-  }
-
   const handleInstructionSave = async () => {
     Notiflix.Loading.circle();
     try {
-      const form = buildInstructionFormData(formData);
+      const form = buildInstructionFormData(formData, contest_id);
       let res = await TriviaServices.createInstruction(form);
       if (res) goNext();
       Notiflix.Loading.remove();
@@ -159,20 +111,18 @@ export default function CreateContest() {
     }
   };
 
-  function buildInstructionFormData(formData: any) {
-    const fd = new FormData();
-    fd.append("instructions", JSON.stringify(formData.instructions));
-    fd.append("contestId", contest_id || formData.contest_id);
-    fd.append("megaPrizeName", formData.mega_prize_name || "");
-    if (formData.sponsor_logo instanceof File) {
-      fd.append(
-        "sponsored_logo",
-        formData.sponsor_logo,
-        formData.sponsor_logo.name,
-      );
+  const handleGameQuestionSave = async () => {
+    Notiflix.Loading.circle();
+    try {
+      const form = buildQuestionJsonData(formData, contest_id);
+      let res = await TriviaServices.postGameQuestionForm(form);
+      if (res) goNext();
+      Notiflix.Loading.remove();
+    } catch (error: any) {
+      Notiflix.Loading.remove();
+      console.error("Error saving contest:", error);
     }
-    return fd;
-  }
+  };
 
   const questions = [
     {
@@ -222,9 +172,7 @@ export default function CreateContest() {
           <OnlyInstructionForm
             formData={formData}
             updateFormData={updateFormData}
-            onSave={() => {
-              handleInstructionSave();
-            }}
+            onSave={handleInstructionSave}
           />
         );
       case 3:
@@ -232,7 +180,7 @@ export default function CreateContest() {
           <OnlyQuestionForm
             formData={formData}
             updateFormData={updateFormData}
-            onSave={() => {}}
+            onSave={handleGameQuestionSave}
             handleFlipSetModalOpen={() => {}}
           />
         );
@@ -262,3 +210,9 @@ export default function CreateContest() {
     </div>
   );
 }
+
+// ContestId;
+// QuestionCategoryId;
+// NoOfQuestions;
+// Timing;
+// QuestionFlip;

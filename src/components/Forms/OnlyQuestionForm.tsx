@@ -5,6 +5,7 @@ import FormSelect from "@/components/FormSelect";
 import { Button, Typography } from "@mui/material";
 import { ContestFormData, QuestionSet } from "@/types";
 import { questionSets } from "./QuestionSet";
+import { CategoryServices } from "@/services";
 
 interface OnlyQuestionFormProps {
   formData: Partial<ContestFormData>;
@@ -45,12 +46,26 @@ const OnlyQuestionForm: React.FC<OnlyQuestionFormProps> = ({
 
   const [selectedSet, setSelectedSet] = useState<string | null>(null);
   const [sets, setSets] = useState<QuestionSet[]>([]);
+  const [selectedFlipSet, setSelectedFlipSet] = useState<string | null>(null);
   const [error, setError] = useState<string>("");
+  const [flipSetError, setFlipSetError] = useState<string>("");
 
   // Example fetch function for question sets
   const fetchQuestionSets = async () => {
     // Replace with actual API call to fetch sets
-    setSets(questionSets);
+    const res = await CategoryServices.getCategoroiesWithCount();
+    console.log(
+      res.data.data.map((e: Record<string, any>) => ({
+        ...e,
+        name: e.category,
+      })),
+    );
+    setSets(
+      res.data?.data?.map((e: Record<string, any>) => ({
+        ...e,
+        name: e.category,
+      })),
+    );
   };
 
   useEffect(() => {
@@ -58,11 +73,12 @@ const OnlyQuestionForm: React.FC<OnlyQuestionFormProps> = ({
   }, []);
 
   const handleSetSelection = (setId: string) => {
-    const selected = sets.find((set: any) => set.id === setId);
+    const selected = sets.find((set: any) => set.id == setId);
+    console.log(selected?.questions, selected, formData.questions, setId, sets);
     if (
       formData.questions &&
       selected &&
-      selected.questions.length < formData.questions?.length
+      selected.questions < formData.questions?.length
     ) {
       setError(
         `Please choose a set with at least ${formData.questions?.length} questions.`,
@@ -70,6 +86,28 @@ const OnlyQuestionForm: React.FC<OnlyQuestionFormProps> = ({
     } else {
       setError("");
       setSelectedSet(setId); // Valid set, proceed to set it
+      updateFormData({
+        QuestionCategoryId: parseInt(setId),
+      });
+    }
+  };
+
+  const handleFlipSetSelection = (setId: string) => {
+    const selected = sets.find((set: any) => set.id == setId);
+    if (
+      formData.questions &&
+      selected &&
+      selected.id === formData.QuestionCategoryId
+    ) {
+      setFlipSetError(
+        `Please choose a set different from set selected for questions.`,
+      );
+    } else {
+      setFlipSetError("");
+      setSelectedFlipSet(setId); // Valid set, proceed to set it
+      updateFormData({
+        flipSet: parseInt(setId),
+      });
     }
   };
 
@@ -91,10 +129,12 @@ const OnlyQuestionForm: React.FC<OnlyQuestionFormProps> = ({
         <FormSelect
           label="Choose Set"
           value={selectedSet || ""}
-          options={sets.map((set: any) => ({
-            value: set.id,
-            label: `${set.name} - ${set.questions.length} Questions`,
-          }))}
+          options={[{ value: "", label: "" }].concat(
+            sets.map((set: any) => ({
+              value: set.id,
+              label: `${set.name}`,
+            })),
+          )}
           onChange={(e) => handleSetSelection(e.target.value)}
         />
         {error && <p className="mt-2 text-xs text-red-500">{error}</p>}
@@ -103,7 +143,7 @@ const OnlyQuestionForm: React.FC<OnlyQuestionFormProps> = ({
       <div className="mb-6">
         <FormSelect
           label="Game Time Level"
-          value={formData.game_time_level || ""}
+          value={formData.game_time_level || "GAME"}
           options={[
             { value: "GAME", label: "Game" },
             { value: "QUESTION", label: "Question" },
@@ -144,52 +184,60 @@ const OnlyQuestionForm: React.FC<OnlyQuestionFormProps> = ({
       <div className="mt-6">
         <FormSelect
           label="Question Flip Allowed"
-          value={formData.flip_allowed ? "YES" : "NO"}
+          value={formData.flip_allowed}
           options={[
-            { value: "YES", label: "Yes" },
-            { value: "NO", label: "No" },
+            { value: "1", label: "Yes" },
+            { value: "0", label: "No" },
           ]}
           onChange={(e) =>
-            updateFormData({ flip_allowed: e.target.value as "YES" | "NO" })
+            updateFormData({ flip_allowed: Number(e.target.value) })
           }
         />
       </div>
 
-      {formData.flip_allowed && (
-        <div className="mt-4 space-y-4">
-          <FormSelect
-            label="No. of Flips Allowed"
-            value={formData.flip_count?.toString() || "1"}
-            options={Array.from({ length: 50 }, (_, i) => ({
-              value: (i + 1).toString(),
-              label: `${i + 1}`,
-            }))}
-            onChange={(e) =>
-              updateFormData({ flip_count: parseInt(e.target.value) })
-            }
-          />
+      <span>
+        {Boolean(formData.flip_allowed) && (
+          <div className="mt-4 space-y-4">
+            <FormSelect
+              label="No. of Flips Allowed"
+              value={formData.flip_count?.toString() || "1"}
+              options={Array.from({ length: 50 }, (_, i) => ({
+                value: (i + 1).toString(),
+                label: `${i + 1}`,
+              }))}
+              onChange={(e) =>
+                updateFormData({ flip_count: parseInt(e.target.value) })
+              }
+            />
 
-          <FormInput
-            label="Flip Fee"
-            type="number"
-            value={formData.flip_fee || ""}
-            onChange={(e) =>
-              updateFormData({ flip_fee: parseInt(e.target.value) })
-            }
-          />
+            <FormInput
+              label="Flip Fee"
+              type="number"
+              value={formData.flip_fee || ""}
+              onChange={(e) =>
+                updateFormData({ flip_fee: parseInt(e.target.value) })
+              }
+            />
 
-          <Button variant="outlined" onClick={handleFlipSetModalOpen}>
-            Choose Flip Set
-          </Button>
-
-          {formData.flip_set && (
-            <Typography variant="body2" sx={{ mt: 1 }}>
-              Flip Set Selected: {formData.flip_set.name} ("
-              {formData.flip_set.questions.length}" questions)
-            </Typography>
-          )}
-        </div>
-      )}
+            <div className="mb-6">
+              <FormSelect
+                label="Choose Flip Set"
+                value={selectedFlipSet || ""}
+                options={[{ value: "", label: "" }].concat(
+                  sets.map((set: any) => ({
+                    value: set.id,
+                    label: `${set.name}`,
+                  })),
+                )}
+                onChange={(e) => handleFlipSetSelection(e.target.value)}
+              />
+              {flipSetError && (
+                <p className="mt-2 text-xs text-red-500">{flipSetError}</p>
+              )}
+            </div>
+          </div>
+        )}
+      </span>
     </FormSection>
   );
 };

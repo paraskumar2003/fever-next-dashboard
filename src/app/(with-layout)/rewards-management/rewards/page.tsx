@@ -1,6 +1,6 @@
 "use client";
 
-import { PageLayout, SearchBar } from "@/components";
+import { SearchBar } from "@/components";
 import { Table } from "@/components/Tables";
 import { TriviaServices } from "@/services";
 import { Contest } from "@/types/contest";
@@ -30,37 +30,9 @@ export default function ViewContest() {
 
   const columns = [
     { field: "seq_no", headerName: "ID", width: 30 },
-    { field: "contest_name", headerName: "Contest Name", flex: 1 },
-    { field: "contest_fee", headerName: "Contest Fee", flex: 1 },
-    {
-      field: "contest_sponsor_logo",
-      headerName: "Contest Sponsor Logo",
-      flex: 1,
-    },
-    { field: "contest_time", headerName: "Contest Time", flex: 1 },
-    { field: "contest_date", headerName: "Contest Date", flex: 1 },
-    { field: "contest_type", headerName: "Contest Type", flex: 1 },
-    { field: "sponsored_name", headerName: "Sponsor Name", flex: 1 },
-    {
-      field: "metrics",
-      headerName: "Metrics",
-      flex: 2,
-      sortable: false,
-      filterable: false,
-      disableColumnMenu: true,
-      renderCell: (params: { row: Contest }) => (
-        <div className="flex h-full items-center justify-center gap-2">
-          <Button
-            variant="primary"
-            color="primary"
-            size="sm"
-            onClick={() => handleAction("metrics", params.row.id as string)}
-          >
-            <ChartColumnBig />
-          </Button>
-        </div>
-      ),
-    },
+    { field: "nama", headerName: "Reward Name", flex: 1 },
+    { field: "reward_type", headerName: "Reward Type", flex: 1 },
+    { field: "createdAt", headerName: "Created At", flex: 1 },
     {
       field: "actions",
       headerName: "Actions",

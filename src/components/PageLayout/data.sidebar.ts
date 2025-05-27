@@ -121,9 +121,20 @@ export const menuItems = [
   },
 
   {
-    id: "rewards",
-    label: "Rewards",
+    id: "rewards-management",
+    label: "Manage Rewards",
     icon: Gift,
-    path: "/rewards",
+    children: [
+      {
+        id: "rewards",
+        label: "Rewards",
+        path: "/rewards-management/rewards",
+      },
+      {
+        id: "coupons",
+        label: "Coupons",
+        path: "/rewards-management/coupons",
+      },
+    ],
   },
 ];

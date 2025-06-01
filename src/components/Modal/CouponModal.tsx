@@ -148,7 +148,7 @@ const CouponModal: React.FC<CouponModalProps> = ({
               }
               options={[
                 { value: "plain", label: "Plain" },
-                { value: "qr", label: "QR Code" },
+                { value: "attachment", label: "Attachment" },
               ]}
               disabled={isViewMode}
             />

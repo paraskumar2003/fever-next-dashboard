@@ -1,140 +1,94 @@
 "use client";
 
 import { SearchBar } from "@/components";
-import { Table } from "@/components/Tables";
-import { Contest } from "@/types/contest";
 import { useSearchParams } from "next/navigation";
-import moment from "moment";
 import { useEffect, useState } from "react";
-import Button from "@/components/Button";
-import { Eye, SquarePen, Trash2 } from "lucide-react";
 import { RewardServices } from "@/services/rewards/reward";
 import { Reward } from "@/types/rewards";
+import RewardList from "@/components/List/RewardList";
+import Button from "@/components/Button";
+import { Plus } from "lucide-react";
 
-export default function ViewContest() {
+export default function RewardsPage() {
   const searchParams = useSearchParams();
-
-  const handleAction = (
-    action: "view" | "edit" | "delete" | "metrics",
-    reward_id: string | number,
-  ) => {
-    if (action == "view") {
-    }
-
-    if (action == "edit") {
-    }
-
-    if (action == "metrics") {
-    }
-  };
-
-  const columns = [
-    { field: "seq_no", headerName: "ID", width: 30 },
-    { field: "name", headerName: "Reward Name", flex: 1 },
-    { field: "reward_type", headerName: "Reward Type", flex: 1 },
-    { field: "createdAt", headerName: "Created At", flex: 1 },
-    {
-      field: "actions",
-      headerName: "Actions",
-      flex: 2,
-      sortable: false,
-      filterable: false,
-      disableColumnMenu: true,
-      renderCell: (params: { row: Contest }) => (
-        <div className="flex h-full items-center justify-center gap-2">
-          <Button
-            variant="primary"
-            color="primary"
-            size="sm"
-            onClick={() => handleAction("view", params.row.id as string)}
-          >
-            <Eye />
-          </Button>
-          <Button
-            variant="secondary"
-            color="secondary"
-            size="sm"
-            onClick={() => handleAction("edit", params.row.id as string)}
-          >
-            <SquarePen className="text-xs" />
-          </Button>
-          <Button
-            variant="danger"
-            color="error"
-            size="sm"
-            onClick={() => handleAction("delete", params.row.id)}
-          >
-            <Trash2 />
-          </Button>
-        </div>
-      ),
-    },
-  ];
-
-  const [rows, setRows] = useState<any[]>([]);
+  const [rewards, setRewards] = useState<Reward[]>([]);
   const [loading, setLoading] = useState(true);
+  const [rowCount, setRowCount] = useState(0);
+  const [search, setSearch] = useState("");
 
-  const fetchData = async (props?: {
+  const fetchRewards = async (props?: {
     page?: number;
     pageSize?: number;
     q?: string;
   }) => {
     try {
-      const { data } = await RewardServices.getRewards(props); // Use props if needed
-      if (data?.data?.rows) {
-        setRows(
-          data.data.rows.map((e: Reward, index: number) => ({
-            seq_no: index + 1,
-            id: e.id,
-            name: e.name,
-            reward_type: e.reward_type,
-            createdAt: moment(e.createdAt).format("YYYY-MM-DD"),
-          })),
-        );
+      const { data } = await RewardServices.getRewards(props);
+      if (data?.data) {
+        setRewards(data.data.rows);
+        setRowCount(data.data.meta.total);
       }
     } catch (error) {
-      console.error("Error fetching contests:", error);
+      console.error("Error fetching rewards:", error);
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchData();
-  }, [searchParams]);
-
-  const [search, setSearch] = useState("");
-
-  const handleSearch = () => {
-    console.log("Search term:", search);
-  };
-
-  useEffect(() => {
     if (search) {
       const timerId = setTimeout(() => {
-        fetchData({
-          q: search,
-        });
+        fetchRewards({ q: search });
       }, 1000);
       return () => clearTimeout(timerId);
     } else {
-      fetchData();
+      fetchRewards();
     }
   }, [search]);
+
+  const handleView = (reward: Reward) => {
+    // Implement view logic
+  };
+
+  const handleEdit = (reward: Reward) => {
+    // Implement edit logic
+  };
+
+  const handleDelete = async (id: string) => {
+    // Implement delete logic
+  };
+
+  const handlePaginationModelChange = (page: number) => {
+    fetchRewards({ page });
+  };
 
   if (loading) return <div>Loading...</div>;
 
   return (
     <div className="min-h-screen p-8">
-      <h1 className="mb-8 text-xl">Reward Overview</h1>
+      <div className="mb-6 flex items-center justify-between">
+        <h1 className="text-3xl font-bold">Rewards Management</h1>
+        <Button variant="primary" onClick={() => {}}>
+          <Plus className="mr-2 h-4 w-4" />
+          Add New Reward
+        </Button>
+      </div>
+
       <SearchBar
         value={search}
         onChange={setSearch}
-        onSubmit={handleSearch}
-        placeholder="Search items..."
+        placeholder="Search rewards..."
       />
-      <div className="py-2"></div>
-      <Table rows={rows} columns={columns} totalCount={rows.length} />
+
+      <div className="mt-6">
+        <RewardList
+          rewards={rewards}
+          onView={handleView}
+          onEdit={handleEdit}
+          onDelete={handleDelete}
+          rowCount={rowCount}
+          onPaginationModelChange={handlePaginationModelChange}
+        />
+      </div>
     </div>
   );
 }

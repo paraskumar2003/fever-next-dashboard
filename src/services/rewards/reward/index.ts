@@ -3,12 +3,22 @@ import { ApiServices } from "@/services/interceptor.base";
 
 interface T extends AxiosResponse<any, any> {}
 
+interface RewardsFilter {
+  q?: string;
+  page?: number;
+  pageSize?: number;
+}
+
 export class RewardServices extends ApiServices {
-  static async getRewards(page = 1, limit = 10) {
+  static async getRewards(props?: RewardsFilter) {
     try {
-      const response = await this.get<T>(
-        `/v1/rewards/list?page=${page}&limit=${limit}`,
-      );
+      const response = await this.get<T>(`/v1/rewards/list`, {
+        params: {
+          page: props?.page || 1,
+          limit: props?.pageSize || 10,
+          ...(props?.q ? { q: props.q } : {}),
+        },
+      });
       return response;
     } catch (err: any) {
       return { data: null, err: err.message, response: err?.response?.data };

@@ -173,7 +173,6 @@ const TriviaPage = () => {
   };
 
   const handlePaginationModelChange = (page: number) => {
-    console.log({ page });
     setPaginationModel({ ...paginationModel, page });
   };
 

@@ -2,35 +2,35 @@
 
 import { SearchBar } from "@/components";
 import { Table } from "@/components/Tables";
-import { TriviaServices } from "@/services";
 import { Contest } from "@/types/contest";
-import { useParams, useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import moment from "moment";
 import { useEffect, useState } from "react";
 import Button from "@/components/Button";
-import { ChartColumnBig, Eye, SquarePen, Trash2 } from "lucide-react";
+import { Eye, SquarePen, Trash2 } from "lucide-react";
+import { RewardServices } from "@/services/rewards/reward";
+import { Reward } from "@/types/rewards";
 
 export default function ViewContest() {
-  const router = useRouter();
-  const params = useParams();
   const searchParams = useSearchParams();
-
-  const handleMetricsModal = (contest_id: string | number) => {};
 
   const handleAction = (
     action: "view" | "edit" | "delete" | "metrics",
-    contest_id: string | number,
+    reward_id: string | number,
   ) => {
-    if (action == "view")
-      router.push(`/${params.game_name}?contest_id=${contest_id}`);
-    if (action == "edit")
-      router.push(`/${params.game_name}?contest_id=${contest_id}`);
-    if (action == "metrics") handleMetricsModal(contest_id);
+    if (action == "view") {
+    }
+
+    if (action == "edit") {
+    }
+
+    if (action == "metrics") {
+    }
   };
 
   const columns = [
     { field: "seq_no", headerName: "ID", width: 30 },
-    { field: "nama", headerName: "Reward Name", flex: 1 },
+    { field: "name", headerName: "Reward Name", flex: 1 },
     { field: "reward_type", headerName: "Reward Type", flex: 1 },
     { field: "createdAt", headerName: "Created At", flex: 1 },
     {
@@ -71,38 +71,35 @@ export default function ViewContest() {
     },
   ];
 
-  const { game_name } = useParams();
   const [rows, setRows] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        let filter: Record<string, any> = {};
-        filter.category = searchParams.get("category") ?? undefined;
-        const { data } = await TriviaServices.getContests(filter);
-        if (data.data) {
-          setRows(
-            data.data.rows.map((e: Contest, index: number) => ({
-              seq_no: index + 1,
-              id: e.id,
-              contest_name: e.name,
-              contest_fee: e.contestFee,
-              contest_sponsor_logo: e.sponsored_logo,
-              contest_date: moment(new Date(e.createdAt)).format("YYYY-MM-DD"),
-              contest_time: moment(new Date(e.createdAt)).format("HH:mm"),
-              sponsored_name: e.sponsored_name,
-              contest_type: e.contestTypeName,
-            })),
-          );
-        }
-      } catch (error) {
-        console.error("Error fetching contests:", error);
-      } finally {
-        setLoading(false);
+  const fetchData = async (props?: {
+    page?: number;
+    pageSize?: number;
+    q?: string;
+  }) => {
+    try {
+      const { data } = await RewardServices.getRewards(props); // Use props if needed
+      if (data?.data?.rows) {
+        setRows(
+          data.data.rows.map((e: Reward, index: number) => ({
+            seq_no: index + 1,
+            id: e.id,
+            name: e.name,
+            reward_type: e.reward_type,
+            createdAt: moment(e.createdAt).format("YYYY-MM-DD"),
+          })),
+        );
       }
-    };
+    } catch (error) {
+      console.error("Error fetching contests:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     fetchData();
   }, [searchParams]);
 
@@ -112,16 +109,24 @@ export default function ViewContest() {
     console.log("Search term:", search);
   };
 
+  useEffect(() => {
+    if (search) {
+      const timerId = setTimeout(() => {
+        fetchData({
+          q: search,
+        });
+      }, 1000);
+      return () => clearTimeout(timerId);
+    } else {
+      fetchData();
+    }
+  }, [search]);
+
   if (loading) return <div>Loading...</div>;
 
   return (
     <div className="min-h-screen p-8">
-      <h1 className="mb-8 text-xl">
-        Contest Overview - (&nbsp;
-        {String(game_name).charAt(0).toUpperCase() +
-          String(game_name).slice(1).toLowerCase()}
-        &nbsp;)
-      </h1>
+      <h1 className="mb-8 text-xl">Reward Overview</h1>
       <SearchBar
         value={search}
         onChange={setSearch}

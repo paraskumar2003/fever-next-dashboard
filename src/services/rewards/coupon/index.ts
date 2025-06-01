@@ -5,14 +5,19 @@ import { AxiosResponse } from "axios";
 interface T extends AxiosResponse<any, any> {}
 
 export class CouponServices extends ApiServices {
-  static async getCoupons(filter: Record<string, any>) {
+  static async getCoupons({
+    page = 1,
+    pageSize = 10,
+    ...filter
+  }: Record<string, any>) {
     try {
-      const queryString = filter
-        ? `?${new URLSearchParams(filter as any).toString()}`
-        : "";
-      const response = await this.get<T>(
-        `/v1/rewards/coupons/list${queryString}`,
-      );
+      const response = await this.get<T>(`/v1/rewards/coupons/list`, {
+        params: {
+          page,
+          limit: pageSize,
+          ...filter,
+        },
+      });
       return response;
     } catch (err: any) {
       return { data: null, err: err.message, response: err?.response?.data };

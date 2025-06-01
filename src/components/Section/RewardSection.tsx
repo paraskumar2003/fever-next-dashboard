@@ -4,6 +4,8 @@ import FormSection from "../FormSection";
 import RewardList from "../List/RewardList";
 import Button from "../Button";
 import { Reward } from "@/types/rewards";
+import RewardModal from "../Modal/RewardModal";
+import { useModal } from "@/hooks/useModal";
 
 interface RewardSectionProps {
   rewards: Reward[];
@@ -24,11 +26,13 @@ const RewardSection: React.FC<RewardSectionProps> = ({
   onPaginationModelChange,
   onSave,
 }) => {
+  const addRewardModal = useModal();
+
   return (
     <FormSection
       title="Rewards"
       headerAction={
-        <Button variant="secondary" size="sm" onClick={onSave}>
+        <Button variant="secondary" size="sm" onClick={addRewardModal.open}>
           <Plus className="mr-2 h-4 w-4" />
           Add New
         </Button>
@@ -41,6 +45,12 @@ const RewardSection: React.FC<RewardSectionProps> = ({
         onDelete={onDelete}
         rowCount={rowCount}
         onPaginationModelChange={onPaginationModelChange}
+      />
+
+      <RewardModal
+        isOpen={addRewardModal.isOpen}
+        onClose={addRewardModal.close}
+        onSave={onSave}
       />
     </FormSection>
   );

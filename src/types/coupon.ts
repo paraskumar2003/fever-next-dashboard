@@ -9,3 +9,14 @@ export interface Coupon {
   createdAt: Date;
   updatedAt: Date;
 }
+
+export interface CouponFormData {
+  type: string;
+  brand_name: string;
+  rewardId: number;
+  couponTypeId: number;
+  coupon_code: string;
+  coupon_pin: string;
+  status: number;
+  coupon_attachment?: File;
+}

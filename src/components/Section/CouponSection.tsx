@@ -4,6 +4,8 @@ import FormSection from "../FormSection";
 import CouponList from "../List/CouponList";
 import Button from "../Button";
 import { Coupon } from "@/types/coupon";
+import CouponModal from "../Modal/CouponModal";
+import { useModal } from "@/hooks/useModal";
 
 interface CouponSectionProps {
   coupons: Coupon[];
@@ -24,11 +26,13 @@ const CouponSection: React.FC<CouponSectionProps> = ({
   onPaginationModelChange,
   onSave,
 }) => {
+  const addCouponModal = useModal();
+
   return (
     <FormSection
       title="Coupons"
       headerAction={
-        <Button variant="secondary" size="sm" onClick={onSave}>
+        <Button variant="secondary" size="sm" onClick={addCouponModal.open}>
           <Plus className="mr-2 h-4 w-4" />
           Add New
         </Button>
@@ -41,6 +45,12 @@ const CouponSection: React.FC<CouponSectionProps> = ({
         onDelete={onDelete}
         rowCount={rowCount}
         onPaginationModelChange={onPaginationModelChange}
+      />
+
+      <CouponModal
+        isOpen={addCouponModal.isOpen}
+        onClose={addCouponModal.close}
+        onSave={onSave}
       />
     </FormSection>
   );

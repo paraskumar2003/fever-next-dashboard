@@ -90,8 +90,14 @@ const CouponModal: React.FC<CouponModalProps> = ({
     setLoading(true);
     try {
       const formDataToSend = buildCouponFormData(formData);
-      await CouponServices.createCoupon(formDataToSend);
-      Notiflix.Notify.success("Coupon created successfully!");
+      
+      if (couponData?.id) {
+        await CouponServices.updateCoupon(couponData.id, formDataToSend);
+        Notiflix.Notify.success("Coupon updated successfully!");
+      } else {
+        await CouponServices.createCoupon(formDataToSend);
+        Notiflix.Notify.success("Coupon created successfully!");
+      }
 
       if (onSave) {
         await onSave();
@@ -99,7 +105,7 @@ const CouponModal: React.FC<CouponModalProps> = ({
       onClose();
     } catch (error) {
       console.error("Error saving coupon:", error);
-      Notiflix.Notify.failure("Failed to create coupon");
+      Notiflix.Notify.failure(couponData?.id ? "Failed to update coupon" : "Failed to create coupon");
     } finally {
       setLoading(false);
     }
@@ -209,7 +215,7 @@ const CouponModal: React.FC<CouponModalProps> = ({
               onChange={handleFileChange}
               disabled={isViewMode}
               accept="image/*,.pdf"
-              required
+              required={!couponData?.id}
             />
 
             <FormSelect
@@ -234,7 +240,11 @@ const CouponModal: React.FC<CouponModalProps> = ({
             {!isViewMode && (
               <Button type="submit" disabled={loading}>
                 <Save className="mr-2 h-4 w-4" />
-                {loading ? "Saving..." : "Save Coupon"}
+                {loading
+                  ? "Saving..."
+                  : couponData?.id
+                  ? "Update Coupon"
+                  : "Save Coupon"}
               </Button>
             )}
           </div>

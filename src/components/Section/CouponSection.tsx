@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Plus } from "lucide-react";
 import FormSection from "../FormSection";
 import CouponList from "../List/CouponList";
@@ -27,12 +27,27 @@ const CouponSection: React.FC<CouponSectionProps> = ({
   onSave,
 }) => {
   const addCouponModal = useModal();
+  const editCouponModal = useModal();
+  const [selectedCoupon, setSelectedCoupon] = useState<Coupon | null>(null);
+  const [isViewMode, setIsViewMode] = useState(false);
+
+  const handleCouponView = (coupon: Coupon) => {
+    setSelectedCoupon(coupon);
+    setIsViewMode(true);
+    editCouponModal.open();
+  };
+
+  const handleCouponEdit = (coupon: Coupon) => {
+    setSelectedCoupon(coupon);
+    setIsViewMode(false);
+    editCouponModal.open();
+  };
 
   return (
     <FormSection
       title="Coupons"
       headerAction={
-        <Button variant="secondary\" size="sm\" onClick={addCouponModal.open}>
+        <Button variant="secondary" size="sm" onClick={addCouponModal.open}>
           <Plus className="mr-2 h-4 w-4" />
           Add New
         </Button>
@@ -40,8 +55,8 @@ const CouponSection: React.FC<CouponSectionProps> = ({
     >
       <CouponList
         coupons={coupons}
-        onView={onView}
-        onEdit={onEdit}
+        onView={handleCouponView}
+        onEdit={handleCouponEdit}
         onDelete={onDelete}
         rowCount={rowCount}
         onPaginationModelChange={onPaginationModelChange}
@@ -50,6 +65,14 @@ const CouponSection: React.FC<CouponSectionProps> = ({
       <CouponModal
         isOpen={addCouponModal.isOpen}
         onClose={addCouponModal.close}
+        onSave={onSave}
+      />
+
+      <CouponModal
+        isOpen={editCouponModal.isOpen}
+        onClose={editCouponModal.close}
+        couponData={selectedCoupon}
+        isViewMode={isViewMode}
         onSave={onSave}
       />
     </FormSection>

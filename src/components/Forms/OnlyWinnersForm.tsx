@@ -24,7 +24,7 @@ const OnlyWinnersForm: React.FC<OnlyWinnersFormProps> = ({
   useEffect(() => {
     const fetchRewards = async () => {
       try {
-        const { data } = await RewardServices.getRewards();
+        const { data } = await RewardServices.getRewards({ pageSize: 100 });
         if (data?.data?.rows) {
           setRewards(data.data.rows);
         }

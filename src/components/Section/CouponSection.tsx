@@ -47,7 +47,7 @@ const CouponSection: React.FC<CouponSectionProps> = ({
     <FormSection
       title="Coupons"
       headerAction={
-        <Button variant="secondary" size="sm" onClick={addCouponModal.open}>
+        <Button variant="secondary\" size="sm\" onClick={addCouponModal.open}>
           <Plus className="mr-2 h-4 w-4" />
           Add New
         </Button>

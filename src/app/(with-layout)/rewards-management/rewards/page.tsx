@@ -6,6 +6,8 @@ import { useEffect, useState } from "react";
 import { RewardServices } from "@/services/rewards/reward";
 import { Reward } from "@/types/rewards";
 import RewardSection from "@/components/Section/RewardSection";
+import { useModal } from "@/hooks/useModal";
+import RewardModal from "@/components/Modal/RewardModal";
 
 export default function RewardsPage() {
   const searchParams = useSearchParams();
@@ -13,6 +15,9 @@ export default function RewardsPage() {
   const [loading, setLoading] = useState(true);
   const [rowCount, setRowCount] = useState(0);
   const [search, setSearch] = useState("");
+  const [selectedReward, setSelectedReward] = useState<Reward | null>(null);
+  const [isViewMode, setIsViewMode] = useState(false);
+  const modal = useModal();
 
   const fetchRewards = async (props?: {
     page?: number;
@@ -44,11 +49,15 @@ export default function RewardsPage() {
   }, [search]);
 
   const handleView = (reward: Reward) => {
-    // Implement view logic
+    setSelectedReward(reward);
+    setIsViewMode(true);
+    modal.open();
   };
 
   const handleEdit = (reward: Reward) => {
-    // Implement edit logic
+    setSelectedReward(reward);
+    setIsViewMode(false);
+    modal.open();
   };
 
   const handleDelete = async (id: string) => {
@@ -79,6 +88,17 @@ export default function RewardsPage() {
         onPaginationModelChange={handlePaginationModelChange}
         onSave={async () => {
           await fetchRewards();
+        }}
+      />
+
+      <RewardModal
+        isOpen={modal.isOpen}
+        onClose={modal.close}
+        rewardData={selectedReward}
+        isViewMode={isViewMode}
+        onSave={async () => {
+          await fetchRewards();
+          modal.close();
         }}
       />
     </div>

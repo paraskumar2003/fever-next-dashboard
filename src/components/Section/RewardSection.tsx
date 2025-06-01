@@ -32,7 +32,7 @@ const RewardSection: React.FC<RewardSectionProps> = ({
     <FormSection
       title="Rewards"
       headerAction={
-        <Button variant="secondary" size="sm" onClick={addRewardModal.open}>
+        <Button variant="secondary\" size="sm\" onClick={addRewardModal.open}>
           <Plus className="mr-2 h-4 w-4" />
           Add New
         </Button>

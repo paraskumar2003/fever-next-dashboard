@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Modal } from "@mui/material";
 import Button from "../Button";
 import FormInput from "../FormInput";
@@ -23,11 +23,25 @@ const RewardModal: React.FC<RewardModalProps> = ({
   onSave,
 }) => {
   const [formData, setFormData] = useState({
-    name: rewardData?.name || "",
-    reward_type: rewardData?.reward_type || "DIGITAL",
+    name: "",
+    reward_type: "DIGITAL",
   });
 
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (rewardData) {
+      setFormData({
+        name: rewardData.name || "",
+        reward_type: rewardData.reward_type || "DIGITAL",
+      });
+    } else {
+      setFormData({
+        name: "",
+        reward_type: "DIGITAL",
+      });
+    }
+  }, [rewardData]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -35,19 +49,32 @@ const RewardModal: React.FC<RewardModalProps> = ({
 
     setLoading(true);
     try {
-      await RewardServices.createReward({
-        name: formData.name,
-        reward_type: formData.reward_type as "DIGITAL" | "PHYSICAL",
-      });
+      if (rewardData?.id) {
+        // Update existing reward
+        await RewardServices.updateReward(rewardData.id, {
+          name: formData.name,
+          reward_type: formData.reward_type as "DIGITAL" | "PHYSICAL",
+        });
+        Notiflix.Notify.success("Reward updated successfully!");
+      } else {
+        // Create new reward
+        await RewardServices.createReward({
+          name: formData.name,
+          reward_type: formData.reward_type as "DIGITAL" | "PHYSICAL",
+        });
+        Notiflix.Notify.success("Reward created successfully!");
+      }
 
       if (onSave) {
         await onSave();
       }
-      Notiflix.Notify.success("Reward created successfully!");
-      onClose();
     } catch (error) {
-      console.error("Error creating reward:", error);
-      Notiflix.Notify.failure("Failed to create reward");
+      console.error("Error saving reward:", error);
+      Notiflix.Notify.failure(
+        rewardData?.id
+          ? "Failed to update reward"
+          : "Failed to create reward"
+      );
     } finally {
       setLoading(false);
     }
@@ -114,7 +141,11 @@ const RewardModal: React.FC<RewardModalProps> = ({
             {!isViewMode && (
               <Button type="submit" disabled={loading}>
                 <Save className="mr-2 h-4 w-4" />
-                {loading ? "Saving..." : "Save Reward"}
+                {loading
+                  ? "Saving..."
+                  : rewardData?.id
+                  ? "Update Reward"
+                  : "Save Reward"}
               </Button>
             )}
           </div>

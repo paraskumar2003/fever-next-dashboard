@@ -8,6 +8,11 @@ import { CouponServices } from "@/services/rewards/coupon";
 import { buildCouponFormData } from "@/lib/utils/rewards/formbuilder";
 import Notiflix from "notiflix";
 
+interface CouponType {
+  id: string;
+  name: string;
+}
+
 interface CouponModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -27,7 +32,7 @@ const CouponModal: React.FC<CouponModalProps> = ({
     type: "plain",
     brand_name: "",
     rewardId: 1,
-    couponTypeId: 1,
+    couponTypeId: "1",
     coupon_code: "",
     coupon_pin: "",
     status: 1,
@@ -35,6 +40,23 @@ const CouponModal: React.FC<CouponModalProps> = ({
   });
 
   const [loading, setLoading] = useState(false);
+  const [couponTypes, setCouponTypes] = useState<CouponType[]>([]);
+
+  useEffect(() => {
+    const fetchCouponTypes = async () => {
+      try {
+        const { data } = await CouponServices.getCouponTypes({});
+        if (data?.data) {
+          setCouponTypes(data.data);
+        }
+      } catch (error) {
+        console.error("Error fetching coupon types:", error);
+        Notiflix.Notify.failure("Failed to fetch coupon types");
+      }
+    };
+
+    fetchCouponTypes();
+  }, []);
 
   useEffect(() => {
     if (couponData) {
@@ -45,13 +67,14 @@ const CouponModal: React.FC<CouponModalProps> = ({
         coupon_code: couponData.coupon_code || "",
         coupon_pin: couponData.coupon_pin || "",
         status: couponData.status || 1,
+        couponTypeId: couponData.couponTypeId || "1",
       });
     } else {
       setFormData({
         type: "plain",
         brand_name: "",
         rewardId: 1,
-        couponTypeId: 1,
+        couponTypeId: "1",
         coupon_code: "",
         coupon_pin: "",
         status: 1,
@@ -128,6 +151,23 @@ const CouponModal: React.FC<CouponModalProps> = ({
                 { value: "qr", label: "QR Code" },
               ]}
               disabled={isViewMode}
+            />
+
+            <FormSelect
+              label="Coupon Type"
+              value={formData.couponTypeId}
+              onChange={(e) =>
+                setFormData({ ...formData, couponTypeId: e.target.value })
+              }
+              options={[
+                { value: "", label: "Select Coupon Type" },
+                ...couponTypes.map((type) => ({
+                  value: type.id,
+                  label: type.name,
+                })),
+              ]}
+              disabled={isViewMode}
+              required
             />
 
             <FormInput

@@ -5,9 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { CouponServices } from "@/services/rewards/coupon";
 import { Coupon } from "@/types/coupon";
-import CouponList from "@/components/List/CouponList";
-import Button from "@/components/Button";
-import { Plus } from "lucide-react";
+import CouponSection from "@/components/Section/CouponSection";
 
 export default function CouponsPage() {
   const searchParams = useSearchParams();
@@ -65,30 +63,24 @@ export default function CouponsPage() {
 
   return (
     <div className="min-h-screen p-8">
-      <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-3xl font-bold">Coupons Management</h1>
-        <Button variant="primary" onClick={() => {}}>
-          <Plus className="mr-2 h-4 w-4" />
-          Add New Coupon
-        </Button>
-      </div>
-
+      <h1 className="mb-8 text-xl">Coupons Management</h1>
       <SearchBar
         value={search}
         onChange={setSearch}
         placeholder="Search coupons..."
       />
-
-      <div className="mt-6">
-        <CouponList
-          coupons={coupons}
-          onView={handleView}
-          onEdit={handleEdit}
-          onDelete={handleDelete}
-          rowCount={rowCount}
-          onPaginationModelChange={handlePaginationModelChange}
-        />
-      </div>
+      <div className="py-2"></div>
+      <CouponSection
+        coupons={coupons}
+        onView={handleView}
+        onEdit={handleEdit}
+        onDelete={handleDelete}
+        rowCount={rowCount}
+        onPaginationModelChange={handlePaginationModelChange}
+        onSave={async () => {
+          await fetchCoupons();
+        }}
+      />
     </div>
   );
 }

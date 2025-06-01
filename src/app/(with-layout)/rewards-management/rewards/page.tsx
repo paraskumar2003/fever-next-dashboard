@@ -5,9 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { RewardServices } from "@/services/rewards/reward";
 import { Reward } from "@/types/rewards";
-import RewardList from "@/components/List/RewardList";
-import Button from "@/components/Button";
-import { Plus } from "lucide-react";
+import RewardSection from "@/components/Section/RewardSection";
 
 export default function RewardsPage() {
   const searchParams = useSearchParams();
@@ -65,30 +63,24 @@ export default function RewardsPage() {
 
   return (
     <div className="min-h-screen p-8">
-      <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-3xl font-bold">Rewards Management</h1>
-        <Button variant="primary" onClick={() => {}}>
-          <Plus className="mr-2 h-4 w-4" />
-          Add New Reward
-        </Button>
-      </div>
-
+      <h1 className="mb-8 text-xl">Rewards Management</h1>
       <SearchBar
         value={search}
         onChange={setSearch}
         placeholder="Search rewards..."
       />
-
-      <div className="mt-6">
-        <RewardList
-          rewards={rewards}
-          onView={handleView}
-          onEdit={handleEdit}
-          onDelete={handleDelete}
-          rowCount={rowCount}
-          onPaginationModelChange={handlePaginationModelChange}
-        />
-      </div>
+      <div className="py-2"></div>
+      <RewardSection
+        rewards={rewards}
+        onView={handleView}
+        onEdit={handleEdit}
+        onDelete={handleDelete}
+        rowCount={rowCount}
+        onPaginationModelChange={handlePaginationModelChange}
+        onSave={async () => {
+          await fetchRewards();
+        }}
+      />
     </div>
   );
 }

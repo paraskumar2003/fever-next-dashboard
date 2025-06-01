@@ -1,9 +1,11 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import FormSection from "@/components/FormSection";
 import FormSelect from "@/components/FormSelect";
 import FormInput from "@/components/FormInput";
-import ImageUpload from "@/components/ImageUpload";
-import { ContestFormData, RewardType } from "@/types";
+import { ContestFormData } from "@/types";
+import { RewardServices } from "@/services/rewards/reward";
+import { ContestServices } from "@/services/contest";
+import Notiflix from "notiflix";
 
 interface OnlyWinnersFormProps {
   formData: Partial<ContestFormData>;
@@ -11,36 +13,43 @@ interface OnlyWinnersFormProps {
   onSave: Function;
 }
 
-const rewardTypeOptions = [
-  { value: "PHYSICAL", label: "Physical" },
-  { value: "COUPON_PDF", label: "Coupon PDF" },
-  { value: "CODE", label: "Code" },
-];
-
 const OnlyWinnersForm: React.FC<OnlyWinnersFormProps> = ({
   formData,
   updateFormData,
   onSave,
 }) => {
-  const { winners, sponsor_logo = "" } = formData;
+  const [rewards, setRewards] = useState<any[]>([]);
+  const { winners } = formData;
+
+  useEffect(() => {
+    const fetchRewards = async () => {
+      try {
+        const { data } = await RewardServices.getRewards();
+        if (data?.data?.rows) {
+          setRewards(data.data.rows);
+        }
+      } catch (error) {
+        console.error("Error fetching rewards:", error);
+      }
+    };
+
+    fetchRewards();
+  }, []);
 
   const handleWinnerCountChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const count = parseInt(e.target.value);
     if (winners) {
       const newWinners = Array.from({ length: count }, (_, index) => ({
-        reward_type: winners[index]?.reward_type || "PHYSICAL",
-        reward_image: winners[index]?.reward_image || "",
-        reward_file: winners[index]?.reward_file || "",
+        reward_id: winners[index]?.reward_id || "",
+        bucks: winners[index]?.bucks || 0,
       }));
-
-      console.log(newWinners);
       updateFormData({ winners: newWinners });
     }
   };
 
   const updateWinner = (
     index: number,
-    data: Partial<ContestFormData["winners"][0]>,
+    data: Partial<{ reward_id: number; bucks: number }>,
   ) => {
     if (winners) {
       const updated = [...winners];
@@ -49,12 +58,32 @@ const OnlyWinnersForm: React.FC<OnlyWinnersFormProps> = ({
     }
   };
 
-  const updateSponsorLogo = (base64: string) => {
-    updateFormData({ sponsor_logo: base64 });
+  const handleSubmit = async () => {
+    try {
+      if (!formData.contest_id || !winners?.length) {
+        Notiflix.Notify.failure("Missing required data");
+        return;
+      }
+
+      const payload = {
+        contest_id: Number(formData.contest_id),
+        prizes: winners.map(winner => ({
+          reward_id: Number(winner.reward_id),
+          bucks: Number(winner.bucks) || 0
+        }))
+      };
+
+      await ContestServices.createContestPrize(payload);
+      Notiflix.Notify.success("Contest prizes saved successfully!");
+      if (onSave) onSave();
+    } catch (error) {
+      console.error("Error saving contest prizes:", error);
+      Notiflix.Notify.failure("Failed to save contest prizes");
+    }
   };
 
   return (
-    <FormSection title="Winners & Rewards" onSave={() => onSave()}>
+    <FormSection title="Winners & Rewards" onSave={handleSubmit}>
       <div className="mb-6">
         {winners && (
           <FormSelect
@@ -81,56 +110,33 @@ const OnlyWinnersForm: React.FC<OnlyWinnersFormProps> = ({
               </h3>
 
               <FormSelect
-                label="Reward Type"
-                value={winner.reward_type}
-                options={rewardTypeOptions}
+                label="Select Reward"
+                value={winner.reward_id?.toString() || ""}
+                options={[
+                  { value: "", label: "Select a reward" },
+                  ...rewards.map(reward => ({
+                    value: reward.id.toString(),
+                    label: `${reward.name} (${reward.reward_type})`
+                  }))
+                ]}
                 onChange={(e) =>
                   updateWinner(index, {
-                    reward_type: e.target.value as RewardType,
+                    reward_id: Number(e.target.value),
                   })
                 }
               />
 
-              {(winner.reward_type === "COUPON_PDF" ||
-                winner.reward_type === "CODE") && (
-                <>
-                  {winner.reward_type === "COUPON_PDF" ? (
-                    <FormInput
-                      type="file"
-                      accept=".pdf"
-                      label="Upload Coupon PDF"
-                      onChange={(e) => {
-                        const file = e.target.files?.[0];
-                        if (file) {
-                          const reader = new FileReader();
-                          reader.onloadend = () =>
-                            updateWinner(index, {
-                              reward_file: reader.result as string,
-                            });
-                          reader.readAsDataURL(file);
-                        }
-                      }}
-                    />
-                  ) : (
-                    <FormInput
-                      label="Enter Voucher Code"
-                      placeholder="Enter code"
-                      value={winner.reward_file || ""}
-                      onChange={(e) =>
-                        updateWinner(index, { reward_file: e.target.value })
-                      }
-                    />
-                  )}
-                </>
+              {rewards.find(r => r.id === Number(winner.reward_id))?.reward_type === "FEVER_BUCKS" && (
+                <FormInput
+                  label="Fever Bucks Amount"
+                  type="number"
+                  min="0"
+                  value={winner.bucks?.toString() || "0"}
+                  onChange={(e) =>
+                    updateWinner(index, { bucks: Number(e.target.value) })
+                  }
+                />
               )}
-
-              <ImageUpload
-                label="Reward Image"
-                value={winner.reward_image || ""}
-                onChange={(base64) =>
-                  updateWinner(index, { reward_image: base64 })
-                }
-              />
             </div>
           ))}
         </div>

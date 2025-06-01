@@ -126,7 +126,7 @@ const OnlyWinnersForm: React.FC<OnlyWinnersFormProps> = ({
                 }
               />
 
-              {rewards.find((r) => r.id === Number(winner.reward_id))
+              {rewards.find((r) => r.id == Number(winner.reward_id))
                 ?.reward_type === "FEVER_BUCKS" && (
                 <FormInput
                   label="Fever Bucks Amount"

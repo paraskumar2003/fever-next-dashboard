@@ -47,6 +47,7 @@ export default function CreateContest() {
         const details = data.data;
         updateFormData({
           ...formData,
+          contest_id: details.id,
           contest_name: details.name,
           reward_name: details?.rewards?.prize,
           start_date: moment(details?.startDate).format("YYYY-MM-DD"),
@@ -124,6 +125,45 @@ export default function CreateContest() {
     }
   };
 
+  const handleWinnersSave = async () => {
+    try {
+      if (!formData.contest_id || !formData.winners?.length) {
+        Notiflix.Notify.failure("Missing required data");
+        return;
+      }
+
+      const payload = {
+        contest_id: Number(formData.contest_id),
+        prizes: formData.winners.map((winner) => ({
+          reward_id: Number(winner.reward_id),
+          bucks: Number(winner.bucks) || 0,
+        })),
+      };
+
+      await ContestServices.createContestPrize(payload);
+      Notiflix.Notify.success("Contest prizes saved successfully!");
+    } catch (error) {
+      console.error("Error saving contest prizes:", error);
+      Notiflix.Notify.failure("Failed to save contest prizes");
+    }
+  };
+
+  const handleChangeIndex = async (e: number) => {
+    if (e === 0) {
+      await handleContestSave();
+    }
+    if (e === 1) {
+      await handleWinnersSave();
+    }
+    if (e === 2) {
+      await handleInstructionSave();
+    }
+    if (e === 3) {
+      await handleGameQuestionSave();
+    }
+    goToStep(e + 1);
+  };
+
   const questions = [
     {
       question_no: 1,
@@ -156,7 +196,9 @@ export default function CreateContest() {
           <OnlyContestForm
             formData={formData}
             updateFormData={updateFormData}
-            onSave={handleContestSave}
+            onSave={() => {
+              handleChangeIndex(currentStep);
+            }}
           />
         );
       case 1:
@@ -164,7 +206,9 @@ export default function CreateContest() {
           <OnlyWinnersForm
             formData={formData}
             updateFormData={updateFormData}
-            onSave={handleContestSave}
+            onSave={() => {
+              handleChangeIndex(currentStep);
+            }}
           />
         );
       case 2:
@@ -172,7 +216,9 @@ export default function CreateContest() {
           <OnlyInstructionForm
             formData={formData}
             updateFormData={updateFormData}
-            onSave={handleInstructionSave}
+            onSave={() => {
+              handleChangeIndex(currentStep);
+            }}
           />
         );
       case 3:

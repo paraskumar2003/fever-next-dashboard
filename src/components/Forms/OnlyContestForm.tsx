@@ -99,30 +99,7 @@ const OnlyContestForm: React.FC<OnlyContestFormProps> = ({
           />
         )}
       </div>
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-        <FormSelect
-          label="Contest Type"
-          options={[
-            { value: "", label: "" },
-            { value: "REGULAR", label: "Regular" },
-            { value: "MAHABONANZA", label: "Maha Bonanza" },
-          ]}
-          value={formData.contest_type_name}
-          onChange={(e) =>
-            updateFormData({
-              contest_type_name: e.target.value as "MAHABONANZA" | "REGULAR",
-            })
-          }
-        />
-        {/* <FormInput
-          label="Contest Variant Name (Optional)"
-          placeholder="E.g., Summer Edition"
-          value={formData.contest_variant_name || ""}
-          onChange={(e) =>
-            updateFormData({ contest_variant_name: e.target.value })
-          }
-        /> */}
-      </div>
+
       {/* <FormInput
         label="Sponsor Name"
         placeholder="Enter sponsor name"

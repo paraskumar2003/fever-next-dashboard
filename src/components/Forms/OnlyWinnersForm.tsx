@@ -64,17 +64,6 @@ const OnlyWinnersForm: React.FC<OnlyWinnersFormProps> = ({
         Notiflix.Notify.failure("Missing required data");
         return;
       }
-
-      const payload = {
-        contest_id: Number(formData.contest_id),
-        prizes: winners.map((winner) => ({
-          reward_id: Number(winner.reward_id),
-          bucks: Number(winner.bucks) || 0,
-        })),
-      };
-
-      await ContestServices.createContestPrize(payload);
-      Notiflix.Notify.success("Contest prizes saved successfully!");
       if (onSave) onSave();
     } catch (error) {
       console.error("Error saving contest prizes:", error);

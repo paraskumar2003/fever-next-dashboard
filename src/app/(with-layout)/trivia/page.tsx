@@ -1,29 +1,50 @@
 "use client";
+
 import React, { useEffect, useState } from "react";
-import { useSearchParams } from "next/navigation";
-import { useContest } from "@/context/ContestContext";
-import { SearchBar } from "@/components";
-import { OnlyInstructionForm, OnlyQuestionForm, OnlyWinnersForm, StepNavigation, TriviaGamePlay } from "@/components";
+
+// Import your already-developed forms
+import {
+  Breadcrumb,
+  OnlyInstructionForm,
+  OnlyQuestionForm,
+  OnlyWinnersForm,
+  StepNavigation,
+  TriviaGamePlay,
+} from "@/components";
 import OnlyContestForm from "@/components/Forms/OnlyContestForm";
+import { useContest } from "@/context/ContestContext";
 import { ContestServices, TriviaServices } from "@/services";
+import { useSearchParams } from "next/navigation";
 import moment from "moment";
 import Notiflix from "notiflix";
-import { buildContestFormData, buildInstructionFormData, buildQuestionJsonData } from "@/lib/utils";
+import {
+  buildContestFormData,
+  buildInstructionFormData,
+  buildQuestionJsonData,
+} from "@/lib/utils";
 
 const steps = [
   "Contest Details",
   "Winners & Rewards",
   "Instructions",
   "Game Questions",
-  "Review & Publish",
 ];
 
 export default function CreateContest() {
   const searchParams = useSearchParams();
+
   const contest_id = searchParams.get("contest_id");
+
   const [currentStep, setCurrentStep] = useState(0);
   const { formData, updateFormData } = useContest();
-  const [stepSubmitted, setStepSubmitted] = useState<boolean[]>(new Array(steps.length).fill(false));
+
+  // New state to track submission status for each form
+  const [formSubmissionStatus, setFormSubmissionStatus] = useState({
+    contestDetails: false,
+    winnersAndRewards: false,
+    instructions: false,
+    gameQuestions: false,
+  });
 
   const fetchContestDetails = async (contest_id: string) => {
     try {
@@ -49,6 +70,8 @@ export default function CreateContest() {
           contest_image_preview: details?.contestImage,
           contest_hero_logo_preview: details?.contestHeroLogo,
         });
+        // If contest details are fetched, assume this step is "submitted"
+        setFormSubmissionStatus((prev) => ({ ...prev, contestDetails: true }));
       }
     } catch (error) {
       console.error("Error fetching contest details:", error);
@@ -61,31 +84,128 @@ export default function CreateContest() {
     }
   }, [contest_id]);
 
+  const goNext = () => {
+    // Only allow going to the next step if the current form has been submitted
+    if (currentStep === 0 && !formSubmissionStatus.contestDetails) {
+      Notiflix.Notify.warning("Please save Contest Details before proceeding.");
+      return;
+    }
+    if (currentStep === 1 && !formSubmissionStatus.winnersAndRewards) {
+      Notiflix.Notify.warning(
+        "Please save Winners & Rewards before proceeding.",
+      );
+      return;
+    }
+    if (currentStep === 2 && !formSubmissionStatus.instructions) {
+      Notiflix.Notify.warning("Please save Instructions before proceeding.");
+      return;
+    }
+    if (currentStep === 3 && !formSubmissionStatus.gameQuestions) {
+      Notiflix.Notify.warning("Please save Game Questions before proceeding.");
+      return;
+    }
+    setCurrentStep((prev) => Math.min(prev + 1, steps.length - 1));
+  };
+
+  const goPrev = () => setCurrentStep((prev) => Math.max(prev - 1, 0));
+
+  const goToStep = (e: number) => {
+    // Prevent jumping to steps if previous forms are not submitted
+    if (e > 0 && !formSubmissionStatus.contestDetails) {
+      Notiflix.Notify.warning(
+        "Please save Contest Details before navigating to other steps.",
+      );
+      return;
+    }
+    if (e > 1 && !formSubmissionStatus.winnersAndRewards) {
+      Notiflix.Notify.warning(
+        "Please save Winners & Rewards before navigating to other steps.",
+      );
+      return;
+    }
+    if (e > 2 && !formSubmissionStatus.instructions) {
+      Notiflix.Notify.warning(
+        "Please save Instructions before navigating to other steps.",
+      );
+      return;
+    }
+    if (e > 3 && !formSubmissionStatus.gameQuestions) {
+      Notiflix.Notify.warning(
+        "Please save Game Questions before navigating to other steps.",
+      );
+      return;
+    }
+    setCurrentStep(e);
+  };
+
   const handleContestSave = async () => {
     Notiflix.Loading.circle();
     try {
       const form = buildContestFormData(formData, contest_id);
       if (!contest_id) {
-        await ContestServices.createContest(form);
+        const { data } = await ContestServices.createContest(form);
+        // Assuming the new contest_id is returned and should be set
+        if (data?.data?.id) {
+          updateFormData({ ...formData, contest_id: data.data.id });
+        }
       }
-      setStepSubmitted(prev => {
-        const newState = [...prev];
-        newState[currentStep] = true;
-        return newState;
-      });
-      Notiflix.Loading.remove();
-      return true;
+      setFormSubmissionStatus((prev) => ({ ...prev, contestDetails: true }));
+      Notiflix.Notify.success("Contest Details saved successfully!");
+      return true; // Indicate success
     } catch (error: any) {
-      Notiflix.Loading.remove();
+      Notiflix.Notify.failure("Failed to save Contest Details.");
       console.error("Error saving contest:", error);
-      return false;
+      return false; // Indicate failure
+    } finally {
+      Notiflix.Loading.remove();
+    }
+  };
+
+  const handleInstructionSave = async () => {
+    Notiflix.Loading.circle();
+    try {
+      const form = buildInstructionFormData(formData, contest_id);
+      let res = await TriviaServices.createInstruction(form);
+      if (res) {
+        setFormSubmissionStatus((prev) => ({ ...prev, instructions: true }));
+        Notiflix.Notify.success("Instructions saved successfully!");
+        return true; // Indicate success
+      }
+      return false; // Indicate failure
+    } catch (error: any) {
+      Notiflix.Notify.failure("Failed to save Instructions.");
+      console.error("Error saving contest:", error);
+      return false; // Indicate failure
+    } finally {
+      Notiflix.Loading.remove();
+    }
+  };
+
+  const handleGameQuestionSave = async () => {
+    Notiflix.Loading.circle();
+    try {
+      const form = buildQuestionJsonData(formData, contest_id);
+      let res = await TriviaServices.postGameQuestionForm(form);
+      if (res) {
+        setFormSubmissionStatus((prev) => ({ ...prev, gameQuestions: true }));
+        Notiflix.Notify.success("Game Questions saved successfully!");
+        return true; // Indicate success
+      }
+      return false; // Indicate failure
+    } catch (error: any) {
+      Notiflix.Notify.failure("Failed to save Game Questions.");
+      console.error("Error saving contest:", error);
+      return false; // Indicate failure
+    } finally {
+      Notiflix.Loading.remove();
     }
   };
 
   const handleWinnersSave = async () => {
+    Notiflix.Loading.circle();
     try {
       if (!formData.contest_id || !formData.winners?.length) {
-        Notiflix.Notify.failure("Missing required data");
+        Notiflix.Notify.failure("Missing required data for Winners & Rewards.");
         return false;
       }
 
@@ -98,82 +218,40 @@ export default function CreateContest() {
       };
 
       await ContestServices.createContestPrize(payload);
+      setFormSubmissionStatus((prev) => ({ ...prev, winnersAndRewards: true }));
       Notiflix.Notify.success("Contest prizes saved successfully!");
-      setStepSubmitted(prev => {
-        const newState = [...prev];
-        newState[currentStep] = true;
-        return newState;
-      });
-      return true;
+      return true; // Indicate success
     } catch (error) {
       console.error("Error saving contest prizes:", error);
       Notiflix.Notify.failure("Failed to save contest prizes");
-      return false;
+      return false; // Indicate failure
+    } finally {
+      Notiflix.Loading.remove();
     }
   };
 
-  const handleInstructionSave = async () => {
-    Notiflix.Loading.circle();
-    try {
-      const form = buildInstructionFormData(formData, contest_id);
-      await TriviaServices.createInstruction(form);
-      setStepSubmitted(prev => {
-        const newState = [...prev];
-        newState[currentStep] = true;
-        return newState;
-      });
-      Notiflix.Loading.remove();
-      return true;
-    } catch (error: any) {
-      Notiflix.Loading.remove();
-      console.error("Error saving contest:", error);
-      return false;
-    }
-  };
-
-  const handleGameQuestionSave = async () => {
-    Notiflix.Loading.circle();
-    try {
-      const form = buildQuestionJsonData(formData, contest_id);
-      await TriviaServices.postGameQuestionForm(form);
-      setStepSubmitted(prev => {
-        const newState = [...prev];
-        newState[currentStep] = true;
-        return newState;
-      });
-      Notiflix.Loading.remove();
-      return true;
-    } catch (error: any) {
-      Notiflix.Loading.remove();
-      console.error("Error saving contest:", error);
-      return false;
-    }
-  };
-
-  const handleStepSubmit = async () => {
-    let success = false;
-    switch (currentStep) {
+  const handleChangeIndex = async (e: number) => {
+    let saved = false;
+    switch (e) {
       case 0:
-        success = await handleContestSave();
+        saved = await handleContestSave();
         break;
       case 1:
-        success = await handleWinnersSave();
+        saved = await handleWinnersSave();
         break;
       case 2:
-        success = await handleInstructionSave();
+        saved = await handleInstructionSave();
         break;
       case 3:
-        success = await handleGameQuestionSave();
+        saved = await handleGameQuestionSave();
         break;
       default:
-        success = true;
+        break;
     }
-    if (success) {
-      setCurrentStep((prev) => Math.min(prev + 1, steps.length - 1));
+    if (saved) {
+      goNext();
     }
   };
-
-  const goPrev = () => setCurrentStep((prev) => Math.max(prev - 1, 0));
 
   const questions = [
     {
@@ -189,7 +267,7 @@ export default function CreateContest() {
     },
     {
       question_no: 2,
-      question_text: "What is the captial of France ?",
+      question_text: "What is the capital of France ?",
       options: [
         { option_text: "Germany", label: "A" },
         { option_text: "Mexico", label: "B" },
@@ -207,7 +285,9 @@ export default function CreateContest() {
           <OnlyContestForm
             formData={formData}
             updateFormData={updateFormData}
-            onSave={handleStepSubmit}
+            onSave={() => {
+              handleChangeIndex(currentStep);
+            }}
           />
         );
       case 1:
@@ -215,7 +295,9 @@ export default function CreateContest() {
           <OnlyWinnersForm
             formData={formData}
             updateFormData={updateFormData}
-            onSave={handleStepSubmit}
+            onSave={() => {
+              handleChangeIndex(currentStep);
+            }}
           />
         );
       case 2:
@@ -223,7 +305,9 @@ export default function CreateContest() {
           <OnlyInstructionForm
             formData={formData}
             updateFormData={updateFormData}
-            onSave={handleStepSubmit}
+            onSave={() => {
+              handleChangeIndex(currentStep);
+            }}
           />
         );
       case 3:
@@ -231,7 +315,9 @@ export default function CreateContest() {
           <OnlyQuestionForm
             formData={formData}
             updateFormData={updateFormData}
-            onSave={handleStepSubmit}
+            onSave={() => {
+              handleChangeIndex(currentStep); // Call handleChangeIndex for consistency
+            }}
             handleFlipSetModalOpen={() => {}}
           />
         );
@@ -246,14 +332,16 @@ export default function CreateContest() {
 
   return (
     <div className="mx-auto p-6">
-      <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-3xl font-bold">Create Contest (Trivia)</h1>
-      </div>
+      <Breadcrumb
+        currentStep={currentStep}
+        steps={steps}
+        onClick={(e) => goToStep(e)}
+      />
       {renderStep()}
       <StepNavigation
         currentStep={currentStep}
         totalSteps={steps.length}
-        onNext={handleStepSubmit}
+        onNext={goNext}
         onPrev={goPrev}
       />
     </div>

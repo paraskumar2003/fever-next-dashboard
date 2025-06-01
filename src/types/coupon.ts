@@ -14,7 +14,7 @@ export interface CouponFormData {
   type: string;
   brand_name: string;
   rewardId: number;
-  couponTypeId: number;
+  couponTypeId: number | string;
   coupon_code: string;
   coupon_pin: string;
   status: number;

@@ -62,12 +62,12 @@ export interface QuestionSet {
 export type RewardType = "PHYSICAL" | "COUPON_PDF" | "CODE";
 
 export interface WinnerReward {
-  reward_type: RewardType;
-  reward_image?: string; // base64
-  reward_file?: string; // base64 for PDFs or string for code
+  reward_id: number;
+  bucks: number;
 }
 
 export interface ContestFormData {
+  contest_id: number;
   contest_name: string;
   reward_name: string;
   start_date: string;

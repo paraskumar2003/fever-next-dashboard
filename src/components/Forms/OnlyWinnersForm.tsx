@@ -40,7 +40,7 @@ const OnlyWinnersForm: React.FC<OnlyWinnersFormProps> = ({
     const count = parseInt(e.target.value);
     if (winners) {
       const newWinners = Array.from({ length: count }, (_, index) => ({
-        reward_id: winners[index]?.reward_id || "",
+        reward_id: winners[index]?.reward_id || 0,
         bucks: winners[index]?.bucks || 0,
       }));
       updateFormData({ winners: newWinners });
@@ -67,10 +67,10 @@ const OnlyWinnersForm: React.FC<OnlyWinnersFormProps> = ({
 
       const payload = {
         contest_id: Number(formData.contest_id),
-        prizes: winners.map(winner => ({
+        prizes: winners.map((winner) => ({
           reward_id: Number(winner.reward_id),
-          bucks: Number(winner.bucks) || 0
-        }))
+          bucks: Number(winner.bucks) || 0,
+        })),
       };
 
       await ContestServices.createContestPrize(payload);
@@ -114,10 +114,10 @@ const OnlyWinnersForm: React.FC<OnlyWinnersFormProps> = ({
                 value={winner.reward_id?.toString() || ""}
                 options={[
                   { value: "", label: "Select a reward" },
-                  ...rewards.map(reward => ({
+                  ...rewards.map((reward) => ({
                     value: reward.id.toString(),
-                    label: `${reward.name} (${reward.reward_type})`
-                  }))
+                    label: `${reward.name} (${reward.reward_type})`,
+                  })),
                 ]}
                 onChange={(e) =>
                   updateWinner(index, {
@@ -126,7 +126,8 @@ const OnlyWinnersForm: React.FC<OnlyWinnersFormProps> = ({
                 }
               />
 
-              {rewards.find(r => r.id === Number(winner.reward_id))?.reward_type === "FEVER_BUCKS" && (
+              {rewards.find((r) => r.id === Number(winner.reward_id))
+                ?.reward_type === "FEVER_BUCKS" && (
                 <FormInput
                   label="Fever Bucks Amount"
                   type="number"

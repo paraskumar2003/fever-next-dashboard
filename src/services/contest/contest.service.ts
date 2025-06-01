@@ -5,8 +5,6 @@ interface T extends AxiosResponse<any, any> {}
 
 interface ContestPrize {
   reward_id: number;
-  coupon_type_id: number;
-  prize_name: string;
   bucks: number;
 }
 
@@ -39,9 +37,18 @@ export class ContestServices extends ApiServices {
 
   static async createContestPrize(payload: ContestPrizePayload) {
     try {
+      // Ensure bucks has a default value of 0
+      const normalizedPayload = {
+        ...payload,
+        prizes: payload.prizes.map(prize => ({
+          ...prize,
+          bucks: prize.bucks || 0
+        }))
+      };
+
       const response = await this.post<T>(
         `/v1/trivia/contest-prize`,
-        payload,
+        normalizedPayload,
         {
           headers: {
             'Content-Type': 'application/json'

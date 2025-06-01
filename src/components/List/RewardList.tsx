@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import RewardRow from "./RewardRow";
 import { Reward } from "@/types/rewards";
 
@@ -75,9 +75,7 @@ const RewardList: React.FC<RewardListProps> = ({
         </table>
 
         {rewards.length === 0 && (
-          <div className="py-8 text-center text-gray-500">
-            No rewards found
-          </div>
+          <div className="py-8 text-center text-gray-500">No rewards found</div>
         )}
       </div>
 

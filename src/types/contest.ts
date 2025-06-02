@@ -1,6 +1,4 @@
-export interface Reward {
-  name: string;
-}
+import { Reward } from "./rewards";
 
 export interface Contest {
   id: string;

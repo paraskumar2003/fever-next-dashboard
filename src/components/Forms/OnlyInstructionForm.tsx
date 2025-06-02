@@ -120,7 +120,7 @@ const OnlyInstructionForm: React.FC<OnlyInstructionFormProps> = ({
       <div className="mt-6">
         <ImageUpload
           label="Sponsor Logo (200x100px, max 1MB)"
-          value={sponsor_logo || ""}
+          value={formData.sponsor_logo_preview || ""}
           onChange={handleImageChange}
         />
       </div>

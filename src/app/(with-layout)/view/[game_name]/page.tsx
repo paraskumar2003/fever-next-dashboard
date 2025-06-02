@@ -8,20 +8,24 @@ import { useParams, useRouter, useSearchParams } from "next/navigation";
 import moment from "moment";
 import { useEffect, useState } from "react";
 import Button from "@/components/Button";
+import { ChartColumnBig, Eye, SquarePen, Trash2 } from "lucide-react";
 
 export default function ViewContest() {
   const router = useRouter();
   const params = useParams();
   const searchParams = useSearchParams();
 
+  const handleMetricsModal = (contest_id: string | number) => {};
+
   const handleAction = (
-    action: "view" | "edit" | "delete",
+    action: "view" | "edit" | "delete" | "metrics",
     contest_id: string | number,
   ) => {
     if (action == "view")
       router.push(`/${params.game_name}?contest_id=${contest_id}`);
     if (action == "edit")
       router.push(`/${params.game_name}?contest_id=${contest_id}`);
+    if (action == "metrics") handleMetricsModal(contest_id);
   };
 
   const columns = [
@@ -38,6 +42,26 @@ export default function ViewContest() {
     { field: "contest_type", headerName: "Contest Type", flex: 1 },
     { field: "sponsored_name", headerName: "Sponsor Name", flex: 1 },
     {
+      field: "metrics",
+      headerName: "Metrics",
+      flex: 2,
+      sortable: false,
+      filterable: false,
+      disableColumnMenu: true,
+      renderCell: (params: { row: Contest }) => (
+        <div className="flex h-full items-center justify-center gap-2">
+          <Button
+            variant="primary"
+            color="primary"
+            size="sm"
+            onClick={() => handleAction("metrics", params.row.id as string)}
+          >
+            <ChartColumnBig />
+          </Button>
+        </div>
+      ),
+    },
+    {
       field: "actions",
       headerName: "Actions",
       flex: 2,
@@ -52,7 +76,7 @@ export default function ViewContest() {
             size="sm"
             onClick={() => handleAction("view", params.row.id as string)}
           >
-            View
+            <Eye />
           </Button>
           <Button
             variant="secondary"
@@ -60,7 +84,7 @@ export default function ViewContest() {
             size="sm"
             onClick={() => handleAction("edit", params.row.id as string)}
           >
-            Edit
+            <SquarePen className="text-xs" />
           </Button>
           <Button
             variant="danger"
@@ -68,7 +92,7 @@ export default function ViewContest() {
             size="sm"
             onClick={() => handleAction("delete", params.row.id)}
           >
-            Delete
+            <Trash2 />
           </Button>
         </div>
       ),
@@ -87,7 +111,7 @@ export default function ViewContest() {
         const { data } = await TriviaServices.getContests(filter);
         if (data.data) {
           setRows(
-            data.data.map((e: Contest, index: number) => ({
+            data.data.rows.map((e: Contest, index: number) => ({
               seq_no: index + 1,
               id: e.id,
               contest_name: e.name,

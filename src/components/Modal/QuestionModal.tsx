@@ -30,7 +30,7 @@ const QuestionModal: React.FC<QuestionModalProps> = ({
         p: 2,
       }}
     >
-      <div className="max-h-[90vh] w-full  overflow-y-auto rounded-lg bg-white shadow-xl">
+      <div className="max-h-[90vh] w-full max-w-5xl  overflow-y-auto rounded-lg bg-white shadow-xl">
         <div className="border-b border-gray-200 px-6 py-4">
           <h2
             className="text-xl font-semibold text-gray-800"
@@ -54,13 +54,8 @@ const QuestionModal: React.FC<QuestionModalProps> = ({
               }
               onClose();
             }}
+            onCancel={onClose}
           />
-        </div>
-
-        <div className="flex justify-end border-t border-gray-200 px-6 py-4">
-          <Button variant="secondary" onClick={onClose}>
-            {isViewMode ? "Close" : "Cancel"}
-          </Button>
         </div>
       </div>
     </Modal>

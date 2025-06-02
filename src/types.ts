@@ -54,20 +54,20 @@ export interface Question {
 }
 
 export interface QuestionSet {
-  id: string;
+  id: number;
   name: string;
-  questions: Question[];
+  questions: number;
 }
 
 export type RewardType = "PHYSICAL" | "COUPON_PDF" | "CODE";
 
 export interface WinnerReward {
-  reward_type: RewardType;
-  reward_image?: string; // base64
-  reward_file?: string; // base64 for PDFs or string for code
+  reward_id: number;
+  bucks: number;
 }
 
 export interface ContestFormData {
+  contest_id: number;
   contest_name: string;
   reward_name: string;
   start_date: string;
@@ -97,10 +97,12 @@ export interface ContestFormData {
   mega_prize_name: string;
   game_timer: string;
   game_time_level: "GAME" | "QUESTION";
-  flip_allowed: "YES" | "NO";
+  flip_allowed: number;
   flip_count: number;
   flip_fee: number;
   flip_set: { name: string; questions: Question[] };
+  QuestionCategoryId: number;
+  flipSet: number;
 }
 
 export interface TambolaFormData {

@@ -10,6 +10,8 @@ import {
   Bell,
   Brain,
   Gamepad2,
+  ChartColumnStacked,
+  CircleHelp,
 } from "lucide-react";
 
 export const menuItems = [
@@ -20,15 +22,22 @@ export const menuItems = [
     path: "/home",
   },
   {
+    id: "category",
+    label: "Category",
+    icon: ChartColumnStacked,
+    path: "/categories",
+  },
+  {
+    id: "questionaire",
+    label: "Questionaire",
+    icon: CircleHelp,
+    path: "/questionaire",
+  },
+  {
     id: "trivia",
     label: "Trivia",
     icon: Brain,
     children: [
-      {
-        id: "questionaire",
-        label: "Questionaire",
-        path: "/trivia/questionaire",
-      },
       {
         id: "create-contests",
         label: "Create Contests",
@@ -112,9 +121,20 @@ export const menuItems = [
   },
 
   {
-    id: "rewards",
-    label: "Rewards",
+    id: "rewards-management",
+    label: "Manage Rewards",
     icon: Gift,
-    path: "/rewards",
+    children: [
+      {
+        id: "rewards",
+        label: "Rewards",
+        path: "/rewards-management/rewards",
+      },
+      {
+        id: "coupons",
+        label: "Coupons",
+        path: "/rewards-management/coupons",
+      },
+    ],
   },
 ];

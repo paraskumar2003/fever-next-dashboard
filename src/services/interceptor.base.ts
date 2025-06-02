@@ -5,7 +5,7 @@ import Notiflix from "notiflix";
 class ApiServices {
   private static instance = axios.create({
     baseURL: process.env.api_url,
-    timeout: 10000,
+    timeout: 60000,
     headers: {
       // "Content-Type": "application/json",
     },

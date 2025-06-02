@@ -29,8 +29,21 @@ export const ContestProvider: React.FC<{ children: ReactNode }> = ({
     },
     instructions: [],
     prize_catalogue: [],
-    questions: [],
-    winners: [],
+    questions: [
+      {
+        question: "",
+        option1: "",
+        option2: "",
+        option3: "",
+        option4: "",
+        correctOption: "option1",
+        timer: "10",
+      },
+    ],
+    winners: [{ reward_id: 1, bucks: 0 }],
+    game_time_level: "GAME",
+    flip_allowed: 1,
+    flip_count: 0,
   });
   const [tambolaFormData, setTambolaFormData] = useState<
     Partial<TambolaFormData>

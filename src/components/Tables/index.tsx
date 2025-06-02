@@ -8,9 +8,15 @@ type DataTableProps<T> = {
   rows: any;
   columns: GridColDef[];
   totalCount: number;
+  onPaginationModelChange?: (paginationModel: any) => void;
 };
 
-const Table = <T,>({ rows, columns, totalCount }: DataTableProps<T>) => {
+const Table = <T,>({
+  rows,
+  columns,
+  totalCount,
+  onPaginationModelChange,
+}: DataTableProps<T>) => {
   const [paginationModel, setPaginationModel] = useState({
     page: 0,
     pageSize: 10,

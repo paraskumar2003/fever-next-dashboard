@@ -36,7 +36,14 @@ export default function CreateContest() {
   const contest_id = searchParams.get("contest_id");
 
   const [currentStep, setCurrentStep] = useState(0);
-  const { formData, updateFormData } = useContest();
+  const { formData, updateFormData, resetFormData } = useContest();
+
+  useEffect(() => {
+    const contest_id = searchParams.get("contest_id");
+    if (!contest_id) {
+      resetFormData();
+    }
+  }, [searchParams]);
 
   // New state to track submission status for each form
   const [formSubmissionStatus, setFormSubmissionStatus] = useState({

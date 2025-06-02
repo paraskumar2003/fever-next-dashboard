@@ -56,14 +56,14 @@ const CouponRow: React.FC<CouponRowProps> = ({
           >
             <Pencil className="h-4 w-4" />
           </Button>
-          <Button
+          {/* <Button
             variant="danger"
             size="sm"
             onClick={() => onDelete?.(coupon.id)}
             title="Delete Coupon"
           >
             <Trash2 className="h-4 w-4" />
-          </Button>
+          </Button> */}
         </div>
       </td>
     </tr>

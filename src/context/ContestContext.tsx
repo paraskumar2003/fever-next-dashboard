@@ -79,6 +79,21 @@ export const ContestProvider: React.FC<{ children: ReactNode }> = ({
       }));
     };
 
+    // Check if any image field is a empty string
+
+    let imageFields: (keyof ContestFormData)[] = [
+      "contest_hero_logo",
+      "contest_image",
+      "sponsor_logo",
+      "thumbnail",
+    ];
+
+    imageFields.forEach((field) => {
+      if (data[field] === "") {
+        setFormData((prev) => ({ ...prev, [`${field}_preview`]: "" }));
+      }
+    });
+
     if (
       data.contest_hero_logo ||
       data.contest_image ||

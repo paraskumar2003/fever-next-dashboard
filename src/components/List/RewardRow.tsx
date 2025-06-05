@@ -47,14 +47,14 @@ const RewardRow: React.FC<RewardRowProps> = ({
           >
             <Pencil className="h-4 w-4" />
           </Button>
-          <Button
+          {/* <Button
             variant="danger"
             size="sm"
             onClick={() => onDelete?.(reward.id)}
             title="Delete Reward"
           >
             <Trash2 className="h-4 w-4" />
-          </Button>
+          </Button> */}
         </div>
       </td>
     </tr>

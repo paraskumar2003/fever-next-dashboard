@@ -109,7 +109,7 @@ export class TriviaServices extends ApiServices {
   static async createQuestion(payload: QuestionPayload): Promise<any> {
     try {
       const response = await this.post<T>(
-        `/v1/trivia/create-question`,
+        `/v1/questions/create-question`,
         payload,
       );
       return response;

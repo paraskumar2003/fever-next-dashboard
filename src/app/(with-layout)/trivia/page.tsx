@@ -14,7 +14,7 @@ import {
 import OnlyContestForm from "@/components/Forms/OnlyContestForm";
 import { useContest } from "@/context/ContestContext";
 import { ContestServices, TriviaServices } from "@/services";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import moment from "moment";
 import Notiflix from "notiflix";
 import {
@@ -32,6 +32,7 @@ const steps = [
 
 export default function CreateContest() {
   const searchParams = useSearchParams();
+  const { push } = useRouter();
 
   const contest_id = searchParams.get("contest_id");
 
@@ -151,9 +152,11 @@ export default function CreateContest() {
       const form = buildContestFormData(formData, contest_id);
       if (!contest_id) {
         const { data } = await ContestServices.createContest(form);
+        console.log("Contest created:", data?.data.id);
         // Assuming the new contest_id is returned and should be set
+        push(`/trivia?contest_id=${data?.data.id}`);
         if (data?.data?.id) {
-          updateFormData({ ...formData, contest_id: data.data.id });
+          updateFormData({ contest_id: data.data.id });
         }
       }
       setFormSubmissionStatus((prev) => ({ ...prev, contestDetails: true }));

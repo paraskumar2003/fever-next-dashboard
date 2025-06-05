@@ -92,13 +92,28 @@ const OnlyQuestionForm: React.FC<OnlyQuestionFormProps> = ({
       errors.push("Question text is required");
     }
 
+    const { option1, option2, option3, option4 } = formState;
+
     if (
-      !formState.option1?.trim() ||
-      !formState.option2?.trim() ||
-      !formState.option3?.trim() ||
-      !formState.option4?.trim()
+      !option1?.trim() ||
+      !option2?.trim() ||
+      !option3?.trim() ||
+      !option4?.trim()
     ) {
       errors.push("All answer options are required");
+    } else {
+      // Check for duplicate options
+      const options = [
+        option1.trim(),
+        option2.trim(),
+        option3.trim(),
+        option4.trim(),
+      ];
+      const uniqueOptions = new Set(options);
+
+      if (uniqueOptions.size < options.length) {
+        errors.push("Answer options must be unique");
+      }
     }
 
     if (errors.length > 0) {

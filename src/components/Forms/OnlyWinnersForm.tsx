@@ -40,7 +40,7 @@ const OnlyWinnersForm: React.FC<OnlyWinnersFormProps> = ({
     const count = parseInt(e.target.value);
     if (winners) {
       const newWinners = Array.from({ length: count }, (_, index) => ({
-        reward_id: winners[index]?.reward_id || 0,
+        reward_id: winners[index]?.reward_id || parseInt(rewards[0]?.id) || 0,
         bucks: winners[index]?.bucks || 0,
       }));
       updateFormData({ winners: newWinners });

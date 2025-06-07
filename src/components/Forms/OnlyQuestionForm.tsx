@@ -54,18 +54,19 @@ const OnlyQuestionForm: React.FC<OnlyQuestionFormProps> = ({
   const fetchQuestionSets = async () => {
     // Replace with actual API call to fetch sets
     const res = await CategoryServices.getCategoroiesWithCount();
-    console.log(
-      res.data.data.map((e: Record<string, any>) => ({
-        ...e,
-        name: e.category,
-      })),
-    );
-    setSets(
-      res.data?.data?.map((e: Record<string, any>) => ({
-        ...e,
-        name: e.category,
-      })),
-    );
+    let setsData = res.data?.data;
+    if (setsData) {
+      setSets(
+        setsData?.map((e: Record<string, any>) => ({
+          ...e,
+          name: e.category,
+        })),
+      );
+      updateFormData({
+        QuestionCategoryId: parseInt(setsData[0].id),
+        flipSet: parseInt(setsData[0].id),
+      });
+    }
   };
 
   useEffect(() => {
@@ -129,12 +130,10 @@ const OnlyQuestionForm: React.FC<OnlyQuestionFormProps> = ({
         <FormSelect
           label="Choose Set"
           value={selectedSet || ""}
-          options={[{ value: "", label: "" }].concat(
-            sets.map((set: any) => ({
-              value: set.id,
-              label: `${set.name}`,
-            })),
-          )}
+          options={sets.map((set: any) => ({
+            value: set.id,
+            label: `${set.name}`,
+          }))}
           onChange={(e) => handleSetSelection(e.target.value)}
         />
         {error && <p className="mt-2 text-xs text-red-500">{error}</p>}
@@ -223,12 +222,10 @@ const OnlyQuestionForm: React.FC<OnlyQuestionFormProps> = ({
               <FormSelect
                 label="Choose Flip Set"
                 value={selectedFlipSet || ""}
-                options={[{ value: "", label: "" }].concat(
-                  sets.map((set: any) => ({
-                    value: set.id,
-                    label: `${set.name}`,
-                  })),
-                )}
+                options={sets.map((set: any) => ({
+                  value: set.id,
+                  label: `${set.name}`,
+                }))}
                 onChange={(e) => handleFlipSetSelection(e.target.value)}
               />
               {flipSetError && (

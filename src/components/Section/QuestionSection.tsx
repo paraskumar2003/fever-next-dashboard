@@ -9,7 +9,7 @@ import { useModal } from "@/hooks/useModal";
 interface QuestionSectionProps {
   questions: any[];
   rowCount: number;
-  onPagninationModelChange: (page: number) => void;
+  onPagninationModelChange: (page: number, pageSize: number) => void;
   onView: (question: any) => void;
   onEdit: (question: any) => void;
   onDelete: (id: number) => void;

@@ -47,12 +47,10 @@ const TriviaPage = () => {
 
   const fetchQuestions = async (args?: fetchQuestionAgrs) => {
     try {
-      console.log({ args });
       if (contestQuestionIds) {
         const { data } = await TriviaServices.getAllQuestions({
           ...args,
         });
-        console.log({ data });
         if (data?.data?.rows) {
           setQuestions(
             data.data.rows.map((q: any) => ({
@@ -66,10 +64,10 @@ const TriviaPage = () => {
 
           const questions = data.data.rows.map((q: any) => ({
             question: q.question,
-            option1: q.questionOptions[0].answer,
-            option2: q.questionOptions[1].answer,
-            option3: q.questionOptions[2].answer,
-            option4: q.questionOptions[3].answer,
+            option1: q.questionOptions[0]?.answer,
+            option2: q.questionOptions[1]?.answer,
+            option3: q.questionOptions[2]?.answer,
+            option4: q.questionOptions[3]?.answer,
             correctOption: `option${q.questionOptions.findIndex((a: any) => a.is_correct) + 1}`,
             timer: q.timer,
             status: contestQuestionIds.includes(q.id) ? 1 : 0,
@@ -172,20 +170,22 @@ const TriviaPage = () => {
     }
   };
 
-  const handlePaginationModelChange = (page: number) => {
-    setPaginationModel({ ...paginationModel, page });
+  const handlePaginationModelChange = (page: number, pageSize: number) => {
+    setPaginationModel({ ...paginationModel, page, limit: pageSize });
   };
 
   return (
     <>
-      <SearchBar
-        value={searchString}
-        onChange={(text: string) => setSearchString(text)}
-      />
-
       <div className="mx-auto  py-8">
         <div className="mb-6 flex items-center justify-between">
           <h1 className="text-3xl font-bold">Questionaire (Trivia)</h1>
+        </div>
+
+        <div className="my-4">
+          <SearchBar
+            value={searchString}
+            onChange={(text: string) => setSearchString(text)}
+          />
         </div>
 
         <div className="space-y-6">

@@ -8,7 +8,6 @@ import {
   OnlyInstructionForm,
   OnlyQuestionForm,
   OnlyWinnersForm,
-  StepNavigation,
   TriviaGamePlay,
 } from "@/components";
 import OnlyContestForm from "@/components/Forms/OnlyContestForm";
@@ -39,6 +38,15 @@ export default function CreateContest() {
 
   const [currentStep, setCurrentStep] = useState(0);
   const { formData, updateFormData, resetFormData } = useContest();
+  const [editMode, setEditMode] = useState<{
+    winners: boolean;
+    instruction: boolean;
+    questions: boolean;
+  }>({
+    winners: false,
+    instruction: false,
+    questions: false,
+  }); // New state for edit mode
 
   useEffect(() => {
     const contest_id = searchParams.get("contest_id");
@@ -46,6 +54,10 @@ export default function CreateContest() {
       resetFormData();
     }
   }, [searchParams]);
+
+  useEffect(() => {
+    console.log(editMode);
+  }, [editMode]);
 
   // New state to track submission status for each form
   const [formSubmissionStatus, setFormSubmissionStatus] = useState({
@@ -60,6 +72,15 @@ export default function CreateContest() {
       const { data } = await ContestServices.getContestById(contest_id);
       if (data?.data) {
         const details = data.data;
+        if (details.winners?.length > 0) {
+          setEditMode((prev) => ({ ...prev, winners: true }));
+        }
+        if (details.instructions?.length > 0) {
+          setEditMode((prev) => ({ ...prev, instruction: true }));
+        }
+        if (details.questions?.length > 0) {
+          setEditMode((prev) => ({ ...prev, questions: true }));
+        }
         updateFormData({
           ...formData,
           contest_id: details.id,
@@ -108,17 +129,29 @@ export default function CreateContest() {
         );
         return;
       }
-      if (currentStep === 1 && !formSubmissionStatus.winnersAndRewards) {
+      if (
+        currentStep === 1 &&
+        !formSubmissionStatus.winnersAndRewards &&
+        !editMode.winners
+      ) {
         Notiflix.Notify.warning(
           "Please save Winners & Rewards before proceeding.",
         );
         return;
       }
-      if (currentStep === 2 && !formSubmissionStatus.instructions) {
+      if (
+        currentStep === 2 &&
+        !formSubmissionStatus.instructions &&
+        !editMode.instruction
+      ) {
         Notiflix.Notify.warning("Please save Instructions before proceeding.");
         return;
       }
-      if (currentStep === 3 && !formSubmissionStatus.gameQuestions) {
+      if (
+        currentStep === 3 &&
+        !formSubmissionStatus.gameQuestions &&
+        !editMode.questions
+      ) {
         Notiflix.Notify.warning(
           "Please save Game Questions before proceeding.",
         );

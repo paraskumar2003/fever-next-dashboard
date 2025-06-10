@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import QuestionRow from "./QuestionRow";
+import ListWrapper from "./ListWrapper";
 
 interface Answer {
   id: number;
@@ -24,8 +25,8 @@ interface QuestionListProps {
   onDelete?: (id: number) => void;
   onView?: (question: Question) => void;
   onStatusChange?: (id: number, status: number) => void;
-  rowCount: number; // New prop for total number of rows
-  onPaginationModelChange: (page: number) => void; // New prop for pagination changes
+  rowCount: number;
+  onPaginationModelChange: (page: number, pageSize: number) => void;
 }
 
 const QuestionList: React.FC<QuestionListProps> = ({
@@ -38,71 +39,83 @@ const QuestionList: React.FC<QuestionListProps> = ({
   onPaginationModelChange,
 }) => {
   console.log({ questions });
-  const [currentPage, setCurrentPage] = useState(1); // Page numbers are typically 0-indexed
-  const pageSize = 10; // Assuming a page size of 10, you can make this a prop if needed
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
 
   const handleNextPage = () => {
     const nextPage = currentPage + 1;
     setCurrentPage(nextPage);
-    onPaginationModelChange(nextPage);
+    onPaginationModelChange(nextPage, pageSize);
   };
 
   const handlePreviousPage = () => {
     const prevPage = currentPage - 1;
     setCurrentPage(prevPage);
-    onPaginationModelChange(prevPage);
+    onPaginationModelChange(prevPage, pageSize);
+  };
+
+  const handlePageSizeChange = (newPageSize: number) => {
+    setPageSize(newPageSize);
+    setCurrentPage(1); // Reset to first page when page size changes
+    onPaginationModelChange(1, newPageSize);
   };
 
   const canGoNext = (currentPage - 1) * pageSize + questions.length < rowCount;
   const canGoPrevious = currentPage > 1;
 
+  const startItem = (currentPage - 1) * pageSize + 1;
+  const endItem = Math.min(rowCount, currentPage * pageSize);
+
   return (
     <div className="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-lg">
-      <div className="overflow-x-auto">
-        <table className="w-full border-collapse">
-          <thead>
-            <tr className="border-b border-gray-200 bg-gray-50">
-              <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">
-                ID
-              </th>
-              <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">
-                Question
-              </th>
-              <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">
-                Correct Answer
-              </th>
-              <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">
-                Category Name
-              </th>
-              <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">
-                Status
-              </th>
-              <th className="px-4 py-3 text-center text-sm font-medium text-gray-600">
-                Actions
-              </th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-200">
-            {questions.map((question, index) => (
-              <QuestionRow
-                key={question.id}
-                index={index} // This index will be relative to the current page's data
-                question={question}
-                onView={onView}
-                onEdit={onEdit}
-                onDelete={onDelete}
-                onStatusChange={onStatusChange}
-              />
-            ))}
-          </tbody>
-        </table>
+      <ListWrapper>
+        <div className="overflow-x-auto">
+          <table className="w-full border-collapse">
+            <thead>
+              <tr className="border-b border-gray-200 bg-gray-50">
+                <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">
+                  ID
+                </th>
+                <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">
+                  Question
+                </th>
+                <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">
+                  Correct Answer
+                </th>
+                <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">
+                  Category Name
+                </th>
+                <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">
+                  Status
+                </th>
+                <th className="px-4 py-3 text-center text-sm font-medium text-gray-600">
+                  Actions
+                </th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-200">
+              {questions.map((question, index) => (
+                <QuestionRow
+                  key={question.id}
+                  index={index}
+                  question={question}
+                  onView={onView}
+                  onEdit={onEdit}
+                  onDelete={onDelete}
+                  onStatusChange={onStatusChange}
+                />
+              ))}
+            </tbody>
+          </table>
 
-        {questions.length === 0 && (
-          <div className="py-8 text-center text-gray-500">
-            No questions found
-          </div>
-        )}
-      </div>
+          {questions.length === 0 && (
+            <div className="py-8 text-center text-gray-500">
+              No questions found
+            </div>
+          )}
+        </div>
+      </ListWrapper>
+
       {/* Pagination Controls */}
       <div className="flex items-center justify-between border-t border-gray-200 bg-white px-4 py-3 sm:px-6">
         <div className="flex flex-1 justify-between sm:hidden">
@@ -122,20 +135,28 @@ const QuestionList: React.FC<QuestionListProps> = ({
           </button>
         </div>
         <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
-          <div>
+          <div className="flex items-center space-x-4">
             <p className="text-sm text-gray-700">
-              Showing{" "}
-              <span className="font-medium">
-                {(currentPage - 1) * pageSize + 1}
-              </span>{" "}
-              to{" "}
-              <span className="font-medium">
-                {Math.min(rowCount, currentPage * pageSize)}
-              </span>{" "}
-              of <span className="font-medium">{rowCount}</span> results
+              Showing <span className="font-medium">{startItem}</span> to{" "}
+              <span className="font-medium">{endItem}</span> of{" "}
+              <span className="font-medium">{rowCount}</span> results
             </p>
           </div>
-          <div>
+
+          <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-2">
+              <select
+                id="pageSize"
+                value={pageSize}
+                onChange={(e) => handlePageSizeChange(Number(e.target.value))}
+                className="rounded-md border border-gray-300 bg-white px-3 py-1 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              >
+                <option value={10}>10</option>
+                <option value={20}>20</option>
+                <option value={50}>50</option>
+                <option value={100}>100</option>
+              </select>
+            </div>
             <nav
               className="isolate inline-flex -space-x-px rounded-md shadow-sm"
               aria-label="Pagination"

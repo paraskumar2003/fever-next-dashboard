@@ -9,7 +9,9 @@ import { useModal } from "@/hooks/useModal";
 import { Category } from "@/components/List/CategoryList";
 import { CategoryFormData } from "@/types/category";
 
-type fetchCategoriesArgs = { q?: string } | undefined;
+type fetchCategoriesArgs =
+  | { q?: string; page?: number; limit?: number }
+  | undefined;
 
 const CategoriesPage = () => {
   const [categories, setCategories] = useState<Category[]>([]);
@@ -19,6 +21,14 @@ const CategoriesPage = () => {
   const [isViewMode, setIsViewMode] = useState(false);
   const [searchString, setSearchString] = useState("");
   const modal = useModal();
+
+  const [paginationModel, setPaginationModel] = useState<{
+    page: number;
+    pageSize: number;
+  }>({
+    page: 1,
+    pageSize: 10,
+  });
 
   const fetchCategories = async (args?: fetchCategoriesArgs) => {
     try {
@@ -35,7 +45,10 @@ const CategoriesPage = () => {
 
   useEffect(() => {
     if (!searchString) {
-      fetchCategories();
+      fetchCategories({
+        page: paginationModel.page,
+        limit: paginationModel.pageSize,
+      });
       return;
     }
     // Set a timer to delay the API call
@@ -49,7 +62,7 @@ const CategoriesPage = () => {
     return () => {
       clearTimeout(timerId);
     };
-  }, [searchString]); // Re-run the effect when searchString
+  }, [searchString, paginationModel]); // Re-run the effect when searchString
 
   const handleCategoryView = (category: Category) => {
     setIsViewMode(true);
@@ -70,6 +83,13 @@ const CategoriesPage = () => {
     } catch (err) {
       console.error("Error deleting category:", err);
     }
+  };
+
+  const handlePaginationModelChange = (page: number, pageSize: number) => {
+    setPaginationModel({
+      page,
+      pageSize,
+    });
   };
 
   return (
@@ -93,6 +113,8 @@ const CategoriesPage = () => {
             onSave={async (formData: CategoryFormData) => {
               await fetchCategories();
             }}
+            rowCount={categories.length}
+            onPaginationModelChange={handlePaginationModelChange}
           />
 
           <CategoryModal

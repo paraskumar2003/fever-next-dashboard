@@ -8,7 +8,6 @@ import {
   OnlyInstructionForm,
   OnlyQuestionForm,
   OnlyWinnersForm,
-  StepNavigation,
   TriviaGamePlay,
 } from "@/components";
 import OnlyContestForm from "@/components/Forms/OnlyContestForm";
@@ -22,6 +21,7 @@ import {
   buildInstructionFormData,
   buildQuestionJsonData,
 } from "@/lib/utils";
+import { Instruction } from "@/types";
 
 const steps = [
   "Contest Details",
@@ -38,6 +38,15 @@ export default function CreateContest() {
 
   const [currentStep, setCurrentStep] = useState(0);
   const { formData, updateFormData, resetFormData } = useContest();
+  const [editMode, setEditMode] = useState<{
+    winners: boolean;
+    instruction: boolean;
+    questions: boolean;
+  }>({
+    winners: false,
+    instruction: false,
+    questions: false,
+  }); // New state for edit mode
 
   useEffect(() => {
     const contest_id = searchParams.get("contest_id");
@@ -45,6 +54,10 @@ export default function CreateContest() {
       resetFormData();
     }
   }, [searchParams]);
+
+  useEffect(() => {
+    console.log(editMode);
+  }, [editMode]);
 
   // New state to track submission status for each form
   const [formSubmissionStatus, setFormSubmissionStatus] = useState({
@@ -59,6 +72,15 @@ export default function CreateContest() {
       const { data } = await ContestServices.getContestById(contest_id);
       if (data?.data) {
         const details = data.data;
+        if (details.winners?.length > 0) {
+          setEditMode((prev) => ({ ...prev, winners: true }));
+        }
+        if (details.instructions?.length > 0) {
+          setEditMode((prev) => ({ ...prev, instruction: true }));
+        }
+        if (details.questions?.length > 0) {
+          setEditMode((prev) => ({ ...prev, questions: true }));
+        }
         updateFormData({
           ...formData,
           contest_id: details.id,
@@ -77,6 +99,13 @@ export default function CreateContest() {
           thumbnail_preview: details?.thumbnail,
           contest_image_preview: details?.contestImage,
           contest_hero_logo_preview: details?.contestHeroLogo,
+          instructions: details?.instructions?.map(
+            (instruction: Instruction) => ({
+              title: instruction.title,
+              description: instruction.description,
+            }),
+          ),
+          mega_prize_name: details?.rewards?.reward,
         });
         // If contest details are fetched, assume this step is "submitted"
         setFormSubmissionStatus((prev) => ({ ...prev, contestDetails: true }));
@@ -92,30 +121,46 @@ export default function CreateContest() {
     }
   }, [contest_id]);
 
-  const goNext = () => {
-    // Only allow going to the next step if the current form has been submitted
-    if (currentStep === 0 && !formSubmissionStatus.contestDetails) {
-      Notiflix.Notify.warning("Please save Contest Details before proceeding.");
-      return;
+  const goNext = (force = false) => {
+    if (!force) {
+      if (currentStep === 0 && !formSubmissionStatus.contestDetails) {
+        Notiflix.Notify.warning(
+          "Please save Contest Details before proceeding.",
+        );
+        return;
+      }
+      if (
+        currentStep === 1 &&
+        !formSubmissionStatus.winnersAndRewards &&
+        !editMode.winners
+      ) {
+        Notiflix.Notify.warning(
+          "Please save Winners & Rewards before proceeding.",
+        );
+        return;
+      }
+      if (
+        currentStep === 2 &&
+        !formSubmissionStatus.instructions &&
+        !editMode.instruction
+      ) {
+        Notiflix.Notify.warning("Please save Instructions before proceeding.");
+        return;
+      }
+      if (
+        currentStep === 3 &&
+        !formSubmissionStatus.gameQuestions &&
+        !editMode.questions
+      ) {
+        Notiflix.Notify.warning(
+          "Please save Game Questions before proceeding.",
+        );
+        return;
+      }
     }
-    if (currentStep === 1 && !formSubmissionStatus.winnersAndRewards) {
-      Notiflix.Notify.warning(
-        "Please save Winners & Rewards before proceeding.",
-      );
-      return;
-    }
-    if (currentStep === 2 && !formSubmissionStatus.instructions) {
-      Notiflix.Notify.warning("Please save Instructions before proceeding.");
-      return;
-    }
-    if (currentStep === 3 && !formSubmissionStatus.gameQuestions) {
-      Notiflix.Notify.warning("Please save Game Questions before proceeding.");
-      return;
-    }
+
     setCurrentStep((prev) => Math.min(prev + 1, steps.length - 1));
   };
-
-  const goPrev = () => setCurrentStep((prev) => Math.max(prev - 1, 0));
 
   const goToStep = (e: number) => {
     // Prevent jumping to steps if previous forms are not submitted
@@ -175,8 +220,8 @@ export default function CreateContest() {
     Notiflix.Loading.circle();
     try {
       const form = buildInstructionFormData(formData, contest_id);
-      let res = await TriviaServices.createInstruction(form);
-      if (res) {
+      let { data } = await TriviaServices.createInstruction(form);
+      if (data) {
         setFormSubmissionStatus((prev) => ({ ...prev, instructions: true }));
         Notiflix.Notify.success("Instructions saved successfully!");
         return true; // Indicate success
@@ -259,14 +304,14 @@ export default function CreateContest() {
         break;
     }
     if (saved) {
-      goNext();
+      goNext(true);
     }
   };
 
   const questions = [
     {
       question_no: 1,
-      question_text: "What is the name of the game?",
+      question_text: "What is the name of the game ?",
       options: [
         { option_text: "Trivia", label: "A" },
         { option_text: "Trivia", label: "B" },
@@ -348,12 +393,12 @@ export default function CreateContest() {
         onClick={(e) => goToStep(e)}
       />
       {renderStep()}
-      <StepNavigation
+      {/* <StepNavigation
         currentStep={currentStep}
         totalSteps={steps.length}
         onNext={goNext}
         onPrev={goPrev}
-      />
+      /> */}
     </div>
   );
 }

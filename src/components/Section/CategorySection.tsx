@@ -13,6 +13,8 @@ interface CategorySectionProps {
   onEdit: (category: any) => void;
   onDelete: (id: number) => void;
   onSave: (formData: CategoryFormData) => Promise<void>;
+  rowCount: number;
+  onPaginationModelChange: (page: number, pageSize: number) => void;
 }
 
 const CategorySection: React.FC<CategorySectionProps> = ({
@@ -21,6 +23,8 @@ const CategorySection: React.FC<CategorySectionProps> = ({
   onEdit,
   onDelete,
   onSave,
+  rowCount,
+  onPaginationModelChange,
 }) => {
   const addCategoryModal = useModal();
 
@@ -39,6 +43,8 @@ const CategorySection: React.FC<CategorySectionProps> = ({
         onView={onView}
         onEdit={onEdit}
         onDelete={onDelete}
+        rowCount={rowCount}
+        onPaginationModelChange={onPaginationModelChange}
       />
 
       <CategoryModal

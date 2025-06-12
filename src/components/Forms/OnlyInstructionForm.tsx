@@ -83,6 +83,7 @@ const OnlyInstructionForm: React.FC<OnlyInstructionFormProps> = ({
           placeholder="Enter Mega Prize Name"
           value={mega_prize_name}
           onChange={handleMegaPrizeChange}
+          required
         />
       </div>
 
@@ -103,6 +104,7 @@ const OnlyInstructionForm: React.FC<OnlyInstructionFormProps> = ({
               onChange={(e) =>
                 updateInstruction(index, { title: e.target.value })
               }
+              required
             />
 
             <FormInput
@@ -112,6 +114,7 @@ const OnlyInstructionForm: React.FC<OnlyInstructionFormProps> = ({
               onChange={(e) =>
                 updateInstruction(index, { description: e.target.value })
               }
+              required
             />
           </div>
         ))}
@@ -122,6 +125,7 @@ const OnlyInstructionForm: React.FC<OnlyInstructionFormProps> = ({
           label="Sponsor Logo (200x100px, max 1MB)"
           value={formData.sponsor_logo_preview || ""}
           onChange={handleImageChange}
+          required
         />
       </div>
     </FormSection>

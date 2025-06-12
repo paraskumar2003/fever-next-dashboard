@@ -6,6 +6,7 @@ interface ImageUploadProps {
   value: string;
   onChange: (base64: string) => void;
   error?: string;
+  required?: boolean;
 }
 
 const ImageUpload: React.FC<ImageUploadProps> = ({
@@ -13,6 +14,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
   value,
   onChange,
   error,
+  required,
 }) => {
   const [isLoading, setIsLoading] = useState(false);
 
@@ -39,7 +41,10 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
 
   return (
     <div className="mb-4">
-      <label className="mb-1  block text-sm font-medium">{label}</label>
+      <label className="mb-1  block text-sm font-medium">
+        <span>{label}</span>
+        {required && <span className="text-red-500">*</span>}
+      </label>
       <div className="rounded-md border border-dashed border-black/20 bg-white/5 p-4">
         <div className="relative flex flex-col items-center justify-center">
           {value ? (

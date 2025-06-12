@@ -123,6 +123,7 @@ const OnlyQuestionForm: React.FC<OnlyQuestionFormProps> = ({
             label: `${i + 1}`,
           }))}
           onChange={handleQuestionCountChange}
+          required
         />
       </div>
 
@@ -135,6 +136,7 @@ const OnlyQuestionForm: React.FC<OnlyQuestionFormProps> = ({
             label: `${set.name}`,
           }))}
           onChange={(e) => handleSetSelection(e.target.value)}
+          required
         />
         {error && <p className="mt-2 text-xs text-red-500">{error}</p>}
       </div>
@@ -152,6 +154,7 @@ const OnlyQuestionForm: React.FC<OnlyQuestionFormProps> = ({
               game_time_level: e.target.value as "GAME" | "QUESTION",
             })
           }
+          required
         />
       </div>
 
@@ -161,6 +164,7 @@ const OnlyQuestionForm: React.FC<OnlyQuestionFormProps> = ({
           type="number"
           value={formData.game_timer || ""}
           onChange={(e) => updateFormData({ game_timer: e.target.value })}
+          required
         />
       ) : (
         <div className="space-y-4">
@@ -175,6 +179,7 @@ const OnlyQuestionForm: React.FC<OnlyQuestionFormProps> = ({
                 questions[index].timer = e.target.value;
                 updateFormData({ questions });
               }}
+              required
             />
           ))}
         </div>
@@ -191,6 +196,7 @@ const OnlyQuestionForm: React.FC<OnlyQuestionFormProps> = ({
           onChange={(e) =>
             updateFormData({ flip_allowed: Number(e.target.value) })
           }
+          required
         />
       </div>
 
@@ -207,6 +213,7 @@ const OnlyQuestionForm: React.FC<OnlyQuestionFormProps> = ({
               onChange={(e) =>
                 updateFormData({ flip_count: parseInt(e.target.value) })
               }
+              required
             />
 
             <FormInput
@@ -216,6 +223,7 @@ const OnlyQuestionForm: React.FC<OnlyQuestionFormProps> = ({
               onChange={(e) =>
                 updateFormData({ flip_fee: parseInt(e.target.value) })
               }
+              required
             />
 
             <div className="mb-6">
@@ -227,6 +235,7 @@ const OnlyQuestionForm: React.FC<OnlyQuestionFormProps> = ({
                   label: `${set.name}`,
                 }))}
                 onChange={(e) => handleFlipSetSelection(e.target.value)}
+                required
               />
               {flipSetError && (
                 <p className="mt-2 text-xs text-red-500">{flipSetError}</p>

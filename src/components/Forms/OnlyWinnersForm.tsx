@@ -83,6 +83,7 @@ const OnlyWinnersForm: React.FC<OnlyWinnersFormProps> = ({
               label: `${i + 1}`,
             }))}
             onChange={handleWinnerCountChange}
+            required
           />
         )}
       </div>
@@ -113,6 +114,7 @@ const OnlyWinnersForm: React.FC<OnlyWinnersFormProps> = ({
                     reward_id: Number(e.target.value),
                   })
                 }
+                required
               />
 
               {rewards.find((r) => r.id == Number(winner.reward_id))
@@ -125,6 +127,7 @@ const OnlyWinnersForm: React.FC<OnlyWinnersFormProps> = ({
                   onChange={(e) =>
                     updateWinner(index, { bucks: Number(e.target.value) })
                   }
+                  required
                 />
               )}
             </div>

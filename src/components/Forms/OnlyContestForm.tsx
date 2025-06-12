@@ -30,6 +30,7 @@ const OnlyContestForm: React.FC<OnlyContestFormProps> = ({
           placeholder="Enter contest name"
           value={formData.contest_name || ""}
           onChange={(e) => updateFormData({ contest_name: e.target.value })}
+          required
         />
         {/* <FormInput
           label="Reward Name"
@@ -45,6 +46,7 @@ const OnlyContestForm: React.FC<OnlyContestFormProps> = ({
             type="date"
             value={formData.start_date || ""}
             onChange={(e) => updateFormData({ start_date: e.target.value })}
+            required
           />
         </div>
         <div>
@@ -53,6 +55,7 @@ const OnlyContestForm: React.FC<OnlyContestFormProps> = ({
             type="time"
             value={formData.start_time || ""}
             onChange={(e) => updateFormData({ start_time: e.target.value })}
+            required
           />
         </div>
       </div>
@@ -63,6 +66,7 @@ const OnlyContestForm: React.FC<OnlyContestFormProps> = ({
             type="date"
             value={formData.end_date || ""}
             onChange={(e) => updateFormData({ end_date: e.target.value })}
+            required
           />
         </div>
         <div>
@@ -71,6 +75,7 @@ const OnlyContestForm: React.FC<OnlyContestFormProps> = ({
             type="time"
             value={formData.end_time || ""}
             onChange={(e) => updateFormData({ end_time: e.target.value })}
+            required
           />
         </div>
       </div>
@@ -85,6 +90,7 @@ const OnlyContestForm: React.FC<OnlyContestFormProps> = ({
           onChange={(e) =>
             updateFormData({ contest_type: e.target.value as "FREE" | "PAID" })
           }
+          required
         />
         {formData.contest_type === "PAID" && (
           <FormInput
@@ -96,6 +102,7 @@ const OnlyContestForm: React.FC<OnlyContestFormProps> = ({
             onChange={(e) =>
               updateFormData({ contest_fee: parseInt(e.target.value) })
             }
+            required
           />
         )}
       </div>
@@ -113,37 +120,22 @@ const OnlyContestForm: React.FC<OnlyContestFormProps> = ({
               contest_type_name: e.target.value as "MAHABONANZA" | "REGULAR",
             })
           }
+          required
         />
-        {/* <FormInput
-          label="Contest Variant Name (Optional)"
-          placeholder="E.g., Summer Edition"
-          value={formData.contest_variant_name || ""}
-          onChange={(e) =>
-            updateFormData({ contest_variant_name: e.target.value })
-          }
-        /> */}
       </div>
-      {/* <FormInput
-        label="Sponsor Name"
-        placeholder="Enter sponsor name"
-        value={formData.sponsor_name || ""}
-        onChange={(e) => updateFormData({ sponsor_name: e.target.value })}
-      /> */}
+
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-        {/* <ImageUpload
-          label="Sponsor Logo"
-          value={formData.sponsor_logo_preview || formData.sponsor_logo || ""}
-          onChange={(base64) => updateFormData({ sponsor_logo: base64 })}
-        /> */}
         <ImageUpload
           label="Thumbnail"
           value={formData.thumbnail_preview || formData.thumbnail || ""}
           onChange={(base64) => updateFormData({ thumbnail: base64 })}
+          required
         />
         <ImageUpload
           label="Contest Image"
           value={formData.contest_image_preview || formData.contest_image || ""}
           onChange={(base64) => updateFormData({ contest_image: base64 })}
+          required
         />
         <ImageUpload
           label="Contest Hero Logo"
@@ -153,6 +145,7 @@ const OnlyContestForm: React.FC<OnlyContestFormProps> = ({
             ""
           }
           onChange={(base64) => updateFormData({ contest_hero_logo: base64 })}
+          required
         />
       </div>
     </FormSection>

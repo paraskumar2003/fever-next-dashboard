@@ -22,6 +22,7 @@ import {
   buildQuestionJsonData,
 } from "@/lib/utils";
 import { Instruction } from "@/types";
+import { validateContestFormData } from "@/components/Forms/validation-schema/create-contest-form";
 
 const steps = [
   "Contest Details",
@@ -194,6 +195,9 @@ export default function CreateContest() {
   const handleContestSave = async () => {
     Notiflix.Loading.circle();
     try {
+      let { isValid, errors } = await validateContestFormData(formData);
+      console.log({ errors });
+      if (!isValid) return false;
       const form = buildContestFormData(formData, contest_id);
       if (!contest_id) {
         const { data } = await ContestServices.createContest(form);

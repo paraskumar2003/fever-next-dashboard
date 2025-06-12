@@ -49,6 +49,9 @@ export default function CreateContest() {
     questions: false,
   }); // New state for edit mode
 
+  // Add state for contest form errors
+  const [contestFormErrors, setContestFormErrors] = useState<Record<string, string>>({});
+
   useEffect(() => {
     const contest_id = searchParams.get("contest_id");
     if (!contest_id) {
@@ -195,9 +198,20 @@ export default function CreateContest() {
   const handleContestSave = async () => {
     Notiflix.Loading.circle();
     try {
+      // Validate form data
       let { isValid, errors } = await validateContestFormData(formData);
       console.log({ errors });
-      if (!isValid) return false;
+      
+      if (!isValid) {
+        // Set errors in state for display
+        setContestFormErrors(errors);
+        Notiflix.Notify.warning("Please fix the validation errors before proceeding.");
+        return false;
+      }
+
+      // Clear any existing errors if validation passes
+      setContestFormErrors({});
+
       const form = buildContestFormData(formData, contest_id);
       if (!contest_id) {
         const { data } = await ContestServices.createContest(form);
@@ -344,6 +358,7 @@ export default function CreateContest() {
           <OnlyContestForm
             formData={formData}
             updateFormData={updateFormData}
+            errors={contestFormErrors}
             onSave={() => {
               handleChangeIndex(currentStep);
             }}

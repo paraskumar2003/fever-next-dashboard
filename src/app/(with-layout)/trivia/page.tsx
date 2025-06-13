@@ -10,6 +10,7 @@ import {
   OnlyWinnersForm,
   TriviaGamePlay,
   validateContestFormData,
+  validateInstructionFormData,
   validateWinnersForm,
 } from "@/components";
 import OnlyContestForm from "@/components/Forms/OnlyContestForm";
@@ -242,6 +243,20 @@ export default function CreateContest() {
   const handleInstructionSave = async () => {
     Notiflix.Loading.circle();
     try {
+      let { isValid, errors } = await validateInstructionFormData(formData);
+
+      console.log({ errors });
+
+      if (!isValid) {
+        // Set errors in state for display
+        setContestFormErrors(errors);
+        Notiflix.Notify.warning(
+          "Please fix the validation errors before proceeding.",
+        );
+        return false;
+      }
+
+      setContestFormErrors({});
       const form = buildInstructionFormData(formData, contest_id);
       let { data } = await TriviaServices.createInstruction(form);
       if (data) {
@@ -395,6 +410,7 @@ export default function CreateContest() {
             onSave={() => {
               handleChangeIndex(currentStep);
             }}
+            errors={contestFormErrors}
           />
         );
       case 3:
@@ -406,6 +422,7 @@ export default function CreateContest() {
               handleChangeIndex(currentStep); // Call handleChangeIndex for consistency
             }}
             handleFlipSetModalOpen={() => {}}
+            errors={contestFormErrors}
           />
         );
       case 4:

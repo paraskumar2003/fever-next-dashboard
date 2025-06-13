@@ -12,6 +12,7 @@ interface OnlyQuestionFormProps {
   updateFormData: (data: Partial<ContestFormData>) => void;
   onSave: () => void;
   handleFlipSetModalOpen: () => void;
+  errors: Record<string, any>;
 }
 
 const OnlyQuestionForm: React.FC<OnlyQuestionFormProps> = ({
@@ -19,6 +20,7 @@ const OnlyQuestionForm: React.FC<OnlyQuestionFormProps> = ({
   updateFormData,
   onSave,
   handleFlipSetModalOpen,
+  errors,
 }) => {
   const handleQuestionCountChange = (
     e: React.ChangeEvent<HTMLSelectElement>,

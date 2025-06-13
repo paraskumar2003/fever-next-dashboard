@@ -6,6 +6,7 @@ import FormSelect from "@/components/FormSelect";
 import ImageUpload from "@/components/ImageUpload";
 import { ContestFormData } from "@/types";
 import { SubscriptionBadge } from "../GliderOverlay";
+import FormCheckbox from "../FormCheckbox";
 
 interface OnlyContestFormProps {
   formData: Partial<ContestFormData>;
@@ -161,6 +162,19 @@ const OnlyContestForm: React.FC<OnlyContestFormProps> = ({
           required
         />
       </div>
+
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+        <FormCheckbox
+          label="Enable Popular Contest"
+          checked={formData.popular_contest}
+          onChange={(e) =>
+            updateFormData({ popular_contest: e.target.checked as boolean })
+          }
+          error={errors.popular_contest}
+          required
+        />
+      </div>
+      <div className="py-2"></div>
     </FormSection>
   );
 };

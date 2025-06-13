@@ -2,7 +2,6 @@ import * as Yup from "yup";
 
 export const contestFormSchema = Yup.object().shape({
   contest_name: Yup.string().required("Contest name is required"),
-  reward_name: Yup.string().required("Reward name is required"),
   start_date: Yup.string().required("Start date is required"),
   start_time: Yup.string().required("Start time is required"),
   end_date: Yup.string().required("End date is required"),
@@ -23,25 +22,22 @@ export const contestFormSchema = Yup.object().shape({
   }),
 
   contest_type_name: Yup.string().required("Contest type name is required"),
-  sponsor_name: Yup.string().required("Sponsor name is required"),
 
-  sponsor_logo: Yup.mixed()
-    .test("is-file", "Sponsor logo must be a file", (value) => {
-      return value instanceof File || value === undefined;
-    })
-    .nullable(),
+  thumbnail: Yup.mixed().test(
+    "is-file",
+    "Thumbnail must be a file",
+    (value) => {
+      return value instanceof File;
+    },
+  ),
 
-  thumbnail: Yup.mixed()
-    .test("is-file", "Thumbnail must be a file", (value) => {
-      return value instanceof File || value === undefined;
-    })
-    .nullable(),
-
-  contest_image: Yup.mixed()
-    .test("is-file", "Contest image must be a file", (value) => {
-      return value instanceof File || value === undefined;
-    })
-    .nullable(),
+  contest_image: Yup.mixed().test(
+    "is-file",
+    "Contest image must be a file",
+    (value) => {
+      return value instanceof File;
+    },
+  ),
 });
 
 export async function validateContestFormData(formData: any): Promise<{

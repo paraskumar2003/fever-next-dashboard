@@ -9,6 +9,8 @@ import {
   OnlyQuestionForm,
   OnlyWinnersForm,
   TriviaGamePlay,
+  validateContestFormData,
+  validateWinnersForm,
 } from "@/components";
 import OnlyContestForm from "@/components/Forms/OnlyContestForm";
 import { useContest } from "@/context/ContestContext";
@@ -22,7 +24,6 @@ import {
   buildQuestionJsonData,
 } from "@/lib/utils";
 import { Instruction } from "@/types";
-import { validateContestFormData } from "@/components/Forms/validation-schema/create-contest-form";
 
 const steps = [
   "Contest Details",
@@ -50,7 +51,9 @@ export default function CreateContest() {
   }); // New state for edit mode
 
   // Add state for contest form errors
-  const [contestFormErrors, setContestFormErrors] = useState<Record<string, string>>({});
+  const [contestFormErrors, setContestFormErrors] = useState<
+    Record<string, string>
+  >({});
 
   useEffect(() => {
     const contest_id = searchParams.get("contest_id");
@@ -201,11 +204,13 @@ export default function CreateContest() {
       // Validate form data
       let { isValid, errors } = await validateContestFormData(formData);
       console.log({ errors });
-      
+
       if (!isValid) {
         // Set errors in state for display
         setContestFormErrors(errors);
-        Notiflix.Notify.warning("Please fix the validation errors before proceeding.");
+        Notiflix.Notify.warning(
+          "Please fix the validation errors before proceeding.",
+        );
         return false;
       }
 
@@ -278,8 +283,16 @@ export default function CreateContest() {
     Notiflix.Loading.circle();
     try {
       if (!formData.contest_id || !formData.winners?.length) {
-        Notiflix.Notify.failure("Missing required data for Winners & Rewards.");
+        Notiflix.Notify.failure("Atleast one winner is required");
         return false;
+      }
+
+      let { isValid, errors } = await validateWinnersForm(formData);
+
+      console.log(errors);
+
+      if (!isValid) {
+        console.log("error in winners form", errors);
       }
 
       const payload = {

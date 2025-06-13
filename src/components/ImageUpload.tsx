@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Upload } from "lucide-react";
 
 interface ImageUploadProps {
@@ -38,6 +38,10 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
       fileInputRef.current.click();
     }
   };
+
+  useEffect(() => {
+    console.log({ error });
+  }, [error]);
 
   return (
     <div className="mb-4">

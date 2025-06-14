@@ -88,9 +88,9 @@ const OnlyWinnersForm: React.FC<OnlyWinnersFormProps> = ({
         )}
       </div>
 
-      {winners && (
+      {formData?.winners && (
         <div className="space-y-6">
-          {winners.map((winner, index) => (
+          {formData?.winners.map((winner, index) => (
             <div
               key={index}
               className="rounded-lg border bg-gray-50 p-4 shadow-md"

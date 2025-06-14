@@ -48,15 +48,14 @@ const OnlyQuestionForm: React.FC<OnlyQuestionFormProps> = ({
         },
     );
 
-    const selected = sets.find((set: any) => set.id == selectedSet);
-    updateFormData({ questions: updatedQuestions });
-    console.log(selected, formData.questions?.length);
-    if (
-      formData.questions &&
-      selected &&
-      selected.questions < formData.questions?.length
-    ) {
-      setError(`Please choose a set with at least ${count} questions.`);
+    const selected = sets.find(
+      (set: any) => set.id == formData.QuestionCategoryId,
+    );
+    if (selected) setSelectedSet(String(selected.id));
+    if (formData.questions && selected) {
+      if (parseInt(selected.questions) < updatedQuestions?.length)
+        setError(`Please choose a set with at least ${count} questions.`);
+      else updateFormData({ questions: updatedQuestions });
     } else {
       setError("");
     }
@@ -74,11 +73,6 @@ const OnlyQuestionForm: React.FC<OnlyQuestionFormProps> = ({
           name: e.category,
         })),
       );
-      setSelectedSet(setsData[0].id);
-      updateFormData({
-        QuestionCategoryId: parseInt(setsData[0].id),
-        flipSet: parseInt(setsData[0].id),
-      });
     }
   };
 
@@ -88,21 +82,31 @@ const OnlyQuestionForm: React.FC<OnlyQuestionFormProps> = ({
 
   const handleSetSelection = (setId: string) => {
     const selected = sets.find((set: any) => set.id == setId);
-    console.log(selected?.questions, selected, formData.questions, setId, sets);
-    if (
-      formData.questions &&
-      selected &&
-      selected.questions < formData.questions?.length
-    ) {
-      setError(
-        `Please choose a set with at least ${formData.questions?.length} questions.`,
-      );
+    if (!selected) {
+      throw new Error("Invalid setId!!");
+    }
+
+    if (!formData.questions) {
+      throw new Error("Invalid question value in form!!");
+    }
+    console.log(
+      formData.questions,
+      selected,
+      parseInt(selected?.questions as string) < formData?.questions?.length,
+    );
+    if (formData.questions && selected) {
+      if (parseInt(selected.questions as string) < formData.questions?.length)
+        setError(
+          `Please choose a set with at least ${formData.questions?.length} questions.`,
+        );
+      else {
+        updateFormData({
+          QuestionCategoryId: selected.id,
+        });
+        setSelectedSet(String(selected.id));
+      }
     } else {
       setError("");
-      setSelectedSet(setId); // Valid set, proceed to set it
-      updateFormData({
-        QuestionCategoryId: parseInt(setId),
-      });
     }
   };
 
@@ -144,7 +148,7 @@ const OnlyQuestionForm: React.FC<OnlyQuestionFormProps> = ({
       <div className="mb-6">
         <FormSelect
           label="Choose Set"
-          value={selectedSet || ""}
+          value={formData.QuestionCategoryId}
           options={sets.map((set: any) => ({
             value: set.id,
             label: `${set.name}`,
@@ -196,7 +200,7 @@ const OnlyQuestionForm: React.FC<OnlyQuestionFormProps> = ({
                 questions[index].timer = e.target.value;
                 updateFormData({ questions });
               }}
-              error={errors[`questions[${index}]`].timer}
+              error={errors[`questions[${index}]`]?.timer}
               required
             />
           ))}
@@ -250,11 +254,13 @@ const OnlyQuestionForm: React.FC<OnlyQuestionFormProps> = ({
             <div className="mb-6">
               <FormSelect
                 label="Choose Flip Set"
-                value={selectedFlipSet || ""}
-                options={sets.map((set: any) => ({
-                  value: set.id,
-                  label: `${set.name}`,
-                }))}
+                value={formData.flipSet || ""}
+                options={sets
+                  .filter((e) => e.id != formData.QuestionCategoryId)
+                  .map((set: any) => ({
+                    value: set.id,
+                    label: `${set.name}`,
+                  }))}
                 onChange={(e) => handleFlipSetSelection(e.target.value)}
                 error={errors.flipSet}
                 required

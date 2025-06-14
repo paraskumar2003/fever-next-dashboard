@@ -56,7 +56,7 @@ export interface Question {
 export interface QuestionSet {
   id: number;
   name: string;
-  questions: number;
+  questions: string;
 }
 
 export type RewardType = "PHYSICAL" | "COUPON_PDF" | "CODE";
@@ -103,7 +103,7 @@ export interface ContestFormData {
   flip_set: { name: string; questions: Question[] };
   QuestionCategoryId: number;
   flipSet: number;
-  isPopular: boolean;
+  isPopular: number;
 }
 
 export interface TambolaFormData {

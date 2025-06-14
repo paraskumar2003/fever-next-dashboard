@@ -25,7 +25,7 @@ import {
   buildInstructionFormData,
   buildQuestionJsonData,
 } from "@/lib/utils";
-import { Instruction } from "@/types";
+import { Instruction, WinnerReward } from "@/types";
 
 const steps = [
   "Contest Details",
@@ -121,26 +121,44 @@ export default function CreateContest() {
           sponsor_logo_preview: details?.sponsored_logo,
           thumbnail_preview: details?.thumbnail,
           contest_image_preview: details?.contestImage,
+          isPopular: details.isPopular,
           contest_hero_logo_preview: details?.contestHeroLogo,
+          winners: details?.contestPrizes?.map((e: any) => ({
+            reward_id: e?.reward?.id,
+            bucks: e.fever_bucks,
+          })),
           instructions: details?.instructions?.map(
             (instruction: Instruction) => ({
               title: instruction.title,
               description: instruction.description,
             }),
           ),
+
           mega_prize_name: details?.rewards?.reward,
           flip_allowed: details?.questionSet.flipAllowed,
           flip_fee: details?.questionSet.flipFee,
-          flipSet: details?.questionSet.flipSet,
-          questions: new Array(details?.questionSet?.noOfQuestions || 0).fill({
-            question: "",
-            option1: "",
-            option2: "",
-            option3: "",
-            option4: "",
-            correctOption: "",
-            timer: "10",
-          }),
+          flipSet: details?.questionSet?.flipCategory?.id,
+          QuestionCategoryId: details?.questionSet.questionCategory?.id,
+          game_time_level:
+            details?.questionSet.timerType == "QUESTIONS" ? "QUESTION" : "GAME",
+          questions: new Array(details?.questionSet?.noOfQuestions || 1)
+            .fill({
+              question: "",
+              option1: "",
+              option2: "",
+              option3: "",
+              option4: "",
+              correctOption: "",
+              timer: "10",
+            })
+            .map((e, i) => ({
+              ...e,
+              timer: details?.questionSet?.timerValues[i] || e?.timer || "10",
+            })),
+          game_timer:
+            details?.questionSet?.timerType === "GAME"
+              ? details?.questionSet?.timerValues[0]
+              : "0",
         });
         // If contest details are fetched, assume this step is "submitted"
         setFormSubmissionStatus((prev) => ({ ...prev, contestDetails: true }));

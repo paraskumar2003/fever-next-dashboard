@@ -7,10 +7,12 @@ export const questionFormSchema = Yup.object().shape({
 
   game_timer: Yup.number()
     .typeError("Game timer must be a number")
-    .min(10, "Minimum game timer is 10 seconds")
     .when("game_time_level", {
       is: "GAME",
-      then: (schema) => schema.required("Game timer is required"),
+      then: (schema) =>
+        schema
+          .required("Game timer is required")
+          .min(10, "Minimum game timer is 10 seconds"),
       otherwise: (schema) => schema.notRequired().nullable(),
     }),
 

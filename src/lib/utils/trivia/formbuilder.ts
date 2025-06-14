@@ -49,7 +49,7 @@ export function buildContestFormData(
     );
   }
   fd.append("isPopular", String(formData.isPopular));
-  fd.append("id", String(formData.contest_id));
+  if (formData.contest_id) fd.append("id", String(formData.contest_id));
   return fd;
 }
 

@@ -35,6 +35,17 @@ const Table = <T,>({
           onPaginationModelChange={onPaginationModelChange}
           pageSizeOptions={[5, 10, 25, 50]}
           className="dark:bg-boxdark dark:text-white"
+          columnVisibilityModel={{
+            seq_no: true,
+            contest_name: true,
+            contest_fee: true,
+            contest_sponsor_logo: true,
+            contest_time: true,
+            contest_date: true,
+            contest_type: true,
+            sponsored_name: true,
+            metrics: true,
+          }}
         />
       </div>
     </Paper>

@@ -103,7 +103,7 @@ export interface ContestFormData {
   flip_set: { name: string; questions: Question[] };
   QuestionCategoryId: number;
   flipSet: number;
-  popular_contest: boolean;
+  isPopular: boolean;
 }
 
 export interface TambolaFormData {

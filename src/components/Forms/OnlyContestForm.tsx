@@ -166,12 +166,11 @@ const OnlyContestForm: React.FC<OnlyContestFormProps> = ({
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
         <FormCheckbox
           label="Enable Popular Contest"
-          checked={formData.popular_contest}
+          checked={formData.isPopular}
           onChange={(e) =>
-            updateFormData({ popular_contest: e.target.checked as boolean })
+            updateFormData({ isPopular: e.target.checked as boolean })
           }
-          error={errors.popular_contest}
-          required
+          error={errors.isPopular}
         />
       </div>
       <div className="py-2"></div>

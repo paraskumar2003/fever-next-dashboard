@@ -9,6 +9,7 @@ type DataTableProps<T> = {
   columns: GridColDef[];
   totalCount: number;
   onPaginationModelChange?: (paginationModel: any) => void;
+  paginationModel: { page: number; pageSize: number };
 };
 
 const Table = <T,>({
@@ -16,12 +17,8 @@ const Table = <T,>({
   columns,
   totalCount,
   onPaginationModelChange,
+  paginationModel,
 }: DataTableProps<T>) => {
-  const [paginationModel, setPaginationModel] = useState({
-    page: 0,
-    pageSize: 10,
-  });
-
   return (
     <Paper
       style={{ height: 500, width: "100%" }}
@@ -35,7 +32,7 @@ const Table = <T,>({
           pagination
           paginationMode="server"
           paginationModel={paginationModel}
-          onPaginationModelChange={setPaginationModel}
+          onPaginationModelChange={onPaginationModelChange}
           pageSizeOptions={[5, 10, 25, 50]}
           className="dark:bg-boxdark dark:text-white"
         />

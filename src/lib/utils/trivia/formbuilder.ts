@@ -48,6 +48,8 @@ export function buildContestFormData(
       formData.contest_image.name,
     );
   }
+  fd.append("isPopular", String(formData.isPopular));
+  fd.append("id", String(formData.contest_id));
   return fd;
 }
 
@@ -134,7 +136,7 @@ export function buildQuestionJsonData(
 
     json.questionFlip = formData.flip_allowed;
     json.flipFee = formData.flip_fee;
-    json.flipAllowed = formData.flip_count;
+    json.flipAllowed = formData.flip_allowed;
     json.flipSet = formData.flipSet;
   }
 

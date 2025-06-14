@@ -134,7 +134,7 @@ export function TriviaGamePlay({
   };
 
   return (
-    <FormSection title="Review">
+    <FormSection title="Preview" onSave={() => {}} saveButtonText="Publish">
       <div className="mx-auto w-[400px] bg-[url('/images/preview/trivia/trivia_bg.png')] bg-cover">
         <>
           {game.state && (

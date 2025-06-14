@@ -23,21 +23,25 @@ export const contestFormSchema = Yup.object().shape({
 
   contest_type_name: Yup.string().required("Contest type name is required"),
 
-  thumbnail: Yup.mixed().test(
-    "is-file",
-    "Thumbnail must be a file",
-    (value) => {
-      return value instanceof File;
-    },
-  ),
+  thumbnail: Yup.mixed().when("contest_id", {
+    is: (val: any) => !!val, // if contest_id is truthy
+    then: (schema) => schema.nullable(), // allow null
+    otherwise: (schema) =>
+      schema.test("is-file", "Thumbnail must be a file", (value) => {
+        return value instanceof File;
+      }),
+  }),
 
-  contest_image: Yup.mixed().test(
-    "is-file",
-    "Contest image must be a file",
-    (value) => {
-      return value instanceof File;
-    },
-  ),
+  contest_image: Yup.mixed().when("contest_id", {
+    is: (val: any) => !!val, // if contest_id is truthy
+    then: (schema) => schema.nullable(),
+    otherwise: (schema) =>
+      schema.test("is-file", "Contest image must be a file", (value) => {
+        return value instanceof File;
+      }),
+  }),
+
+  isPopular: Yup.boolean().required("Popularity is required"),
 });
 
 export async function validateContestFormData(formData: any): Promise<{

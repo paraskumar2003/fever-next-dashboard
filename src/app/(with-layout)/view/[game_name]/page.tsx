@@ -101,14 +101,26 @@ export default function ViewContest() {
 
   const { game_name } = useParams();
   const [rows, setRows] = useState<any[]>([]);
+  const [totalCount, setTotalCount] = useState<number>(0);
   const [loading, setLoading] = useState(true);
+  const [paginationModel, setPaginationModel] = useState<{
+    page: number;
+    pageSize: number;
+  }>({
+    page: 1,
+    pageSize: 10,
+  });
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        let filter: Record<string, any> = {};
+        let filter: Record<string, any> = {
+          page: paginationModel.page,
+          limit: paginationModel.pageSize,
+        };
         filter.category = searchParams.get("category") ?? undefined;
         const { data } = await TriviaServices.getContests(filter);
+        if (data.data.meta) setTotalCount(data.data?.meta?.total);
         if (data.data) {
           setRows(
             data.data.rows.map((e: Contest, index: number) => ({
@@ -132,7 +144,7 @@ export default function ViewContest() {
     };
 
     fetchData();
-  }, [searchParams]);
+  }, [searchParams, paginationModel]);
 
   const [search, setSearch] = useState("");
 
@@ -157,7 +169,16 @@ export default function ViewContest() {
         placeholder="Search items..."
       />
       <div className="py-2"></div>
-      <Table rows={rows} columns={columns} totalCount={rows.length} />
+      <Table
+        rows={rows}
+        columns={columns}
+        totalCount={totalCount}
+        paginationModel={paginationModel}
+        onPaginationModelChange={(e) => {
+          console.log(e);
+          setPaginationModel(e);
+        }}
+      />
     </div>
   );
 }

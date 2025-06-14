@@ -44,7 +44,7 @@ export const ContestProvider: React.FC<{ children: ReactNode }> = ({
     game_time_level: "GAME",
     flip_allowed: 1,
     flip_count: 1,
-    isPopular: false,
+    isPopular: 0,
   });
   const [tambolaFormData, setTambolaFormData] = useState<
     Partial<TambolaFormData>
@@ -149,7 +149,7 @@ export const ContestProvider: React.FC<{ children: ReactNode }> = ({
       game_time_level: "GAME",
       flip_allowed: 1,
       flip_count: 0,
-      isPopular: false,
+      isPopular: 0,
     });
   };
 

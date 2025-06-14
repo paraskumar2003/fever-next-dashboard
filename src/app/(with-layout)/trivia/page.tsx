@@ -129,6 +129,18 @@ export default function CreateContest() {
             }),
           ),
           mega_prize_name: details?.rewards?.reward,
+          flip_allowed: details?.questionSet.flipAllowed,
+          flip_fee: details?.questionSet.flipFee,
+          flipSet: details?.questionSet.flipSet,
+          questions: new Array(details?.questionSet?.noOfQuestions || 0).fill({
+            question: "",
+            option1: "",
+            option2: "",
+            option3: "",
+            option4: "",
+            correctOption: "",
+            timer: "10",
+          }),
         });
         // If contest details are fetched, assume this step is "submitted"
         setFormSubmissionStatus((prev) => ({ ...prev, contestDetails: true }));

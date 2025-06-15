@@ -94,14 +94,16 @@ const CategoriesPage = () => {
 
   return (
     <>
-      <SearchBar
-        value={searchString}
-        onChange={(text: string) => setSearchString(text)}
-      />
-
       <div className="mx-auto py-8">
         <div className="mb-6 flex items-center justify-between">
           <h1 className="text-3xl font-bold">Categories Management</h1>
+        </div>
+
+        <div className="my-4">
+          <SearchBar
+            value={searchString}
+            onChange={(text: string) => setSearchString(text)}
+          />
         </div>
 
         <div className="space-y-6">

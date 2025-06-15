@@ -283,6 +283,7 @@ const OnlyQuestionForm: React.FC<OnlyQuestionFormProps> = ({
             { value: "option4", label: "Option 4" },
           ]}
           disabled={readOnly}
+          required
         />
 
         <FormSelect
@@ -297,6 +298,7 @@ const OnlyQuestionForm: React.FC<OnlyQuestionFormProps> = ({
             })),
           )}
           disabled={readOnly}
+          required
         />
 
         <FormInput

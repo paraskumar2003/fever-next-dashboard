@@ -8,6 +8,7 @@ interface OnlyInstructionFormProps {
   formData: Partial<ContestFormData>;
   updateFormData: (data: Partial<ContestFormData>) => void;
   onSave: Function;
+  errors: Record<string, any>;
 }
 
 const MAX_INSTRUCTIONS = 5;
@@ -25,6 +26,7 @@ const OnlyInstructionForm: React.FC<OnlyInstructionFormProps> = ({
   formData,
   updateFormData,
   onSave,
+  errors,
 }) => {
   const {
     mega_prize_name = "",
@@ -77,12 +79,18 @@ const OnlyInstructionForm: React.FC<OnlyInstructionFormProps> = ({
 
   return (
     <FormSection title="Game Instructions" onSave={() => onSave()}>
+      {errors.instructions && (
+        <div className="text-red-500">{errors.instructions}</div>
+      )}
+
       <div className="mb-6">
         <FormInput
           label="Mega Prize Title"
           placeholder="Enter Mega Prize Name"
           value={mega_prize_name}
           onChange={handleMegaPrizeChange}
+          error={errors.mega_prize_name}
+          required
         />
       </div>
 
@@ -103,6 +111,8 @@ const OnlyInstructionForm: React.FC<OnlyInstructionFormProps> = ({
               onChange={(e) =>
                 updateInstruction(index, { title: e.target.value })
               }
+              error={errors[`instructions[${index}].title`]}
+              required
             />
 
             <FormInput
@@ -112,6 +122,7 @@ const OnlyInstructionForm: React.FC<OnlyInstructionFormProps> = ({
               onChange={(e) =>
                 updateInstruction(index, { description: e.target.value })
               }
+              error={errors[`instructions[${index}].description`]}
             />
           </div>
         ))}
@@ -122,6 +133,8 @@ const OnlyInstructionForm: React.FC<OnlyInstructionFormProps> = ({
           label="Sponsor Logo (200x100px, max 1MB)"
           value={formData.sponsor_logo_preview || ""}
           onChange={handleImageChange}
+          error={errors.sponsor_logo}
+          required
         />
       </div>
     </FormSection>

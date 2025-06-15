@@ -30,44 +30,49 @@ export default function ViewContest() {
 
   const columns = [
     { field: "seq_no", headerName: "ID", width: 30 },
-    { field: "contest_name", headerName: "Contest Name", flex: 1 },
-    { field: "contest_fee", headerName: "Contest Fee", flex: 1 },
+    { field: "contest_name", headerName: "Contest Name", width: 200 },
+    { field: "contest_fee", headerName: "Contest Fee", width: 200 },
     {
       field: "contest_sponsor_logo",
       headerName: "Contest Sponsor Logo",
-      flex: 1,
+
+      width: 200,
     },
-    { field: "contest_time", headerName: "Contest Time", flex: 1 },
-    { field: "contest_date", headerName: "Contest Date", flex: 1 },
-    { field: "contest_type", headerName: "Contest Type", flex: 1 },
-    { field: "sponsored_name", headerName: "Sponsor Name", flex: 1 },
+    { field: "contest_time", headerName: "Contest Time", width: 200 },
+    { field: "contest_date", headerName: "Contest Date", width: 200 },
+    { field: "contest_type", headerName: "Contest Type", width: 200 },
     {
-      field: "metrics",
-      headerName: "Metrics",
-      flex: 2,
-      sortable: false,
-      filterable: false,
-      disableColumnMenu: true,
-      renderCell: (params: { row: Contest }) => (
-        <div className="flex h-full items-center justify-center gap-2">
-          <Button
-            variant="primary"
-            color="primary"
-            size="sm"
-            onClick={() => handleAction("metrics", params.row.id as string)}
-          >
-            <ChartColumnBig />
-          </Button>
-        </div>
-      ),
+      field: "sponsored_name",
+      headerName: "Sponsor Name",
+      width: 150,
     },
+    // {
+    //   field: "metrics",
+    //   headerName: "Metrics",
+    //   flex: 2,
+    //   sortable: false,
+    //   filterable: false,
+    //   disableColumnMenu: true,
+    //   renderCell: (params: { row: Contest }) => (
+    //     <div className="flex h-full items-center justify-center gap-2">
+    //       <Button
+    //         variant="primary"
+    //         color="primary"
+    //         size="sm"
+    //         onClick={() => handleAction("metrics", params.row.id as string)}
+    //       >
+    //         <ChartColumnBig />
+    //       </Button>
+    //     </div>
+    //   ),
+    // },
     {
       field: "actions",
       headerName: "Actions",
-      flex: 2,
       sortable: false,
       filterable: false,
       disableColumnMenu: true,
+      width: 300,
       renderCell: (params: { row: Contest }) => (
         <div className="flex h-full items-center justify-center gap-2">
           <Button
@@ -101,14 +106,26 @@ export default function ViewContest() {
 
   const { game_name } = useParams();
   const [rows, setRows] = useState<any[]>([]);
+  const [totalCount, setTotalCount] = useState<number>(0);
   const [loading, setLoading] = useState(true);
+  const [paginationModel, setPaginationModel] = useState<{
+    page: number;
+    pageSize: number;
+  }>({
+    page: 1,
+    pageSize: 10,
+  });
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        let filter: Record<string, any> = {};
+        let filter: Record<string, any> = {
+          page: paginationModel.page,
+          limit: paginationModel.pageSize,
+        };
         filter.category = searchParams.get("category") ?? undefined;
         const { data } = await TriviaServices.getContests(filter);
+        if (data.data.meta) setTotalCount(data.data?.meta?.total);
         if (data.data) {
           setRows(
             data.data.rows.map((e: Contest, index: number) => ({
@@ -132,7 +149,7 @@ export default function ViewContest() {
     };
 
     fetchData();
-  }, [searchParams]);
+  }, [searchParams, paginationModel]);
 
   const [search, setSearch] = useState("");
 
@@ -157,7 +174,16 @@ export default function ViewContest() {
         placeholder="Search items..."
       />
       <div className="py-2"></div>
-      <Table rows={rows} columns={columns} totalCount={rows.length} />
+      <Table
+        rows={rows}
+        columns={columns}
+        totalCount={totalCount}
+        paginationModel={paginationModel}
+        onPaginationModelChange={(e) => {
+          console.log(e);
+          setPaginationModel(e);
+        }}
+      />
     </div>
   );
 }

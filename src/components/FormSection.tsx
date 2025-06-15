@@ -7,6 +7,7 @@ interface FormSectionProps {
   onEdit?: Function;
   onSave?: Function;
   headerAction?: ReactNode;
+  saveButtonText?: string;
 }
 
 const FormSection: React.FC<FormSectionProps> = ({
@@ -15,6 +16,7 @@ const FormSection: React.FC<FormSectionProps> = ({
   onEdit,
   onSave,
   headerAction,
+  saveButtonText = "Save",
 }) => {
   return (
     <div className="mb-8 rounded-lg border border-white/20 bg-white p-6 shadow-xl backdrop-blur-md">
@@ -41,7 +43,7 @@ const FormSection: React.FC<FormSectionProps> = ({
               type="submit"
               onClick={() => onSave()}
             >
-              Save
+              {saveButtonText}
             </Button>
           )}
         </div>

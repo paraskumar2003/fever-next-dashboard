@@ -4,3 +4,4 @@ export * from "./OnlyInstructionForm";
 export * from "./OnlyQuestion";
 export * from "./OnlyQuestionForm";
 export * from "./OnlyWinnersForm";
+export * from "./validation-schema";

@@ -9,6 +9,10 @@ import {
   OnlyQuestionForm,
   OnlyWinnersForm,
   TriviaGamePlay,
+  validateContestFormData,
+  validateInstructionFormData,
+  validateQuestionFormData,
+  validateWinnersForm,
 } from "@/components";
 import OnlyContestForm from "@/components/Forms/OnlyContestForm";
 import { useContest } from "@/context/ContestContext";
@@ -21,13 +25,14 @@ import {
   buildInstructionFormData,
   buildQuestionJsonData,
 } from "@/lib/utils";
-import { Instruction } from "@/types";
+import { Instruction, WinnerReward } from "@/types";
 
 const steps = [
   "Contest Details",
   "Winners & Rewards",
   "Instructions",
   "Game Questions",
+  "Preview",
 ];
 
 export default function CreateContest() {
@@ -47,6 +52,11 @@ export default function CreateContest() {
     instruction: false,
     questions: false,
   }); // New state for edit mode
+
+  // Add state for contest form errors
+  const [contestFormErrors, setContestFormErrors] = useState<
+    Record<string, string>
+  >({});
 
   useEffect(() => {
     const contest_id = searchParams.get("contest_id");
@@ -72,14 +82,27 @@ export default function CreateContest() {
       const { data } = await ContestServices.getContestById(contest_id);
       if (data?.data) {
         const details = data.data;
-        if (details.winners?.length > 0) {
+        if (details.contestPrizes?.length > 0) {
+          console.log("contestPrizes", details.contestPrizes);
           setEditMode((prev) => ({ ...prev, winners: true }));
+          setFormSubmissionStatus((prev) => ({
+            ...prev,
+            winnersAndRewards: true,
+          }));
         }
         if (details.instructions?.length > 0) {
-          setEditMode((prev) => ({ ...prev, instruction: true }));
+          setEditMode((prev) => ({ ...prev, instructions: true }));
+          setFormSubmissionStatus((prev) => ({
+            ...prev,
+            instructions: true,
+          }));
         }
         if (details.questions?.length > 0) {
-          setEditMode((prev) => ({ ...prev, questions: true }));
+          setEditMode((prev) => ({ ...prev, gameQuestions: true }));
+          setFormSubmissionStatus((prev) => ({
+            ...prev,
+            gameQuestions: true,
+          }));
         }
         updateFormData({
           ...formData,
@@ -98,14 +121,44 @@ export default function CreateContest() {
           sponsor_logo_preview: details?.sponsored_logo,
           thumbnail_preview: details?.thumbnail,
           contest_image_preview: details?.contestImage,
+          isPopular: details.isPopular,
           contest_hero_logo_preview: details?.contestHeroLogo,
+          winners: details?.contestPrizes?.map((e: any) => ({
+            reward_id: e?.reward?.id,
+            bucks: e.fever_bucks,
+          })),
           instructions: details?.instructions?.map(
             (instruction: Instruction) => ({
               title: instruction.title,
               description: instruction.description,
             }),
           ),
+
           mega_prize_name: details?.rewards?.reward,
+          flip_allowed: details?.questionSet.flipAllowed,
+          flip_fee: details?.questionSet.flipFee,
+          flipSet: details?.questionSet?.flipCategory?.id,
+          QuestionCategoryId: details?.questionSet.questionCategory?.id,
+          game_time_level:
+            details?.questionSet.timerType == "QUESTIONS" ? "QUESTION" : "GAME",
+          questions: new Array(details?.questionSet?.noOfQuestions || 1)
+            .fill({
+              question: "",
+              option1: "",
+              option2: "",
+              option3: "",
+              option4: "",
+              correctOption: "",
+              timer: "10",
+            })
+            .map((e, i) => ({
+              ...e,
+              timer: details?.questionSet?.timerValues[i] || e?.timer || "10",
+            })),
+          game_timer:
+            details?.questionSet?.timerType === "GAME"
+              ? details?.questionSet?.timerValues[0]
+              : "0",
         });
         // If contest details are fetched, assume this step is "submitted"
         setFormSubmissionStatus((prev) => ({ ...prev, contestDetails: true }));
@@ -120,6 +173,10 @@ export default function CreateContest() {
       fetchContestDetails(contest_id);
     }
   }, [contest_id]);
+
+  useEffect(() => {
+    console.log({ formSubmissionStatus });
+  }, [formSubmissionStatus]);
 
   const goNext = (force = false) => {
     if (!force) {
@@ -194,15 +251,28 @@ export default function CreateContest() {
   const handleContestSave = async () => {
     Notiflix.Loading.circle();
     try {
+      // Validate form data
+      let { isValid, errors } = await validateContestFormData(formData);
+      console.log({ errors });
+
+      if (!isValid) {
+        // Set errors in state for display
+        setContestFormErrors(errors);
+        Notiflix.Notify.warning(
+          "Please fix the validation errors before proceeding.",
+        );
+        return false;
+      }
+
+      // Clear any existing errors if validation passes
+      setContestFormErrors({});
+
       const form = buildContestFormData(formData, contest_id);
-      if (!contest_id) {
-        const { data } = await ContestServices.createContest(form);
-        console.log("Contest created:", data?.data.id);
-        // Assuming the new contest_id is returned and should be set
-        push(`/trivia?contest_id=${data?.data.id}`);
-        if (data?.data?.id) {
-          updateFormData({ contest_id: data.data.id });
-        }
+      const { data } = await ContestServices.createContest(form);
+      // Assuming the new contest_id is returned and should be set
+      push(`/trivia?contest_id=${data?.data.id}`);
+      if (data?.data?.id) {
+        updateFormData({ contest_id: data.data.id });
       }
       setFormSubmissionStatus((prev) => ({ ...prev, contestDetails: true }));
       Notiflix.Notify.success("Contest Details saved successfully!");
@@ -219,6 +289,20 @@ export default function CreateContest() {
   const handleInstructionSave = async () => {
     Notiflix.Loading.circle();
     try {
+      let { isValid, errors } = await validateInstructionFormData(formData);
+
+      console.log({ errors });
+
+      if (!isValid) {
+        // Set errors in state for display
+        setContestFormErrors(errors);
+        Notiflix.Notify.warning(
+          "Please fix the validation errors before proceeding.",
+        );
+        return false;
+      }
+
+      setContestFormErrors({});
       const form = buildInstructionFormData(formData, contest_id);
       let { data } = await TriviaServices.createInstruction(form);
       if (data) {
@@ -239,6 +323,20 @@ export default function CreateContest() {
   const handleGameQuestionSave = async () => {
     Notiflix.Loading.circle();
     try {
+      let { isValid, errors } = await validateQuestionFormData(formData);
+
+      console.log({ errors });
+
+      if (!isValid) {
+        // Set errors in state for display
+        setContestFormErrors(errors);
+        Notiflix.Notify.warning(
+          "Please fix the validation errors before proceeding.",
+        );
+        return false;
+      }
+
+      setContestFormErrors({});
       const form = buildQuestionJsonData(formData, contest_id);
       let res = await TriviaServices.postGameQuestionForm(form);
       if (res) {
@@ -260,8 +358,16 @@ export default function CreateContest() {
     Notiflix.Loading.circle();
     try {
       if (!formData.contest_id || !formData.winners?.length) {
-        Notiflix.Notify.failure("Missing required data for Winners & Rewards.");
+        Notiflix.Notify.failure("Atleast one winner is required");
         return false;
+      }
+
+      let { isValid, errors } = await validateWinnersForm(formData);
+
+      console.log(errors);
+
+      if (!isValid) {
+        console.log("error in winners form", errors);
       }
 
       const payload = {
@@ -300,6 +406,8 @@ export default function CreateContest() {
       case 3:
         saved = await handleGameQuestionSave();
         break;
+      case 4:
+        saved = true;
       default:
         break;
     }
@@ -340,6 +448,7 @@ export default function CreateContest() {
           <OnlyContestForm
             formData={formData}
             updateFormData={updateFormData}
+            errors={contestFormErrors}
             onSave={() => {
               handleChangeIndex(currentStep);
             }}
@@ -363,6 +472,7 @@ export default function CreateContest() {
             onSave={() => {
               handleChangeIndex(currentStep);
             }}
+            errors={contestFormErrors}
           />
         );
       case 3:
@@ -374,6 +484,7 @@ export default function CreateContest() {
               handleChangeIndex(currentStep); // Call handleChangeIndex for consistency
             }}
             handleFlipSetModalOpen={() => {}}
+            errors={contestFormErrors}
           />
         );
       case 4:
@@ -392,13 +503,7 @@ export default function CreateContest() {
         steps={steps}
         onClick={(e) => goToStep(e)}
       />
-      {renderStep()}
-      {/* <StepNavigation
-        currentStep={currentStep}
-        totalSteps={steps.length}
-        onNext={goNext}
-        onPrev={goPrev}
-      /> */}
+      {renderStep()}{" "}
     </div>
   );
 }

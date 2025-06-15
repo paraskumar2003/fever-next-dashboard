@@ -83,13 +83,14 @@ const OnlyWinnersForm: React.FC<OnlyWinnersFormProps> = ({
               label: `${i + 1}`,
             }))}
             onChange={handleWinnerCountChange}
+            required
           />
         )}
       </div>
 
-      {winners && (
+      {formData?.winners && (
         <div className="space-y-6">
-          {winners.map((winner, index) => (
+          {formData?.winners.map((winner, index) => (
             <div
               key={index}
               className="rounded-lg border bg-gray-50 p-4 shadow-md"
@@ -113,6 +114,7 @@ const OnlyWinnersForm: React.FC<OnlyWinnersFormProps> = ({
                     reward_id: Number(e.target.value),
                   })
                 }
+                required
               />
 
               {rewards.find((r) => r.id == Number(winner.reward_id))
@@ -125,6 +127,7 @@ const OnlyWinnersForm: React.FC<OnlyWinnersFormProps> = ({
                   onChange={(e) =>
                     updateWinner(index, { bucks: Number(e.target.value) })
                   }
+                  required
                 />
               )}
             </div>

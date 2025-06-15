@@ -14,7 +14,10 @@ const FormSelect: React.FC<FormSelectProps> = ({
 }) => {
   return (
     <div className="mb-4">
-      <label className="mb-1  block text-sm font-medium">{label}</label>
+      <label className="mb-1  block text-sm font-medium">
+        <span>{label}</span>
+        {props.required && <span className="text-red-500">*</span>}
+      </label>
       <select
         className={`w-full border bg-white/5 ${
           error ? "border-red-500" : "border-black/20"

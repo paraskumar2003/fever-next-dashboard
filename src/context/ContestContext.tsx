@@ -27,7 +27,27 @@ export const ContestProvider: React.FC<{ children: ReactNode }> = ({
     game_proceed: {
       submitBtn: "Proceed to Game",
     },
-    instructions: [],
+    instructions: [
+      {
+        title: "",
+        description: "Get a Tambola ticket and wait for contestto begin",
+      },
+      {
+        title: "",
+        description:
+          "Ensure that you mark the numbers onyour ticket that have been called out",
+      },
+      {
+        title: "",
+        description:
+          "The number will be marked in RED incase automatically in case you missedto mark",
+      },
+      {
+        title: "",
+        description:
+          "Categories to win:- Full House, Lines, Corners, and early 5",
+      },
+    ],
     prize_catalogue: [],
     questions: [
       {
@@ -46,6 +66,7 @@ export const ContestProvider: React.FC<{ children: ReactNode }> = ({
     flip_count: 1,
     isPopular: 0,
   });
+
   const [tambolaFormData, setTambolaFormData] = useState<
     Partial<TambolaFormData>
   >({
@@ -132,7 +153,27 @@ export const ContestProvider: React.FC<{ children: ReactNode }> = ({
       game_proceed: {
         submitBtn: "Proceed to Game",
       },
-      instructions: [],
+      instructions: [
+        {
+          title: "",
+          description: "Get a Tambola ticket and wait for contestto begin",
+        },
+        {
+          title: "",
+          description:
+            "Ensure that you mark the numbers onyour ticket that have been called out",
+        },
+        {
+          title: "",
+          description:
+            "The number will be marked in RED incase automatically in case you missedto mark",
+        },
+        {
+          title: "",
+          description:
+            "Categories to win:- Full House, Lines, Corners, and early 5",
+        },
+      ],
       prize_catalogue: [],
       questions: [
         {

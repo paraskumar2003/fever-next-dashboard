@@ -49,14 +49,16 @@ const OnlyQuestionForm: React.FC<OnlyQuestionFormProps> = ({
     );
 
     const selected = sets.find(
-      (set: any) => set.id == formData?.QuestionCategoryId || sets[0].id,
+      (set: any) => set.id == formData?.QuestionCategoryId,
     );
     if (selected) setSelectedSet(String(selected.id));
-    console.log(selected, formData.questions);
     if (formData.questions && selected) {
       if (parseInt(selected.questions) < updatedQuestions?.length)
         setError(`Please choose a set with at least ${count} questions.`);
-      else updateFormData({ questions: updatedQuestions });
+      else {
+        updateFormData({ questions: updatedQuestions });
+        setError("");
+      }
     } else {
       setError("");
     }

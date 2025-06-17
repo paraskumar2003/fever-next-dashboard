@@ -83,7 +83,6 @@ export default function CreateContest() {
       if (data?.data) {
         const details = data.data;
         if (details.contestPrizes?.length > 0) {
-          console.log("contestPrizes", details.contestPrizes);
           setEditMode((prev) => ({ ...prev, winners: true }));
           setFormSubmissionStatus((prev) => ({
             ...prev,
@@ -127,13 +126,34 @@ export default function CreateContest() {
             reward_id: e?.reward?.id,
             bucks: e.fever_bucks,
           })),
-          instructions: details?.instructions?.map(
-            (instruction: Instruction) => ({
-              title: instruction.title,
-              description: instruction.description,
-            }),
-          ),
-
+          instructions:
+            details?.instructions.length > 0
+              ? details?.instructions.map((instruction: Instruction) => ({
+                  title: instruction.title,
+                  description: instruction.description,
+                }))
+              : [
+                  {
+                    title: "",
+                    description:
+                      "Get a Tambola ticket and wait for contestto begin",
+                  },
+                  {
+                    title: "",
+                    description:
+                      "Ensure that you mark the numbers onyour ticket that have been called out",
+                  },
+                  {
+                    title: "",
+                    description:
+                      "The number will be marked in RED incase automatically in case you missedto mark",
+                  },
+                  {
+                    title: "",
+                    description:
+                      "Categories to win:- Full House, Lines, Corners, and early 5",
+                  },
+                ],
           mega_prize_name: details?.rewards?.reward,
           flip_allowed: details?.questionSet.flipAllowed,
           flip_fee: details?.questionSet.flipFee,

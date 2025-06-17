@@ -13,15 +13,15 @@ export const instructionFormSchema = Yup.object().shape({
     .of(
       Yup.object().shape({
         title: Yup.string()
+          .optional()
+          .max(1000, "Description must be less than 1000 characters"),
+        description: Yup.string()
           .required("Instruction title is required")
           .min(3, "Instruction title must be at least 3 characters")
           .max(100, "Title must be less than 100 characters"),
-        description: Yup.string()
-          .optional()
-          .max(1000, "Description must be less than 1000 characters"),
       }),
     )
-    .min(5, "At least five instruction is required")
+    .min(3, "At least three instruction is required")
     .required("Instructions are required"),
 
   sponsor_logo: Yup.mixed()

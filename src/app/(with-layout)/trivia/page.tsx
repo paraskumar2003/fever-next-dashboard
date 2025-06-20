@@ -461,6 +461,11 @@ export default function CreateContest() {
     },
   ];
 
+  const handlePublish = () => {
+    Notiflix.Notify.success("Game Published Successfully!");
+    push("/view/trivia?category=upcoming");
+  };
+
   const renderStep = () => {
     switch (currentStep) {
       case 0:
@@ -509,7 +514,11 @@ export default function CreateContest() {
         );
       case 4:
         return (
-          <TriviaGamePlay questions={questions} addNewQuestion={() => {}} />
+          <TriviaGamePlay
+            questions={questions}
+            addNewQuestion={() => {}}
+            onPublish={handlePublish}
+          />
         );
       default:
         return null;

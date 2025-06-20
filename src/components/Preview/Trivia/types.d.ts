@@ -21,4 +21,5 @@ export interface TriviaGamePlayProps {
   onExit?: Function;
   addNewQuestion: (question: Question) => void;
   contestData?: ContestData;
+  onPublish?: () => void;
 }

@@ -16,7 +16,7 @@ enum GameState {
   ENDED = "ended",
 }
 
-export function TriviaGamePlay({ questions }: TriviaGamePlayProps) {
+export function TriviaGamePlay({ questions, onPublish }: TriviaGamePlayProps) {
   const router = useRouter();
   let contest_id = Cookies.get("contest_id");
 
@@ -121,7 +121,7 @@ export function TriviaGamePlay({ questions }: TriviaGamePlayProps) {
   };
 
   return (
-    <FormSection title="Preview" onSave={() => {}} saveButtonText="Publish">
+    <FormSection title="Preview" onSave={onPublish} saveButtonText="Publish">
       <div className="mx-auto w-[400px] bg-[url('/images/preview/trivia/trivia_bg.png')] bg-cover">
         <>
           {game.state === GameState.ENDED && (

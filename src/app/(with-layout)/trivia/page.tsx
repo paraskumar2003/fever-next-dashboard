@@ -96,7 +96,7 @@ export default function CreateContest() {
             instructions: true,
           }));
         }
-        if (details.questions?.length > 0) {
+        if (details.questionSet?.noOfQuestions > 0) {
           setEditMode((prev) => ({ ...prev, gameQuestions: true }));
           setFormSubmissionStatus((prev) => ({
             ...prev,

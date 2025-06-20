@@ -1,6 +1,5 @@
 import { useLayoutEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { TriviaServices } from "@/services/trivia";
 import Cookies from "js-cookie";
 import Notiflix from "notiflix";
 import { Flip } from "./Flip";
@@ -12,11 +11,12 @@ import { Question } from "./Question";
 import { TriviaGamePlayProps, Question as QuestionType } from "./types";
 import FormSection from "@/components/FormSection";
 
-export function TriviaGamePlay({
-  questions,
-  addNewQuestion,
-  contestData,
-}: TriviaGamePlayProps) {
+enum GameState {
+  PLAYING = "playing",
+  ENDED = "ended",
+}
+
+export function TriviaGamePlay({ questions }: TriviaGamePlayProps) {
   const router = useRouter();
   let contest_id = Cookies.get("contest_id");
 
@@ -30,10 +30,9 @@ export function TriviaGamePlay({
     state: true,
     timeOut: currentQuestion.timer,
   });
-  const [proceedModal, setProceedModal] = useState<boolean>(true);
-  const [didUserLoggedInOnThisPage, setDidUserLoggedInOnThisPage] =
-    useState<boolean>(false);
-  const [game, setGame] = useState<{ state: boolean }>({ state: true });
+  const [game, setGame] = useState<{ state: GameState }>({
+    state: GameState.PLAYING,
+  });
 
   useLayoutEffect(() => {
     questions.length < 1
@@ -54,23 +53,26 @@ export function TriviaGamePlay({
       });
       if (questions[currentQIndex + 1])
         setCurrentQuestion(questions[currentQIndex + 1]);
-      // redirection to be performed when quiz is finish
       else console.log("Quiz finished");
     }, time);
   };
 
-  // Correct and Incorrect visualization on UI depends upon the boolean returned from here.
   const handleAnswer = async (id: number, answer: string): Promise<boolean> => {
     if (contest_id) {
-      let { data } = await TriviaServices.submitAnswer({
-        contestId: parseInt(contest_id),
-        questionId: currentQuestion.question_no,
-        answer,
-      });
+      let data = {
+        data: {
+          correct: true,
+          rewardGiven: null,
+        },
+      };
       displayNextQuestion(1000); //=> Milliseconds delay while changing question
+      if (currentQIndex + 1 == questions.length) {
+        setTimeout(() => {
+          setGame({ state: GameState.ENDED });
+        }, 1000);
+      }
       if (!data.data.rewardGiven) return data.data.correct;
       else {
-        router.push(`/rewards/${data.data.rewardGiven}`);
         return data.data.correct;
       }
     }
@@ -81,21 +83,20 @@ export function TriviaGamePlay({
 
   const handleMissedQuestion = async (): Promise<boolean> => {
     if (contest_id) {
-      let { data } = await TriviaServices.submitAnswer({
-        contestId: parseInt(contest_id),
-        questionId: currentQuestion.question_no,
-        missed: true,
-        answer: "",
-      });
+      let data = {
+        data: {
+          correct: true,
+          rewardGiven: null,
+        },
+      };
       displayNextQuestion(1000); //=> Milliseconds delay while changing question
       if (data.data) {
         if (!data.data.rewardGiven) return data.data.correct;
         else {
-          router.push(`/rewards/${data.data.reward_id}`);
           return data.data.correct;
         }
       } else {
-        Notiflix.Notify.failure(data.message);
+        Notiflix.Notify.failure("Error while missing question");
       }
     }
     {
@@ -105,39 +106,31 @@ export function TriviaGamePlay({
 
   const handleFlipQuestion = async (currentQuestionId: number) => {
     if (contest_id) {
-      let { data } = await TriviaServices.flipQuestion({
-        contestId: contest_id,
-        currentQuestionId: String(currentQuestionId),
-      });
+      let data = {
+        data: {
+          correct: true,
+          rewardGiven: null,
+        },
+      };
       let newQuestion = data.data;
       if (newQuestion) {
-        addNewQuestion(newQuestion);
         Notiflix.Notify.success("Question Flipped!");
       } else Notiflix.Notify.failure("Unable to flip question at the moment!!");
       displayNextQuestion(1000);
     }
   };
 
-  const handleGameProceed = async () => {
-    if (contest_id) {
-      //   let { data } = await ContentServices.preGameParticipate({
-      //     game_slug: "happening-quiz",
-      //     contest_id,
-      //   });
-      closeModal();
-      setGame({ state: true });
-    }
-  };
-
-  const closeModal = () => {
-    setProceedModal(false);
-  };
-
   return (
     <FormSection title="Preview" onSave={() => {}} saveButtonText="Publish">
       <div className="mx-auto w-[400px] bg-[url('/images/preview/trivia/trivia_bg.png')] bg-cover">
         <>
-          {game.state && (
+          {game.state === GameState.ENDED && (
+            <div className="flex h-full flex-col items-center justify-center p-4 text-center">
+              <h2 className="mb-2 text-2xl font-medium">Game Ended</h2>
+              <p className="text-gray-600">Thank you for playing!</p>
+            </div>
+          )}
+          {game.state === GameState.PLAYING && (
             <>
               {/* i button */}
               <IButton />

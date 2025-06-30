@@ -12,6 +12,7 @@ import {
   Gamepad2,
   ChartColumnStacked,
   CircleHelp,
+  FileQuestion,
 } from "lucide-react";
 
 export const menuItems = [
@@ -32,6 +33,12 @@ export const menuItems = [
     label: "Questionaire",
     icon: CircleHelp,
     path: "/questionaire",
+  },
+  {
+    id: "question-sets",
+    label: "Question Sets",
+    icon: FileQuestion,
+    path: "/question-sets",
   },
   {
     id: "trivia",

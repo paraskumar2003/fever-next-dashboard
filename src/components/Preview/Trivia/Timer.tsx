@@ -4,12 +4,10 @@ import Image from "next/image";
 export function Timer({
   timeToCount,
   start = false,
-  currentQuestion,
   onEnd,
 }: {
   timeToCount: number;
   start?: boolean;
-  currentQuestion?: number;
   onEnd?: () => void;
 }) {
   const [timeLeft, setTimeLeft] = useState<number>(timeToCount);
@@ -21,7 +19,7 @@ export function Timer({
     if (intervalId) {
       clearInterval(intervalId);
     }
-  }, [currentQuestion, timeToCount]);
+  }, [timeToCount]);
 
   // Start countdown
   useEffect(() => {

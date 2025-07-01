@@ -514,6 +514,7 @@ export default function CreateContest() {
         return (
           <TriviaGamePlay
             questions={questions}
+            formData={formData}
             addNewQuestion={() => {}}
             onPublish={handlePublish}
           />

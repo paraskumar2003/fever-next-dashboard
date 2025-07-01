@@ -16,7 +16,11 @@ enum GameState {
   ENDED = "ended",
 }
 
-export function TriviaGamePlay({ questions, onPublish }: TriviaGamePlayProps) {
+export function TriviaGamePlay({
+  questions,
+  onPublish,
+  formData,
+}: TriviaGamePlayProps) {
   const router = useRouter();
   let contest_id = Cookies.get("contest_id");
 
@@ -28,7 +32,10 @@ export function TriviaGamePlay({ questions, onPublish }: TriviaGamePlayProps) {
   const [currentQIndex, setCurrentQIndex] = useState<number>(0);
   const [timer, setTimer] = useState<{ timeOut: number; state: boolean }>({
     state: true,
-    timeOut: currentQuestion.timer,
+    timeOut:
+      (formData?.game_time_level === "GAME"
+        ? +formData?.game_timer!
+        : +currentQuestion?.timer) * 1000,
   });
   const [game, setGame] = useState<{ state: GameState }>({
     state: GameState.PLAYING,
@@ -40,20 +47,43 @@ export function TriviaGamePlay({ questions, onPublish }: TriviaGamePlayProps) {
       : setCurrentQuestion(questions[0]);
   }, [questions, router]);
 
+  // const displayNextQuestion = (time: number) => {
+  //   setTimeout(() => {
+  //     setCurrentQIndex((prev) => {
+  //       const newIndex = prev + 1;
+  //       setTimer({ ...timer, state: false });
+  //       setTimer({
+  //         timeOut: questions[newIndex]?.timer || 10000,
+  //         state: true,
+  //       });
+  //       return newIndex;
+  //     });
+  //     if (questions[currentQIndex + 1])
+  //       setCurrentQuestion(questions[currentQIndex + 1]);
+  //     else console.log("Quiz finished");
+  //   }, time);
+  // };
+
   const displayNextQuestion = (time: number) => {
     setTimeout(() => {
       setCurrentQIndex((prev) => {
         const newIndex = prev + 1;
+
+        if (formData?.game_time_level === "QUESTION") {
+          const nextQuestion = questions[newIndex];
+          setTimer({
+            timeOut: +nextQuestion?.timer * 1000 || 10000,
+            state: true,
+          });
+        }
+
+        if (questions[newIndex]) {
+          setCurrentQuestion(questions[newIndex]);
+        } else {
+        }
+
         return newIndex;
       });
-      setTimer({ ...timer, state: false });
-      setTimer({
-        timeOut: questions[currentQIndex + 1]?.timer || 10000,
-        state: true,
-      });
-      if (questions[currentQIndex + 1])
-        setCurrentQuestion(questions[currentQIndex + 1]);
-      else console.log("Quiz finished");
     }, time);
   };
 
@@ -143,7 +173,7 @@ export function TriviaGamePlay({ questions, onPublish }: TriviaGamePlayProps) {
                 <Timer
                   timeToCount={timer.timeOut}
                   start={timer.state}
-                  currentQuestion={currentQuestion.question_no}
+                  // currentQuestion={currentQuestion.question_no}
                   onEnd={() => handleMissedQuestion()}
                 />
               )}

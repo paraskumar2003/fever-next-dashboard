@@ -1,5 +1,6 @@
 "use client";
 
+
 import React, { useEffect, useState } from "react";
 import { SearchBar } from "@/components";
 import { QuestionSetServices } from "@/services/trivia/sets.service";
@@ -25,6 +26,7 @@ const QuestionSetsPage = () => {
     pageSize: number;
   }>({
     page: 1,
+    pageSize: 10,
     pageSize: 10,
   });
 
@@ -65,11 +67,14 @@ const QuestionSetsPage = () => {
   const handleQuestionSetView = (questionSet: QuestionSet) => {
     setIsViewMode(true);
     setSelectedQuestionSet(questionSet);
+    setSelectedQuestionSet(questionSet);
     modal.open();
   };
 
   const handleQuestionSetEdit = (questionSet: QuestionSet) => {
+  const handleQuestionSetEdit = (questionSet: QuestionSet) => {
     setIsViewMode(false);
+    setSelectedQuestionSet(questionSet);
     setSelectedQuestionSet(questionSet);
     modal.open();
   };
@@ -80,10 +85,15 @@ const QuestionSetsPage = () => {
       fetchQuestionSets();
     } catch (err) {
       console.error("Error deleting question set:", err);
+      console.error("Error deleting question set:", err);
     }
   };
 
   const handlePaginationModelChange = (page: number, pageSize: number) => {
+    setPaginationModel({
+      page,
+      pageSize,
+    });
     setPaginationModel({
       page,
       pageSize,
@@ -133,4 +143,4 @@ const QuestionSetsPage = () => {
   );
 };
 
-export default QuestionSetsPage;
+export default TriviaPage;

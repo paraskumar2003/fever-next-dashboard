@@ -219,7 +219,7 @@ export class TriviaServices extends ApiServices {
 
   /**
    * Bulk upload questions from Excel file
-   * @param formData - FormData containing the Excel file with key 'excel'
+   * @param formData - FormData containing the Excel file with key 'excel', category_id, and set_id
    * @returns Promise with API response
    */
   static async bulkUploadQuestions(formData: FormData): Promise<any> {

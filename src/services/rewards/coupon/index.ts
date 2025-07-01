@@ -99,7 +99,7 @@ export class CouponServices extends ApiServices {
           headers: {
             "Content-Type": "multipart/form-data",
           },
-        }
+        },
       );
       return response;
     } catch (err: any) {

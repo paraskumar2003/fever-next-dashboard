@@ -84,7 +84,7 @@ const BulkUploadCoupons: React.FC<BulkUploadCouponsProps> = ({
     try {
       const formData = new FormData();
       formData.append("excel", selectedExcelFile);
-      formData.append("reward_id", selectedRewardId);
+      formData.append("rewardId", selectedRewardId);
       formData.append("brand_name", brandName.trim());
 
       const response = await CouponServices.bulkUploadCoupons(formData);

@@ -151,7 +151,7 @@ const OnlyQuestionForm: React.FC<OnlyQuestionFormProps> = ({
 
       <div className="mb-6">
         <FormSelect
-          label="Choose Set"
+          label="Choose Category"
           value={formData.QuestionCategoryId}
           options={sets.map((set: any) => ({
             value: set.id,

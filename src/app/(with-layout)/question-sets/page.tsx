@@ -1,6 +1,5 @@
 "use client";
 
-
 import React, { useEffect, useState } from "react";
 import { SearchBar } from "@/components";
 import { QuestionSetServices } from "@/services/trivia/sets.service";
@@ -26,7 +25,6 @@ const QuestionSetsPage = () => {
     pageSize: number;
   }>({
     page: 1,
-    pageSize: 10,
     pageSize: 10,
   });
 
@@ -70,8 +68,6 @@ const QuestionSetsPage = () => {
     setSelectedQuestionSet(questionSet);
     modal.open();
   };
-
-  const handleQuestionSetEdit = (questionSet: QuestionSet) => {
   const handleQuestionSetEdit = (questionSet: QuestionSet) => {
     setIsViewMode(false);
     setSelectedQuestionSet(questionSet);
@@ -143,4 +139,4 @@ const QuestionSetsPage = () => {
   );
 };
 
-export default TriviaPage;
+export default QuestionSetsPage;

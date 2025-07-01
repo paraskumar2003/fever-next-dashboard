@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Upload, X } from "lucide-react";
+import { Download, Upload, X } from "lucide-react";
 import { Modal } from "@mui/material";
 import Button from "../Button";
 import FormInput from "../FormInput";
@@ -32,7 +32,9 @@ const BulkUploadQuestions: React.FC<BulkUploadQuestionsProps> = ({
   const [isUploading, setIsUploading] = useState(false);
   const [categories, setCategories] = useState<Category[]>([]);
   const [questionSets, setQuestionSets] = useState<QuestionSet[]>([]);
-  const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null);
+  const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(
+    null,
+  );
   const [selectedSetId, setSelectedSetId] = useState<number | null>(null);
 
   useEffect(() => {
@@ -57,7 +59,10 @@ const BulkUploadQuestions: React.FC<BulkUploadQuestionsProps> = ({
     const fetchQuestionSets = async () => {
       if (selectedCategoryId) {
         try {
-          const { data } = await QuestionSetServices.getQuestionSetsByCategoryId(selectedCategoryId);
+          const { data } =
+            await QuestionSetServices.getQuestionSetsByCategoryId(
+              selectedCategoryId,
+            );
           if (data?.data?.rows) {
             setQuestionSets(data.data.rows);
             // Set first question set as default
@@ -89,8 +94,10 @@ const BulkUploadQuestions: React.FC<BulkUploadQuestionsProps> = ({
     const file = e.target.files?.[0];
     if (file) {
       // Validate file type
-      if (!file.name.endsWith('.xlsx') && !file.name.endsWith('.xls')) {
-        Notiflix.Notify.failure("Please select a valid Excel file (.xlsx or .xls)");
+      if (!file.name.endsWith(".xlsx") && !file.name.endsWith(".xls")) {
+        Notiflix.Notify.failure(
+          "Please select a valid Excel file (.xlsx or .xls)",
+        );
         return;
       }
       setSelectedExcelFile(file);
@@ -116,12 +123,12 @@ const BulkUploadQuestions: React.FC<BulkUploadQuestionsProps> = ({
     setIsUploading(true);
     try {
       const formData = new FormData();
-      formData.append('excel', selectedExcelFile);
-      formData.append('category_id', selectedCategoryId.toString());
-      formData.append('set_id', selectedSetId.toString());
+      formData.append("excel", selectedExcelFile);
+      formData.append("category_id", selectedCategoryId.toString());
+      formData.append("set_id", selectedSetId.toString());
 
       const response = await TriviaServices.bulkUploadQuestions(formData);
-      
+
       if (response.data) {
         Notiflix.Notify.success("Questions uploaded successfully!");
         setShowBulkUploadModal(false);
@@ -131,7 +138,9 @@ const BulkUploadQuestions: React.FC<BulkUploadQuestionsProps> = ({
           onUploadSuccess();
         }
       } else {
-        Notiflix.Notify.failure(response.response?.message || "Failed to upload questions");
+        Notiflix.Notify.failure(
+          response.response?.message || "Failed to upload questions",
+        );
       }
     } catch (error) {
       console.error("Error uploading questions:", error);
@@ -157,24 +166,37 @@ const BulkUploadQuestions: React.FC<BulkUploadQuestionsProps> = ({
     setSelectedSetId(setId);
   };
 
+  const handleBulkDownloadClick = () => {
+    const link = document.createElement("a");
+    link.href = "/files/questions-sample.xlsx"; // relative to the public folder
+    link.download = "sample.xlsx"; // desired file name for download
+    link.click();
+  };
+
   return (
     <>
       <div className="my-4 flex items-center gap-4">
         <div className="flex-1">
-          <SearchBar
-            value={searchString}
-            onChange={onSearchChange}
-          />
+          <SearchBar value={searchString} onChange={onSearchChange} />
         </div>
+        <Button
+          variant="secondary"
+          size="sm"
+          onClick={handleBulkDownloadClick}
+          title="Download Sample File"
+          className="flex items-center gap-2"
+        >
+          <Download className="h-4 w-4" />
+        </Button>
         <Button
           variant="secondary"
           size="sm"
           onClick={handleBulkUploadClick}
           title="Bulk Upload Questions"
-          className="flex items-center gap-2"
+          className="flex items-center gap-2 p-1"
         >
           <Upload className="h-4 w-4" />
-          Bulk Upload
+          <span className="pl-1">Bulk Upload</span>
         </Button>
       </div>
 
@@ -212,9 +234,12 @@ const BulkUploadQuestions: React.FC<BulkUploadQuestionsProps> = ({
           <div className="p-6">
             <div className="space-y-4">
               <div className="text-sm text-gray-600">
-                <p className="mb-2">Upload an Excel file (.xlsx or .xls) containing questions.</p>
+                <p className="mb-2">
+                  Upload an Excel file (.xlsx or .xls) containing questions.
+                </p>
                 <p className="text-xs text-gray-500">
-                  Make sure your Excel file follows the required format with proper columns for questions, options, and correct answers.
+                  Make sure your Excel file follows the required format with
+                  proper columns for questions, options, and correct answers.
                 </p>
               </div>
 
@@ -276,7 +301,12 @@ const BulkUploadQuestions: React.FC<BulkUploadQuestionsProps> = ({
               <Button
                 type="button"
                 onClick={handleBulkUpload}
-                disabled={!selectedExcelFile || !selectedCategoryId || !selectedSetId || isUploading}
+                disabled={
+                  !selectedExcelFile ||
+                  !selectedCategoryId ||
+                  !selectedSetId ||
+                  isUploading
+                }
               >
                 {isUploading ? "Uploading..." : "Upload Questions"}
               </Button>

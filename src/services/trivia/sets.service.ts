@@ -2,7 +2,7 @@ import { AxiosResponse } from "axios";
 import { ApiServices } from "../interceptor.base";
 
 interface QuestionSetPayload {
-  category_id: number;
+  categoryId: number;
   name: string;
   description: string;
 }

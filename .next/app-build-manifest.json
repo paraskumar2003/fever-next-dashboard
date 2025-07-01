@@ -1,0 +1,40 @@
+{
+  "pages": {
+    "/layout": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/css/app/layout.css",
+      "static/chunks/app/layout.js"
+    ],
+    "/(with-layout)/categories/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/css/app/(with-layout)/categories/page.css",
+      "static/chunks/app/(with-layout)/categories/page.js"
+    ],
+    "/(with-layout)/layout": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/css/app/(with-layout)/layout.css",
+      "static/chunks/app/(with-layout)/layout.js"
+    ],
+    "/(with-layout)/question-sets/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/css/app/(with-layout)/question-sets/page.css",
+      "static/chunks/app/(with-layout)/question-sets/page.js"
+    ],
+    "/(with-layout)/questionaire/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/css/app/(with-layout)/questionaire/page.css",
+      "static/chunks/app/(with-layout)/questionaire/page.js"
+    ],
+    "/(with-layout)/trivia/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/css/app/(with-layout)/trivia/page.css",
+      "static/chunks/app/(with-layout)/trivia/page.js"
+    ]
+  }
+}

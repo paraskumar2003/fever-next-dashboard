@@ -61,7 +61,7 @@ const TriviaPage = () => {
             categoryId: q.category?.id,
             setName: q.set?.name,
           }));
-          
+
           setQuestions(mappedQuestions);
           setRowCount(data.data.meta.total);
 
@@ -113,6 +113,8 @@ const TriviaPage = () => {
           correctOption: `option${question.questionOptions.findIndex((a: any) => a.is_correct) + 1}`,
           timer: 10000, // Default timer
           status: question.status,
+          categoryId: question?.category?.id,
+          set_id: question?.set?.id,
         };
         setSelectedQuestion(formattedQuestion);
       }

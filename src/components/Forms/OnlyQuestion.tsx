@@ -18,7 +18,7 @@ interface QuestionData {
   correctOption: string;
   timer: number;
   status: number;
-  category_id: number | null;
+  categoryId: number | null;
   set_id?: number | null;
 }
 
@@ -53,7 +53,7 @@ const OnlyQuestionForm: React.FC<OnlyQuestionFormProps> = ({
     correctOption: "option1",
     timer: 10000,
     status: 1,
-    category_id: null,
+    categoryId: null,
     set_id: null,
   });
   const [categories, setCategories] = useState<Category[]>([]);
@@ -65,6 +65,10 @@ const OnlyQuestionForm: React.FC<OnlyQuestionFormProps> = ({
   >(null);
 
   useEffect(() => {
+    console.log({ formState });
+  }, [formState]);
+
+  useEffect(() => {
     const fetchCategories = async () => {
       try {
         const { data } = await CategoryServices.getAllCategories({});
@@ -73,11 +77,21 @@ const OnlyQuestionForm: React.FC<OnlyQuestionFormProps> = ({
 
           // Handle initial data loading
           if (questionData) {
+            console.log(questionData);
             // Edit mode - fetch question sets for the existing category
-            if (questionData.category_id) {
-              await fetchQuestionSetsByCategory(questionData.category_id);
+            if (questionData.categoryId) {
+              setFormState((prev) => ({
+                ...prev,
+                categoryId: questionData.categoryId,
+              }));
+              await fetchQuestionSetsByCategory(questionData.categoryId);
               setSelectedQuestionSetId(questionData.set_id || null);
             }
+
+            setFormState((prev) => ({
+              ...prev,
+              categoryId: data.data.rows[0].id,
+            }));
           } else if (data.data.rows.length > 0) {
             // Add mode - fetch question sets for the first category
             const firstCategoryId = data.data.rows[0].id;
@@ -185,7 +199,7 @@ const OnlyQuestionForm: React.FC<OnlyQuestionFormProps> = ({
       }
     }
 
-    if (!formState.category_id) {
+    if (!formState.categoryId) {
       errors.push("Category is required");
     }
 
@@ -234,8 +248,8 @@ const OnlyQuestionForm: React.FC<OnlyQuestionFormProps> = ({
             isCorrect: formState.correctOption === "option4",
           },
         ],
-        category_id: formState.category_id
-          ? parseInt(formState.category_id.toString())
+        category_id: formState.categoryId
+          ? parseInt(formState.categoryId.toString())
           : null,
         timer: formState.timer.toString(),
         set_id: selectedQuestionSetId, // Add set_id to the payload
@@ -266,7 +280,7 @@ const OnlyQuestionForm: React.FC<OnlyQuestionFormProps> = ({
           correctOption: "option1",
           timer: 10000,
           status: 1,
-          category_id: categories.length > 0 ? +categories[0].id : null,
+          categoryId: categories.length > 0 ? +categories[0].id : null,
           set_id: null,
         });
         setSelectedQuestionSetId(null);
@@ -304,7 +318,7 @@ const OnlyQuestionForm: React.FC<OnlyQuestionFormProps> = ({
         <FormSelect
           label="Category"
           name="category_id"
-          value={formState.category_id || ""}
+          value={formState.categoryId || ""}
           onChange={handleInputChange}
           options={[{ value: "", label: "Select a category" }].concat(
             categories.map((category) => ({

@@ -5,6 +5,7 @@ import FormInput from "../FormInput";
 import FormSelect from "../FormSelect";
 import FormTextarea from "../FormTextarea";
 import { CategoryServices, TriviaServices } from "@/services";
+import { QuestionSetServices } from "@/services/trivia/sets.service";
 import { Category } from "@/types/category";
 
 interface QuestionData {
@@ -18,20 +19,27 @@ interface QuestionData {
   timer: number;
   status: number;
   category_id: number | null;
+  set_id?: number | null;
+}
+
+interface QuestionSet {
+  id: number;
+  name: string;
+  description: string;
 }
 
 interface OnlyQuestionFormProps {
   readOnly?: boolean;
   questionData?: QuestionData;
   onSave?: (formData: QuestionData) => Promise<void>;
-  onCancel?: () => void; // Added onCancel prop
+  onCancel?: () => void;
 }
 
 const OnlyQuestionForm: React.FC<OnlyQuestionFormProps> = ({
   readOnly = false,
   questionData,
   onSave,
-  onCancel, // Added onCancel prop
+  onCancel,
 }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -46,8 +54,11 @@ const OnlyQuestionForm: React.FC<OnlyQuestionFormProps> = ({
     timer: 10000,
     status: 1,
     category_id: null,
+    set_id: null,
   });
   const [categories, setCategories] = useState<Category[]>([]);
+  const [questionSetsForCategory, setQuestionSetsForCategory] = useState<QuestionSet[]>([]);
+  const [selectedQuestionSetId, setSelectedQuestionSetId] = useState<number | null>(null);
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -55,6 +66,20 @@ const OnlyQuestionForm: React.FC<OnlyQuestionFormProps> = ({
         const { data } = await CategoryServices.getAllCategories({});
         if (data?.data) {
           setCategories(data.data.rows);
+          
+          // Handle initial data loading
+          if (questionData) {
+            // Edit mode - fetch question sets for the existing category
+            if (questionData.category_id) {
+              await fetchQuestionSetsByCategory(questionData.category_id);
+              setSelectedQuestionSetId(questionData.set_id || null);
+            }
+          } else if (data.data.rows.length > 0) {
+            // Add mode - fetch question sets for the first category
+            const firstCategoryId = data.data.rows[0].id;
+            setFormState(prev => ({ ...prev, category_id: firstCategoryId }));
+            await fetchQuestionSetsByCategory(firstCategoryId);
+          }
         }
       } catch (error) {
         console.error("Error fetching categories:", error);
@@ -66,10 +91,29 @@ const OnlyQuestionForm: React.FC<OnlyQuestionFormProps> = ({
   useEffect(() => {
     if (questionData) {
       setFormState(questionData);
-      console.log("questionData", questionData);
-      console.log("formState", formState);
+      setSelectedQuestionSetId(questionData.set_id || null);
     }
   }, [questionData]);
+
+  const fetchQuestionSetsByCategory = async (categoryId: number) => {
+    try {
+      const { data } = await QuestionSetServices.getQuestionSetsByCategoryId(categoryId);
+      if (data?.data?.rows) {
+        setQuestionSetsForCategory(data.data.rows);
+        // If no question set is selected and there are available sets, select the first one
+        if (!selectedQuestionSetId && data.data.rows.length > 0) {
+          setSelectedQuestionSetId(data.data.rows[0].id);
+        }
+      } else {
+        setQuestionSetsForCategory([]);
+        setSelectedQuestionSetId(null);
+      }
+    } catch (error) {
+      console.error("Error fetching question sets:", error);
+      setQuestionSetsForCategory([]);
+      setSelectedQuestionSetId(null);
+    }
+  };
 
   const handleInputChange = (
     e: React.ChangeEvent<
@@ -79,10 +123,30 @@ const OnlyQuestionForm: React.FC<OnlyQuestionFormProps> = ({
     if (readOnly) return;
 
     const { name, value } = e.target;
-    setFormState((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    
+    if (name === "category_id") {
+      const categoryId = parseInt(value);
+      setFormState((prev) => ({
+        ...prev,
+        [name]: categoryId,
+      }));
+      
+      // Fetch question sets for the new category
+      if (categoryId) {
+        fetchQuestionSetsByCategory(categoryId);
+        setSelectedQuestionSetId(null); // Reset question set selection
+      }
+    } else {
+      setFormState((prev) => ({
+        ...prev,
+        [name]: value,
+      }));
+    }
+  };
+
+  const handleQuestionSetChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const setId = parseInt(e.target.value);
+    setSelectedQuestionSetId(setId || null);
   };
 
   const validateForm = () => {
@@ -114,6 +178,14 @@ const OnlyQuestionForm: React.FC<OnlyQuestionFormProps> = ({
       if (uniqueOptions.size < options.length) {
         errors.push("Answer options must be unique");
       }
+    }
+
+    if (!formState.category_id) {
+      errors.push("Category is required");
+    }
+
+    if (!selectedQuestionSetId) {
+      errors.push("Question set is required");
     }
 
     if (errors.length > 0) {
@@ -161,6 +233,7 @@ const OnlyQuestionForm: React.FC<OnlyQuestionFormProps> = ({
           ? parseInt(formState.category_id.toString())
           : null,
         timer: formState.timer.toString(),
+        set_id: selectedQuestionSetId, // Add set_id to the payload
       };
 
       // If it's a new question, create it
@@ -172,7 +245,7 @@ const OnlyQuestionForm: React.FC<OnlyQuestionFormProps> = ({
       }
 
       if (onSave) {
-        await onSave(formState);
+        await onSave({ ...formState, set_id: selectedQuestionSetId });
       }
 
       setSuccess(true);
@@ -188,8 +261,10 @@ const OnlyQuestionForm: React.FC<OnlyQuestionFormProps> = ({
           correctOption: "option1",
           timer: 10000,
           status: 1,
-          category_id: null,
+          category_id: categories.length > 0 ? categories[0].id : null,
+          set_id: null,
         });
+        setSelectedQuestionSetId(null);
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred");
@@ -221,6 +296,36 @@ const OnlyQuestionForm: React.FC<OnlyQuestionFormProps> = ({
       )}
 
       <div className="space-y-4">
+        <FormSelect
+          label="Category"
+          name="category_id"
+          value={formState.category_id || ""}
+          onChange={handleInputChange}
+          options={[{ value: "", label: "Select a category" }].concat(
+            categories.map((category) => ({
+              value: category.id.toString(),
+              label: `${category.name} - ${category.questions.length} Questions`,
+            })),
+          )}
+          disabled={readOnly}
+          required
+        />
+
+        <FormSelect
+          label="Question Set"
+          name="set_id"
+          value={selectedQuestionSetId?.toString() || ""}
+          onChange={handleQuestionSetChange}
+          options={[{ value: "", label: "Select a question set" }].concat(
+            questionSetsForCategory.map((questionSet) => ({
+              value: questionSet.id.toString(),
+              label: questionSet.name,
+            })),
+          )}
+          disabled={readOnly || questionSetsForCategory.length === 0}
+          required
+        />
+
         <FormTextarea
           label="Question"
           name="question"
@@ -282,21 +387,6 @@ const OnlyQuestionForm: React.FC<OnlyQuestionFormProps> = ({
             { value: "option3", label: "Option 3" },
             { value: "option4", label: "Option 4" },
           ]}
-          disabled={readOnly}
-          required
-        />
-
-        <FormSelect
-          label="Category"
-          name="category_id"
-          value={formState.category_id || ""}
-          onChange={handleInputChange}
-          options={[{ value: "", label: "" }].concat(
-            categories.map((category) => ({
-              value: category.id,
-              label: `${category.name} - ${category.questions.length} Question`,
-            })),
-          )}
           disabled={readOnly}
           required
         />

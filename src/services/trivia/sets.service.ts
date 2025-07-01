@@ -122,4 +122,23 @@ export class QuestionSetServices extends ApiServices {
       };
     }
   }
+
+  /**
+   * Get question sets by category ID
+   * GET /v1/questions/questionsets-category/:categoryId
+   */
+  static async getQuestionSetsByCategoryId(categoryId: number): Promise<any> {
+    try {
+      const response = await this.get<T>(
+        `/v1/questions/questionsets-category/${categoryId}`,
+      );
+      return response;
+    } catch (err: any) {
+      return {
+        data: null,
+        err: err.message,
+        response: err?.response?.data,
+      };
+    }
+  }
 }

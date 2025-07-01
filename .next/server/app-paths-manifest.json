@@ -1,6 +1,0 @@
-{
-  "/(with-layout)/categories/page": "app/(with-layout)/categories/page.js",
-  "/(with-layout)/question-sets/page": "app/(with-layout)/question-sets/page.js",
-  "/(with-layout)/questionaire/page": "app/(with-layout)/questionaire/page.js",
-  "/(with-layout)/trivia/page": "app/(with-layout)/trivia/page.js"
-}

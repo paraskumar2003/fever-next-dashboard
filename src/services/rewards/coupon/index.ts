@@ -84,4 +84,26 @@ export class CouponServices extends ApiServices {
       return { data: null, err: err.message, response: err?.response?.data };
     }
   }
+
+  /**
+   * Bulk upload coupons from Excel file
+   * @param formData - FormData containing the Excel file with key 'excel', reward_id, and brand_name
+   * @returns Promise with API response
+   */
+  static async bulkUploadCoupons(formData: FormData): Promise<any> {
+    try {
+      const response = await this.post<T>(
+        `/v1/rewards/coupon/bulk-upload`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+      return response;
+    } catch (err: any) {
+      return { data: null, err: err.message, response: err?.response?.data };
+    }
+  }
 }

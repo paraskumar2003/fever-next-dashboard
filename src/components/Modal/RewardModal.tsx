@@ -25,6 +25,7 @@ const RewardModal: React.FC<RewardModalProps> = ({
   const [formData, setFormData] = useState({
     name: "",
     reward_type: "DIGITAL",
+    brand_name: "",
   });
 
   const [loading, setLoading] = useState(false);
@@ -34,11 +35,13 @@ const RewardModal: React.FC<RewardModalProps> = ({
       setFormData({
         name: rewardData.name || "",
         reward_type: rewardData.reward_type || "DIGITAL",
+        brand_name: rewardData.brand_name || "",
       });
     } else {
       setFormData({
         name: "",
         reward_type: "DIGITAL",
+        brand_name: "",
       });
     }
   }, [rewardData]);
@@ -54,6 +57,7 @@ const RewardModal: React.FC<RewardModalProps> = ({
         await RewardServices.updateReward(rewardData.id, {
           name: formData.name,
           reward_type: formData.reward_type as "DIGITAL" | "PHYSICAL",
+          brand_name: formData.brand_name,
         });
         Notiflix.Notify.success("Reward updated successfully!");
       } else {
@@ -61,6 +65,7 @@ const RewardModal: React.FC<RewardModalProps> = ({
         await RewardServices.createReward({
           name: formData.name,
           reward_type: formData.reward_type as "DIGITAL" | "PHYSICAL",
+          brand_name: formData.brand_name,
         });
         Notiflix.Notify.success("Reward created successfully!");
       }
@@ -71,9 +76,7 @@ const RewardModal: React.FC<RewardModalProps> = ({
     } catch (error) {
       console.error("Error saving reward:", error);
       Notiflix.Notify.failure(
-        rewardData?.id
-          ? "Failed to update reward"
-          : "Failed to create reward"
+        rewardData?.id ? "Failed to update reward" : "Failed to create reward",
       );
     } finally {
       setLoading(false);
@@ -101,8 +104,8 @@ const RewardModal: React.FC<RewardModalProps> = ({
             {isViewMode
               ? "View Reward"
               : rewardData
-              ? "Edit Reward"
-              : "Add Reward"}
+                ? "Edit Reward"
+                : "Add Reward"}
           </h2>
         </div>
 
@@ -115,6 +118,17 @@ const RewardModal: React.FC<RewardModalProps> = ({
                 setFormData({ ...formData, name: e.target.value })
               }
               placeholder="Enter reward name"
+              disabled={isViewMode}
+              required
+            />
+
+            <FormInput
+              label="Brand Name"
+              value={formData.brand_name}
+              onChange={(e) =>
+                setFormData({ ...formData, brand_name: e.target.value })
+              }
+              placeholder="Enter brand name"
               disabled={isViewMode}
               required
             />
@@ -144,8 +158,8 @@ const RewardModal: React.FC<RewardModalProps> = ({
                 {loading
                   ? "Saving..."
                   : rewardData?.id
-                  ? "Update Reward"
-                  : "Save Reward"}
+                    ? "Update Reward"
+                    : "Save Reward"}
               </Button>
             )}
           </div>

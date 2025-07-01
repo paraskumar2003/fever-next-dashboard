@@ -138,6 +138,7 @@ export function buildQuestionJsonData(
     json.flipFee = formData.flip_fee;
     json.flipAllowed = formData.flip_allowed;
     json.flipSet = formData.flipSet;
+    json.set_id = formData.set_id;
   }
 
   return json;

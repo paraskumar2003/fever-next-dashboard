@@ -57,8 +57,12 @@ const OnlyQuestionForm: React.FC<OnlyQuestionFormProps> = ({
     set_id: null,
   });
   const [categories, setCategories] = useState<Category[]>([]);
-  const [questionSetsForCategory, setQuestionSetsForCategory] = useState<QuestionSet[]>([]);
-  const [selectedQuestionSetId, setSelectedQuestionSetId] = useState<number | null>(null);
+  const [questionSetsForCategory, setQuestionSetsForCategory] = useState<
+    QuestionSet[]
+  >([]);
+  const [selectedQuestionSetId, setSelectedQuestionSetId] = useState<
+    number | null
+  >(null);
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -66,7 +70,7 @@ const OnlyQuestionForm: React.FC<OnlyQuestionFormProps> = ({
         const { data } = await CategoryServices.getAllCategories({});
         if (data?.data) {
           setCategories(data.data.rows);
-          
+
           // Handle initial data loading
           if (questionData) {
             // Edit mode - fetch question sets for the existing category
@@ -77,7 +81,7 @@ const OnlyQuestionForm: React.FC<OnlyQuestionFormProps> = ({
           } else if (data.data.rows.length > 0) {
             // Add mode - fetch question sets for the first category
             const firstCategoryId = data.data.rows[0].id;
-            setFormState(prev => ({ ...prev, category_id: firstCategoryId }));
+            setFormState((prev) => ({ ...prev, category_id: firstCategoryId }));
             await fetchQuestionSetsByCategory(firstCategoryId);
           }
         }
@@ -97,7 +101,8 @@ const OnlyQuestionForm: React.FC<OnlyQuestionFormProps> = ({
 
   const fetchQuestionSetsByCategory = async (categoryId: number) => {
     try {
-      const { data } = await QuestionSetServices.getQuestionSetsByCategoryId(categoryId);
+      const { data } =
+        await QuestionSetServices.getQuestionSetsByCategoryId(categoryId);
       if (data?.data?.rows) {
         setQuestionSetsForCategory(data.data.rows);
         // If no question set is selected and there are available sets, select the first one
@@ -123,14 +128,14 @@ const OnlyQuestionForm: React.FC<OnlyQuestionFormProps> = ({
     if (readOnly) return;
 
     const { name, value } = e.target;
-    
+
     if (name === "category_id") {
       const categoryId = parseInt(value);
       setFormState((prev) => ({
         ...prev,
         [name]: categoryId,
       }));
-      
+
       // Fetch question sets for the new category
       if (categoryId) {
         fetchQuestionSetsByCategory(categoryId);
@@ -261,7 +266,7 @@ const OnlyQuestionForm: React.FC<OnlyQuestionFormProps> = ({
           correctOption: "option1",
           timer: 10000,
           status: 1,
-          category_id: categories.length > 0 ? categories[0].id : null,
+          category_id: categories.length > 0 ? +categories[0].id : null,
           set_id: null,
         });
         setSelectedQuestionSetId(null);

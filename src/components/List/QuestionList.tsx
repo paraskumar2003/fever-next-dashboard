@@ -1,23 +1,7 @@
 import React, { useState } from "react";
 import QuestionRow from "./QuestionRow";
 import ListWrapper from "./ListWrapper";
-
-interface Answer {
-  id: number;
-  answer: string;
-  is_correct: boolean;
-  status: string;
-}
-
-export interface Question {
-  id: number;
-  question: string;
-  correct_answer: string;
-  status: number;
-  answers: Answer[];
-  categoryName: string;
-  categoryId: number;
-}
+import { Question } from "@/types/question";
 
 interface QuestionListProps {
   questions: Question[];
@@ -38,7 +22,6 @@ const QuestionList: React.FC<QuestionListProps> = ({
   rowCount,
   onPaginationModelChange,
 }) => {
-  console.log({ questions });
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
 
@@ -84,6 +67,9 @@ const QuestionList: React.FC<QuestionListProps> = ({
                 </th>
                 <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">
                   Category Name
+                </th>
+                <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">
+                  Question Set
                 </th>
                 <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">
                   Status

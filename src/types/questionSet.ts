@@ -1,3 +1,5 @@
+import { Question } from "./question";
+
 export interface Category {
   id: number;
   name: string;
@@ -8,7 +10,7 @@ export interface QuestionSet {
   id: number;
   name: string;
   description: string;
-  questions: any[];
+  questions: Question[];
   category: Category;
 }
 

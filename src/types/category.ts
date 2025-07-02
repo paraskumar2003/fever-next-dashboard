@@ -1,4 +1,4 @@
-import { Question } from "@/types";
+import { Question } from "./question";
 
 export interface Category {
   id: string;

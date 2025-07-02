@@ -104,6 +104,7 @@ export interface ContestFormData {
   QuestionCategoryId: number;
   flipSet: number;
   isPopular: number;
+  set_id: number;
 }
 
 export interface TambolaFormData {

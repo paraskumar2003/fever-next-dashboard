@@ -96,7 +96,7 @@ export default function CreateContest() {
             instructions: true,
           }));
         }
-        if (details.questions?.length > 0) {
+        if (details.questionSet?.noOfQuestions > 0) {
           setEditMode((prev) => ({ ...prev, gameQuestions: true }));
           setFormSubmissionStatus((prev) => ({
             ...prev,
@@ -345,8 +345,6 @@ export default function CreateContest() {
     try {
       let { isValid, errors } = await validateQuestionFormData(formData);
 
-      console.log({ errors });
-
       if (!isValid) {
         // Set errors in state for display
         setContestFormErrors(errors);
@@ -461,6 +459,11 @@ export default function CreateContest() {
     },
   ];
 
+  const handlePublish = () => {
+    Notiflix.Notify.success("Game Published Successfully!");
+    push("/view/trivia?category=upcoming");
+  };
+
   const renderStep = () => {
     switch (currentStep) {
       case 0:
@@ -509,7 +512,12 @@ export default function CreateContest() {
         );
       case 4:
         return (
-          <TriviaGamePlay questions={questions} addNewQuestion={() => {}} />
+          <TriviaGamePlay
+            questions={questions}
+            formData={formData}
+            addNewQuestion={() => {}}
+            onPublish={handlePublish}
+          />
         );
       default:
         return null;

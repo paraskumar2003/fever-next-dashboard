@@ -3,7 +3,11 @@ import FormSection from "@/components/FormSection";
 import FormInput from "@/components/FormInput";
 import FormSelect from "@/components/FormSelect";
 import { ContestFormData, QuestionSet } from "@/types";
-import { CategoryServices } from "@/services";
+import {
+  CategoryServices,
+  QuestionSetServices,
+  TriviaServices,
+} from "@/services";
 
 interface OnlyQuestionFormProps {
   formData: Partial<ContestFormData>;
@@ -20,7 +24,11 @@ const OnlyQuestionForm: React.FC<OnlyQuestionFormProps> = ({
   handleFlipSetModalOpen,
   errors,
 }) => {
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(
+    String(formData.QuestionCategoryId)! || null,
+  );
   const [selectedSet, setSelectedSet] = useState<string | null>(null);
+  const [categories, setCategories] = useState<QuestionSet[]>([]);
   const [sets, setSets] = useState<QuestionSet[]>([]);
   const [selectedFlipSet, setSelectedFlipSet] = useState<string | null>(null);
   const [error, setError] = useState<string>("");
@@ -48,10 +56,10 @@ const OnlyQuestionForm: React.FC<OnlyQuestionFormProps> = ({
         },
     );
 
-    const selected = sets.find(
-      (set: any) => set.id == formData?.QuestionCategoryId,
+    const selected = categories.find(
+      (c: any) => c.id == formData?.QuestionCategoryId,
     );
-    if (selected) setSelectedSet(String(selected.id));
+    if (selected) setSelectedCategory(String(selected.id));
     if (formData.questions && selected) {
       if (parseInt(selected.questions) < updatedQuestions?.length)
         setError(`Please choose a set with at least ${count} questions.`);
@@ -68,21 +76,72 @@ const OnlyQuestionForm: React.FC<OnlyQuestionFormProps> = ({
   const fetchQuestionSets = async () => {
     // Replace with actual API call to fetch sets
     const res = await CategoryServices.getCategoroiesWithCount();
-    let setsData = res.data?.data;
+    let categoriesData = res.data?.data;
+    if (categoriesData) {
+      setCategories(
+        categoriesData?.map((e: Record<string, any>) => ({
+          ...e,
+          name: e.category,
+        })),
+      );
+      formData.QuestionCategoryId ??= categoriesData[0].id;
+    }
+  };
+
+  useEffect(() => {
+    fetchQuestionSets();
+  }, []);
+
+  useEffect(() => {
+    if (selectedCategory) fetchSets();
+  }, [selectedCategory]);
+
+  const fetchSets = async () => {
+    // Replace with actual API call to fetch sets
+    const res = await QuestionSetServices.getQuestionSetsByCategoryId(
+      +selectedCategory!,
+    );
+    let setsData = res.data?.data?.rows;
     if (setsData) {
       setSets(
         setsData?.map((e: Record<string, any>) => ({
           ...e,
-          name: e.category,
+          name: e.name,
         })),
       );
       formData.QuestionCategoryId ??= setsData[0].id;
     }
   };
 
-  useEffect(() => {
-    fetchQuestionSets(); // Fetch the sets when component mounts
-  }, []);
+  const handleCategorySelection = (categoryId: string) => {
+    const selected = categories.find((c: any) => c.id == categoryId);
+    if (!selected) {
+      throw new Error("Invalid setId!!");
+    }
+
+    if (!formData.questions) {
+      throw new Error("Invalid question value in form!!");
+    }
+    console.log(
+      formData.questions,
+      selected,
+      parseInt(selected?.questions as string) < formData?.questions?.length,
+    );
+    if (formData.questions && selected) {
+      if (parseInt(selected.questions as string) < formData.questions?.length)
+        setError(
+          `Please choose a set with at least ${formData.questions?.length} questions.`,
+        );
+      else {
+        updateFormData({
+          QuestionCategoryId: selected.id,
+        });
+        setSelectedCategory(String(selected.id));
+      }
+    } else {
+      setError("");
+    }
+  };
 
   const handleSetSelection = (setId: string) => {
     const selected = sets.find((set: any) => set.id == setId);
@@ -105,7 +164,7 @@ const OnlyQuestionForm: React.FC<OnlyQuestionFormProps> = ({
         );
       else {
         updateFormData({
-          QuestionCategoryId: selected.id,
+          set_id: selected.id,
         });
         setSelectedSet(String(selected.id));
       }
@@ -151,14 +210,29 @@ const OnlyQuestionForm: React.FC<OnlyQuestionFormProps> = ({
 
       <div className="mb-6">
         <FormSelect
-          label="Choose Set"
+          label="Choose Category"
           value={formData.QuestionCategoryId}
+          options={categories.map((category: any) => ({
+            value: category.id,
+            label: `${category.name}`,
+          }))}
+          onChange={(e) => handleCategorySelection(e.target.value)}
+          error={errors.QuestionCategoryId}
+          required
+        />
+        {error && <p className="mt-2 text-xs text-red-500">{error}</p>}
+      </div>
+
+      <div className="mb-6">
+        <FormSelect
+          label="Choose Set"
+          value={formData.set_id}
           options={sets.map((set: any) => ({
             value: set.id,
             label: `${set.name}`,
           }))}
           onChange={(e) => handleSetSelection(e.target.value)}
-          error={errors.QuestionCategoryId}
+          error={errors.set_id}
           required
         />
         {error && <p className="mt-2 text-xs text-red-500">{error}</p>}

@@ -1,29 +1,33 @@
 import React, { useState } from "react";
-import QuestionRow from "./QuestionRow";
+import QuestionSetRow from "./QuestionSetRow";
 import ListWrapper from "./ListWrapper";
-import { Question } from "@/types/question";
+import { QuestionSet } from "@/types/questionSet";
 
-interface QuestionListProps {
-  questions: Question[];
-  onEdit?: (question: Question) => void;
+interface QuestionSetListProps {
+  questionSets: QuestionSet[];
+  onEdit?: (questionSet: QuestionSet) => void;
   onDelete?: (id: number) => void;
-  onView?: (question: Question) => void;
-  onStatusChange?: (id: number, status: number) => void;
+  onView?: (questionSet: QuestionSet) => void;
   rowCount: number;
   onPaginationModelChange: (page: number, pageSize: number) => void;
 }
 
-const QuestionList: React.FC<QuestionListProps> = ({
-  questions,
+const QuestionSetList: React.FC<QuestionSetListProps> = ({
+  questionSets,
   onEdit,
   onDelete,
   onView,
-  onStatusChange,
   rowCount,
   onPaginationModelChange,
 }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
+
+  const handlePageSizeChange = (newPageSize: number) => {
+    setPageSize(newPageSize);
+    setCurrentPage(1);
+    onPaginationModelChange(1, newPageSize);
+  };
 
   const handleNextPage = () => {
     const nextPage = currentPage + 1;
@@ -37,13 +41,7 @@ const QuestionList: React.FC<QuestionListProps> = ({
     onPaginationModelChange(prevPage, pageSize);
   };
 
-  const handlePageSizeChange = (newPageSize: number) => {
-    setPageSize(newPageSize);
-    setCurrentPage(1); // Reset to first page when page size changes
-    onPaginationModelChange(1, newPageSize);
-  };
-
-  const canGoNext = (currentPage - 1) * pageSize + questions.length < rowCount;
+  const canGoNext = (currentPage - 1) * pageSize + questionSets.length < rowCount;
   const canGoPrevious = currentPage > 1;
 
   const startItem = (currentPage - 1) * pageSize + 1;
@@ -60,19 +58,16 @@ const QuestionList: React.FC<QuestionListProps> = ({
                   ID
                 </th>
                 <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">
-                  Question
+                  Name
                 </th>
                 <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">
-                  Correct Answer
+                  Description
                 </th>
                 <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">
-                  Category Name
+                  Category
                 </th>
                 <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">
-                  Question Set
-                </th>
-                <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">
-                  Status
+                  Questions Count
                 </th>
                 <th className="px-4 py-3 text-center text-sm font-medium text-gray-600">
                   Actions
@@ -80,23 +75,22 @@ const QuestionList: React.FC<QuestionListProps> = ({
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              {questions.map((question, index) => (
-                <QuestionRow
-                  key={question.id}
+              {questionSets.map((questionSet, index) => (
+                <QuestionSetRow
+                  key={questionSet.id}
                   index={index}
-                  question={question}
+                  questionSet={questionSet}
                   onView={onView}
                   onEdit={onEdit}
                   onDelete={onDelete}
-                  onStatusChange={onStatusChange}
                 />
               ))}
             </tbody>
           </table>
 
-          {questions.length === 0 && (
+          {questionSets.length === 0 && (
             <div className="py-8 text-center text-gray-500">
-              No questions found
+              No question sets found
             </div>
           )}
         </div>
@@ -193,4 +187,4 @@ const QuestionList: React.FC<QuestionListProps> = ({
   );
 };
 
-export default QuestionList;
+export default QuestionSetList;

@@ -1,14 +1,7 @@
 import React, { useState } from "react";
 import { Eye, Pencil, Trash2 } from "lucide-react";
 import Button from "../Button";
-import { Question } from "./QuestionList";
-
-interface Answer {
-  id: number;
-  answer: string;
-  is_correct: boolean;
-  status: string;
-}
+import { Question } from "@/types/question";
 
 interface QuestionRowProps {
   question: Question;
@@ -33,7 +26,7 @@ const QuestionRow: React.FC<QuestionRowProps> = ({
     try {
       setLoadingStatus(true);
       const newStatus = question.status === 1 ? 0 : 1;
-      await onStatusChange?.(question.id, newStatus);
+      await onStatusChange?.(parseInt(question.id), newStatus);
     } finally {
       setLoadingStatus(false);
     }
@@ -49,7 +42,10 @@ const QuestionRow: React.FC<QuestionRowProps> = ({
         {question.correct_answer}
       </td>
       <td className="px-4 py-3 text-sm text-gray-600">
-        {question.categoryName}
+        {question.category?.name || question.categoryName || "N/A"}
+      </td>
+      <td className="px-4 py-3 text-sm text-gray-600">
+        {question.set?.name || question.setName || "N/A"}
       </td>
       <td className="px-4 py-3 text-sm">
         <button
@@ -91,7 +87,7 @@ const QuestionRow: React.FC<QuestionRowProps> = ({
           <Button
             variant="danger"
             size="sm"
-            onClick={() => onDelete?.(question.id)}
+            onClick={() => onDelete?.(parseInt(question.id))}
             title="Delete Question"
           >
             <Trash2 className="h-4 w-4" />

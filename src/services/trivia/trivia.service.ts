@@ -216,4 +216,26 @@ export class TriviaServices extends ApiServices {
       return { data: null, err: err.message, response: err?.response?.data };
     }
   }
+
+  /**
+   * Bulk upload questions from Excel file
+   * @param formData - FormData containing the Excel file with key 'excel', category_id, and set_id
+   * @returns Promise with API response
+   */
+  static async bulkUploadQuestions(formData: FormData): Promise<any> {
+    try {
+      const response = await this.post<T>(
+        `/v1/questions/bulk-upload`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+      return response;
+    } catch (err: any) {
+      return { data: null, err: err.message, response: err?.response?.data };
+    }
+  }
 }

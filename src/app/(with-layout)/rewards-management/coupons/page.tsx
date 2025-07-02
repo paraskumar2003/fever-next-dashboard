@@ -1,11 +1,11 @@
 "use client";
 
-import { SearchBar } from "@/components";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { CouponServices } from "@/services/rewards/coupon";
 import { Coupon } from "@/types/coupon";
 import CouponSection from "@/components/Section/CouponSection";
+import { BulkUploadCoupons } from "@/components/BulkUpload";
 
 export default function CouponsPage() {
   const searchParams = useSearchParams();
@@ -59,16 +59,22 @@ export default function CouponsPage() {
     fetchCoupons({ page });
   };
 
+  const handleUploadSuccess = () => {
+    fetchCoupons();
+  };
+
   if (loading) return <div>Loading...</div>;
 
   return (
     <div className="min-h-screen p-8">
       <h1 className="mb-8 text-xl">Coupons Management</h1>
-      <SearchBar
-        value={search}
-        onChange={setSearch}
-        placeholder="Search coupons..."
+      
+      <BulkUploadCoupons
+        searchString={search}
+        onSearchChange={setSearch}
+        onUploadSuccess={handleUploadSuccess}
       />
+      
       <div className="py-2"></div>
       <CouponSection
         coupons={coupons}

@@ -1,4 +1,5 @@
 import { ContestData } from "@/app/gameplay/happening-quiz";
+import { ContestFormData } from "@/types";
 
 export interface Option {
   option_text: string;
@@ -21,4 +22,6 @@ export interface TriviaGamePlayProps {
   onExit?: Function;
   addNewQuestion: (question: Question) => void;
   contestData?: ContestData;
+  onPublish?: () => void;
+  formData?: Partial<ContestFormData>;
 }

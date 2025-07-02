@@ -1,12 +1,14 @@
 "use client";
+
 import React, { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { useContest } from "@/context/ContestContext";
-import { SearchBar } from "@/components";
 import { TriviaServices } from "@/services";
 import QuestionModal from "@/components/Modal/QuestionModal";
 import { useModal } from "@/hooks/useModal";
 import QuestionSection from "@/components/Section/QuestionSection";
+import { Question } from "@/types/question";
+import { BulkUploadQuestions } from "@/components/BulkUpload";
 
 type fetchQuestionAgrs =
   | { q?: string; page?: number; limit?: number }
@@ -17,7 +19,7 @@ const TriviaPage = () => {
   const contest_id = router.get("contest_id");
 
   const { updateFormData } = useContest();
-  const [questions, setQuestions] = useState([]);
+  const [questions, setQuestions] = useState<Question[]>([]);
   const [rowCount, setRowCount] = useState(0);
   const [paginationModel, setPaginationModel] = useState({
     page: 1,
@@ -52,27 +54,30 @@ const TriviaPage = () => {
           ...args,
         });
         if (data?.data?.rows) {
-          setQuestions(
-            data.data.rows.map((q: any) => ({
-              ...q,
-              status: contestQuestionIds.includes(q.id) ? 1 : 0,
-              categoryName: q?.category?.name,
-              categoryId: q?.category?.id,
-            })),
-          );
+          // Map the new API structure to include computed properties
+          const mappedQuestions = data.data.rows.map((q: Question) => ({
+            ...q,
+            status: contestQuestionIds.includes(parseInt(q.id)) ? 1 : 0,
+            categoryName: q.category?.name,
+            categoryId: q.category?.id,
+            setName: q.set?.name,
+          }));
+
+          setQuestions(mappedQuestions);
           setRowCount(data.data.meta.total);
 
-          const questions = data.data.rows.map((q: any) => ({
+          // Update context with formatted questions for backward compatibility
+          const contextQuestions = mappedQuestions.map((q: Question) => ({
             question: q.question,
-            option1: q.questionOptions[0]?.answer,
-            option2: q.questionOptions[1]?.answer,
-            option3: q.questionOptions[2]?.answer,
-            option4: q.questionOptions[3]?.answer,
+            option1: q.questionOptions[0]?.answer || "",
+            option2: q.questionOptions[1]?.answer || "",
+            option3: q.questionOptions[2]?.answer || "",
+            option4: q.questionOptions[3]?.answer || "",
             correctOption: `option${q.questionOptions.findIndex((a: any) => a.is_correct) + 1}`,
-            timer: q.timer,
-            status: contestQuestionIds.includes(q.id) ? 1 : 0,
+            timer: "10000", // Default timer
+            status: contestQuestionIds.includes(parseInt(q.id)) ? 1 : 0,
           }));
-          updateFormData({ questions });
+          updateFormData({ questions: contextQuestions });
         }
       }
     } catch (error) {
@@ -102,13 +107,15 @@ const TriviaPage = () => {
         const formattedQuestion = {
           id: question.id,
           question: question.question,
-          option1: question.questionOptions[0].answer,
-          option2: question.questionOptions[1].answer,
-          option3: question.questionOptions[2].answer,
-          option4: question.questionOptions[3].answer,
+          option1: question.questionOptions[0]?.answer || "",
+          option2: question.questionOptions[1]?.answer || "",
+          option3: question.questionOptions[2]?.answer || "",
+          option4: question.questionOptions[3]?.answer || "",
           correctOption: `option${question.questionOptions.findIndex((a: any) => a.is_correct) + 1}`,
-          timer: question.timer || 10000,
+          timer: 10000, // Default timer
           status: question.status,
+          categoryId: question?.category?.id,
+          set_id: question?.set?.id,
         };
         setSelectedQuestion(formattedQuestion);
       }
@@ -118,16 +125,16 @@ const TriviaPage = () => {
     }
   };
 
-  const handleQuestionView = async (question: any) => {
+  const handleQuestionView = async (question: Question) => {
     setIsViewMode(true);
-    await fetchQuestionDetails(question.id);
+    await fetchQuestionDetails(parseInt(question.id));
     modal.open();
   };
 
-  const handleQuestionEdit = async (question: any) => {
+  const handleQuestionEdit = async (question: Question) => {
     setIsViewMode(false);
     console.log({ question });
-    await fetchQuestionDetails(question.id);
+    await fetchQuestionDetails(parseInt(question.id));
     modal.open();
   };
 
@@ -174,6 +181,10 @@ const TriviaPage = () => {
     setPaginationModel({ ...paginationModel, page, limit: pageSize });
   };
 
+  const handleUploadSuccess = () => {
+    fetchQuestions();
+  };
+
   return (
     <>
       <div className="mx-auto  py-8">
@@ -181,12 +192,11 @@ const TriviaPage = () => {
           <h1 className="text-3xl font-bold">Questionaire (Trivia)</h1>
         </div>
 
-        <div className="my-4">
-          <SearchBar
-            value={searchString}
-            onChange={(text: string) => setSearchString(text)}
-          />
-        </div>
+        <BulkUploadQuestions
+          searchString={searchString}
+          onSearchChange={(text: string) => setSearchString(text)}
+          onUploadSuccess={handleUploadSuccess}
+        />
 
         <div className="space-y-6">
           <QuestionSection

@@ -231,7 +231,30 @@ export class TriviaServices extends ApiServices {
           headers: {
             "Content-Type": "multipart/form-data",
           },
-        }
+        },
+      );
+      return response;
+    } catch (err: any) {
+      return { data: null, err: err.message, response: err?.response?.data };
+    }
+  }
+
+  /**
+   * Activate or deactivate a question
+   * @param question_id - ID of the question to activate or deactivate
+   * @param status - 1 to activate, 0 to deactivate
+   * @returns Promise with API response
+   */
+  static async activateOrDeactivateQuestion(
+    question_id: string,
+    status: number,
+  ) {
+    try {
+      const response = await this.post<T>(
+        `/v1/questions/activation/${question_id}`,
+        {
+          status: status,
+        },
       );
       return response;
     } catch (err: any) {

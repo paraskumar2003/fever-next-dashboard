@@ -32,6 +32,10 @@ const QuestionRow: React.FC<QuestionRowProps> = ({
     }
   };
 
+  if (question.status === 0) {
+    console.log({ question });
+  }
+
   return (
     <tr className="transition-colors hover:bg-gray-50">
       <td className="px-4 py-3 text-sm text-gray-600">#{index + 1}</td>

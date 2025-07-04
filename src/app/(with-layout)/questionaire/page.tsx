@@ -57,7 +57,7 @@ const TriviaPage = () => {
           // Map the new API structure to include computed properties
           const mappedQuestions = data.data.rows.map((q: Question) => ({
             ...q,
-            status: contestQuestionIds.includes(parseInt(q.id)) ? 1 : 0,
+            status: q.status,
             categoryName: q.category?.name,
             categoryId: q.category?.id,
             setName: q.set?.name,
@@ -149,29 +149,11 @@ const TriviaPage = () => {
 
   const handleStatusChange = async (id: number, statusToChanged: number) => {
     try {
-      // Update the contestQuestionIds based on the status
-      if (contestQuestionIds) {
-        setContestQuestionIds((prevIds) => {
-          if (statusToChanged === 0) {
-            // Remove the id if status is 0
-            if (prevIds)
-              return prevIds.filter((questionId) => questionId !== id);
-          } else if (statusToChanged === 1) {
-            // Add the id if status is 1 and it's not already present
-            if (prevIds)
-              return prevIds.includes(id) ? prevIds : [...prevIds, id];
-          }
-          return prevIds; // Default case (no change)
-        });
-      }
-
-      if (contest_id) {
-        await TriviaServices.updateContestQuestions(
-          contestQuestionIds || [],
-          Number(contest_id),
-        );
-        await fetchContestQuestions(contest_id);
-      }
+      await TriviaServices.activateOrDeactivateQuestion(
+        id.toString(),
+        statusToChanged,
+      );
+      await fetchQuestions();
     } catch (err) {
       console.error("Error updating question status:", err);
     }

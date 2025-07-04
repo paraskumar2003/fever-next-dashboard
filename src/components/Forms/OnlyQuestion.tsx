@@ -65,8 +65,8 @@ const OnlyQuestionForm: React.FC<OnlyQuestionFormProps> = ({
   >(null);
 
   useEffect(() => {
-    console.log({ formState });
-  }, [formState]);
+    console.log({ questionData, formState });
+  }, [questionData, formState]);
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -74,10 +74,8 @@ const OnlyQuestionForm: React.FC<OnlyQuestionFormProps> = ({
         const { data } = await CategoryServices.getAllCategories({});
         if (data?.data) {
           setCategories(data.data.rows);
-
           // Handle initial data loading
           if (questionData) {
-            console.log(questionData);
             // Edit mode - fetch question sets for the existing category
             if (questionData.categoryId) {
               setFormState((prev) => ({
@@ -86,12 +84,12 @@ const OnlyQuestionForm: React.FC<OnlyQuestionFormProps> = ({
               }));
               await fetchQuestionSetsByCategory(questionData.categoryId);
               setSelectedQuestionSetId(questionData.set_id || null);
+            } else {
+              setFormState((prev) => ({
+                ...prev,
+                categoryId: data.data.rows[0].id,
+              }));
             }
-
-            setFormState((prev) => ({
-              ...prev,
-              categoryId: data.data.rows[0].id,
-            }));
           } else if (data.data.rows.length > 0) {
             // Add mode - fetch question sets for the first category
             const firstCategoryId = data.data.rows[0].id;
@@ -143,7 +141,7 @@ const OnlyQuestionForm: React.FC<OnlyQuestionFormProps> = ({
 
     const { name, value } = e.target;
 
-    if (name === "category_id") {
+    if (name === "categoryId") {
       const categoryId = parseInt(value);
       setFormState((prev) => ({
         ...prev,
@@ -317,7 +315,7 @@ const OnlyQuestionForm: React.FC<OnlyQuestionFormProps> = ({
       <div className="space-y-4">
         <FormSelect
           label="Category"
-          name="category_id"
+          name="categoryId"
           value={formState.categoryId || ""}
           onChange={handleInputChange}
           options={[{ value: "", label: "Select a category" }].concat(
@@ -409,7 +407,7 @@ const OnlyQuestionForm: React.FC<OnlyQuestionFormProps> = ({
           disabled={readOnly}
           required
         />
-
+        {/* 
         <FormInput
           label="Timer (milliseconds)"
           name="timer"
@@ -420,7 +418,7 @@ const OnlyQuestionForm: React.FC<OnlyQuestionFormProps> = ({
           step="1000"
           required
           disabled={readOnly}
-        />
+        /> */}
       </div>
 
       <div className="flex justify-end space-x-3">

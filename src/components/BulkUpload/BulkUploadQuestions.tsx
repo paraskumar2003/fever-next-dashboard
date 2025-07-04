@@ -177,16 +177,21 @@ const BulkUploadQuestions: React.FC<BulkUploadQuestionsProps> = ({
     <>
       <div className="my-4 flex items-center gap-4">
         <div className="flex-1">
-          <SearchBar value={searchString} onChange={onSearchChange} />
+          <SearchBar
+            value={searchString}
+            onChange={onSearchChange}
+            placeholder="Seach By Category, Question Set or Question..."
+          />
         </div>
         <Button
           variant="secondary"
           size="sm"
           onClick={handleBulkDownloadClick}
           title="Download Sample File"
-          className="flex items-center gap-2"
+          className="flex items-center gap-2 p-1"
         >
           <Download className="h-4 w-4" />
+          <span className="pl-1">Sample File</span>
         </Button>
         <Button
           variant="secondary"

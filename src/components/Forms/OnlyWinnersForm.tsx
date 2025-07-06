@@ -10,12 +10,14 @@ interface OnlyWinnersFormProps {
   formData: Partial<ContestFormData>;
   updateFormData: (data: Partial<ContestFormData>) => void;
   onSave: Function;
+  errors: Record<string, any>;
 }
 
 const OnlyWinnersForm: React.FC<OnlyWinnersFormProps> = ({
   formData,
   updateFormData,
   onSave,
+  errors,
 }) => {
   const [rewards, setRewards] = useState<any[]>([]);
   const [duplicateError, setDuplicateError] = useState<string | null>(null);
@@ -74,7 +76,7 @@ const OnlyWinnersForm: React.FC<OnlyWinnersFormProps> = ({
     const count = parseInt(e.target.value);
     if (winners) {
       const newWinners = Array.from({ length: count }, (_, index) => ({
-        reward_id: winners[index]?.reward_id || 0, //parseInt(rewards[0]?.id) || 0
+        reward_id: winners[index]?.reward_id, //parseInt(rewards[0]?.id) || 0
         bucks: winners[index]?.bucks || 0,
         qty: winners[index]?.qty || 0,
       }));
@@ -152,6 +154,7 @@ const OnlyWinnersForm: React.FC<OnlyWinnersFormProps> = ({
             }))}
             onChange={handleWinnerCountChange}
             required
+            error={errors?.["winners"]?.[0]}
           />
         )}
       </div>
@@ -191,6 +194,7 @@ const OnlyWinnersForm: React.FC<OnlyWinnersFormProps> = ({
                   })
                 }
                 required
+                error={errors?.["winners"]?.[index]?.reward_id}
               />
 
               {rewards.find((r) => r.id == Number(winner.reward_id))
@@ -204,6 +208,7 @@ const OnlyWinnersForm: React.FC<OnlyWinnersFormProps> = ({
                     updateWinner(index, { qty: Number(e.target.value) })
                   }
                   required
+                  error={errors?.["winners"]?.[index]?.qty}
                 />
               )}
 
@@ -218,6 +223,7 @@ const OnlyWinnersForm: React.FC<OnlyWinnersFormProps> = ({
                     updateWinner(index, { bucks: Number(e.target.value) })
                   }
                   required
+                  error={errors?.["winners"]?.[index]?.bucks}
                 />
               )}
             </div>

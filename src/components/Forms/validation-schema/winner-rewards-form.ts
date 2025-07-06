@@ -11,6 +11,10 @@ export const winnersForm = Yup.object().shape({
         reward_id: Yup.number()
           .typeError("Reward ID must be a number")
           .required("Reward ID is required"),
+        qty: Yup.number()
+          .typeError("Qty must be a number")
+          .min(1, "Qty must be at least 0")
+          .required("Qty is required"),
         bucks: Yup.number()
           .typeError("Bucks must be a number")
           .min(0, "Bucks must be at least 0")

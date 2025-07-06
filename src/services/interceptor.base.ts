@@ -19,15 +19,17 @@ class ApiServices {
         Notiflix.Loading.circle();
         // Get token from cookies (client-side) or from headers (server-side)
         let token: string | undefined;
-        
+
         if (typeof window !== "undefined") {
           // Client-side: get from cookies
           token = Cookies.get("authToken");
         } else {
           // Server-side: get from request headers if available
-          token = config.headers?.["Authorization"]?.replace("Bearer ", "");
+          token = config.headers?.["Authorization"]
+            ?.toString()
+            .replace("Bearer ", "");
         }
-        
+
         if (token) {
           config.headers["Authorization"] = `Bearer ${token}`;
         }

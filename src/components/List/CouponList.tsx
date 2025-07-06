@@ -9,6 +9,7 @@ interface CouponListProps {
   onView?: (coupon: Coupon) => void;
   rowCount: number;
   onPaginationModelChange: (page: number) => void;
+  onStatusChange?: (couponId: number, status: number) => Promise<any>;
 }
 
 const CouponList: React.FC<CouponListProps> = ({
@@ -17,6 +18,7 @@ const CouponList: React.FC<CouponListProps> = ({
   onDelete,
   onView,
   rowCount,
+  onStatusChange,
   onPaginationModelChange,
 }) => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -72,15 +74,14 @@ const CouponList: React.FC<CouponListProps> = ({
                 onView={onView}
                 onEdit={onEdit}
                 onDelete={onDelete}
+                onStatusChange={onStatusChange}
               />
             ))}
           </tbody>
         </table>
 
         {coupons.length === 0 && (
-          <div className="py-8 text-center text-gray-500">
-            No coupons found
-          </div>
+          <div className="py-8 text-center text-gray-500">No coupons found</div>
         )}
       </div>
 

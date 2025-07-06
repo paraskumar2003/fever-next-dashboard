@@ -15,6 +15,7 @@ interface CouponSectionProps {
   rowCount: number;
   onPaginationModelChange: (page: number) => void;
   onSave: () => Promise<void>;
+  onStatusChange?: (couponId: number, status: number) => Promise<any>;
 }
 
 const CouponSection: React.FC<CouponSectionProps> = ({
@@ -24,6 +25,7 @@ const CouponSection: React.FC<CouponSectionProps> = ({
   onDelete,
   rowCount,
   onPaginationModelChange,
+  onStatusChange,
   onSave,
 }) => {
   const addCouponModal = useModal();
@@ -60,6 +62,7 @@ const CouponSection: React.FC<CouponSectionProps> = ({
         onDelete={onDelete}
         rowCount={rowCount}
         onPaginationModelChange={onPaginationModelChange}
+        onStatusChange={onStatusChange}
       />
 
       <CouponModal

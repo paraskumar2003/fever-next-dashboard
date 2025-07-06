@@ -135,6 +135,10 @@ const CouponModal: React.FC<CouponModalProps> = ({
     }
   };
 
+  useEffect(() => {
+    console.log({ couponTypes });
+  }, [couponTypes]);
+
   return (
     <Modal
       open={isOpen}
@@ -164,23 +168,6 @@ const CouponModal: React.FC<CouponModalProps> = ({
         <form onSubmit={handleSubmit} className="p-6">
           <div className="space-y-4">
             <FormSelect
-              label="Coupon Type"
-              value={formData.couponTypeId}
-              onChange={(e) =>
-                setFormData({ ...formData, couponTypeId: e.target.value })
-              }
-              options={[
-                { value: "", label: "Select Coupon Type" },
-                ...couponTypes.map((type) => ({
-                  value: type.id,
-                  label: type.name,
-                })),
-              ]}
-              disabled={isViewMode}
-              required
-            />
-
-            <FormSelect
               label="Reward"
               value={formData.rewardId}
               onChange={(e) =>
@@ -197,6 +184,22 @@ const CouponModal: React.FC<CouponModalProps> = ({
               required
             />
 
+            <FormSelect
+              label="Coupon Type"
+              value={formData.couponTypeId}
+              onChange={(e) =>
+                setFormData({ ...formData, couponTypeId: e.target.value })
+              }
+              options={[
+                { value: "", label: "Select Coupon Type" },
+                { value: "1", label: "PDF" },
+                { value: "2", label: "Code" },
+              ]}
+              disabled={isViewMode}
+              required
+            />
+
+            {/* 
             <FormInput
               label="Brand Name"
               value={formData.brand_name}
@@ -206,7 +209,7 @@ const CouponModal: React.FC<CouponModalProps> = ({
               placeholder="Enter brand name"
               disabled={isViewMode}
               required
-            />
+            /> */}
 
             {formData.couponTypeId == "2" && (
               <FormInput

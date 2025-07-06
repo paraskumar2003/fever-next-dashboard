@@ -1,6 +1,8 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { AuthServices } from "@/services/auth";
+import { Eye, EyeOff } from "lucide-react";
 
 export default function Login() {
   const [form, setForm] = useState({
@@ -16,18 +18,27 @@ export default function Login() {
     setForm({ ...form, [name]: type === "checkbox" ? checked : value });
   };
 
-  const handleSubmit = (e: any) => {
+  const handleSubmit = async (e: any) => {
     e.preventDefault();
 
-    // Static token
-    localStorage.setItem("token", "dummy_token_123");
+    const response = await AuthServices.dashboardLogin({
+      email: form.username,
+      password: form.password,
+    });
+
+    if (response?.data?.data.accessToken) {
+      localStorage.setItem("token", response?.data?.data.accessToken);
+      // Auto redirect after 5 seconds
+      setShowModal(true);
+      setTimeout(() => push("/home"), 5000);
+    }
 
     // Show modal
-    setShowModal(true);
-
-    // Auto redirect after 5 seconds
-    setTimeout(() => push("/home"), 5000);
   };
+
+  const [showPassword, setShowPassword] = useState(false);
+
+  const togglePassword = () => setShowPassword((prev) => !prev);
 
   return (
     <div
@@ -54,10 +65,9 @@ export default function Login() {
             />
           </div>
 
-          {/* Password Input */}
           <div className="relative">
             <input
-              type="password"
+              type={showPassword ? "text" : "password"}
               id="password"
               name="password"
               value={form.password}
@@ -66,6 +76,15 @@ export default function Login() {
               className="peer w-full rounded-lg border border-black/30 bg-transparent px-3 pb-2 pt-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder={form.password ? "" : "Password"}
             />
+
+            {/* Toggle Icon */}
+            <button
+              type="button"
+              onClick={togglePassword}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-black"
+            >
+              {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+            </button>
           </div>
 
           {/* Remember Me */}

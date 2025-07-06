@@ -136,7 +136,7 @@ export class TriviaServices extends ApiServices {
   static async deleteQuestion(question_id: string): Promise<any> {
     try {
       const response = await this.post<T>(
-        `/v1/trivia/delete-question/${question_id}`,
+        `/v1/questions/delete-question/${question_id}`,
         {},
       );
       return response;

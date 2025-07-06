@@ -10,7 +10,6 @@ import { QuestionSetServices } from "@/services/trivia/sets.service";
 import { Category } from "@/types/category";
 import Notiflix from "notiflix";
 
-
 interface QuestionSet {
   id: number;
   name: string;
@@ -133,13 +132,11 @@ const BulkUploadQuestions: React.FC<BulkUploadQuestionsProps> = ({
       const response = await TriviaServices.bulkUploadQuestions(formData);
 
       if (response.data) {
-        let insertedQuestions = response.data.data?.inserted || 0;
+        let insertedQuestions = response.data.data?.total || 0;
         setUploadSuccess(true);
         setUploadedQuestionsCount(insertedQuestions);
-        
+
         Notiflix.Notify.success("Questions uploaded successfully!");
-        setShowBulkUploadModal(false);
-        setSelectedExcelFile(null);
         // Call the success callback to refresh the questions list
         if (onUploadSuccess) {
           onUploadSuccess();
@@ -265,11 +262,13 @@ const BulkUploadQuestions: React.FC<BulkUploadQuestionsProps> = ({
                   <div className="space-y-4">
                     <div className="text-sm text-gray-600">
                       <p className="mb-2">
-                        Upload an Excel file (.xlsx or .xls) containing questions.
+                        Upload an Excel file (.xlsx or .xls) containing
+                        questions.
                       </p>
                       <p className="text-xs text-gray-500">
-                        Make sure your Excel file follows the required format with
-                        proper columns for questions, options, and correct answers.
+                        Make sure your Excel file follows the required format
+                        with proper columns for questions, options, and correct
+                        answers.
                       </p>
                     </div>
                     <FormSelect

@@ -29,10 +29,10 @@ export default function Login() {
 
     if (response?.data?.data.accessToken) {
       // Set token in cookie with 7 days expiry
-      Cookies.set("authToken", response?.data?.data.accessToken, { 
+      Cookies.set("authToken", response?.data?.data.accessToken, {
         expires: 7,
         secure: process.env.NODE_ENV === "production",
-        sameSite: "strict"
+        sameSite: "strict",
       });
       // Auto redirect after 5 seconds
       setShowModal(true);

@@ -4,7 +4,6 @@ export const winnersForm = Yup.object().shape({
   contest_id: Yup.number()
     .typeError("Contest ID must be a number")
     .required("Contest ID is required"),
-
   winners: Yup.array()
     .of(
       Yup.object().shape({

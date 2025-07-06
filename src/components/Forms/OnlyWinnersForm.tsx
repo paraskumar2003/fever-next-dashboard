@@ -4,7 +4,6 @@ import FormSelect from "@/components/FormSelect";
 import FormInput from "@/components/FormInput";
 import { ContestFormData } from "@/types";
 import { RewardServices } from "@/services/rewards/reward";
-import { ContestServices } from "@/services/contest";
 import Notiflix from "notiflix";
 
 interface OnlyWinnersFormProps {
@@ -29,16 +28,20 @@ const OnlyWinnersForm: React.FC<OnlyWinnersFormProps> = ({
       return;
     }
 
-    const rewardIds = winnersArray.map(winner => winner.reward_id).filter(id => id);
-    const duplicateIds = rewardIds.filter((id, index) => rewardIds.indexOf(id) !== index);
-    
+    const rewardIds = winnersArray
+      .map((winner) => winner.reward_id)
+      .filter((id) => id);
+    const duplicateIds = rewardIds.filter(
+      (id, index) => rewardIds.indexOf(id) !== index,
+    );
+
     if (duplicateIds.length > 0) {
-      const duplicateRewardNames = duplicateIds.map(id => {
-        const reward = rewards.find(r => r.id === id);
+      const duplicateRewardNames = duplicateIds.map((id) => {
+        const reward = rewards.find((r) => r.id === id);
         return reward ? reward.name : `ID: ${id}`;
       });
       setDuplicateError(
-        `Duplicate rewards detected: ${duplicateRewardNames.join(', ')}. Each reward can only be assigned once.`
+        `Duplicate rewards detected: ${duplicateRewardNames.join(", ")}. Each reward can only be assigned once.`,
       );
     } else {
       setDuplicateError(null);
@@ -71,7 +74,7 @@ const OnlyWinnersForm: React.FC<OnlyWinnersFormProps> = ({
     const count = parseInt(e.target.value);
     if (winners) {
       const newWinners = Array.from({ length: count }, (_, index) => ({
-        reward_id: winners[index]?.reward_id || parseInt(rewards[0]?.id) || 0,
+        reward_id: winners[index]?.reward_id || 0, //parseInt(rewards[0]?.id) || 0
         bucks: winners[index]?.bucks || 0,
         qty: winners[index]?.qty || 0,
       }));
@@ -114,8 +117,16 @@ const OnlyWinnersForm: React.FC<OnlyWinnersFormProps> = ({
         <div className="mb-4 rounded-md border border-red-500 bg-red-50 p-4">
           <div className="flex">
             <div className="flex-shrink-0">
-              <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+              <svg
+                className="h-5 w-5 text-red-400"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                  clipRule="evenodd"
+                />
               </svg>
             </div>
             <div className="ml-3">

@@ -10,6 +10,7 @@ import { QuestionSetServices } from "@/services/trivia/sets.service";
 import { Category } from "@/types/category";
 import Notiflix from "notiflix";
 
+
 interface QuestionSet {
   id: number;
   name: string;

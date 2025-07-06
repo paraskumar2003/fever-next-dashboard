@@ -42,6 +42,7 @@ const OnlyWinnersForm: React.FC<OnlyWinnersFormProps> = ({
       const newWinners = Array.from({ length: count }, (_, index) => ({
         reward_id: winners[index]?.reward_id || parseInt(rewards[0]?.id) || 0,
         bucks: winners[index]?.bucks || 0,
+        qty: winners[index]?.qty || 0,
       }));
       updateFormData({ winners: newWinners });
     }
@@ -49,7 +50,7 @@ const OnlyWinnersForm: React.FC<OnlyWinnersFormProps> = ({
 
   const updateWinner = (
     index: number,
-    data: Partial<{ reward_id: number; bucks: number }>,
+    data: Partial<{ reward_id: number; bucks: number; qty: number }>,
   ) => {
     if (winners) {
       const updated = [...winners];
@@ -76,7 +77,7 @@ const OnlyWinnersForm: React.FC<OnlyWinnersFormProps> = ({
       <div className="mb-6">
         {winners && (
           <FormSelect
-            label="Winners Count"
+            label="Types of Rewards"
             value={winners.length.toString()}
             options={Array.from({ length: 100 }, (_, i) => ({
               value: (i + 1).toString(),
@@ -96,7 +97,7 @@ const OnlyWinnersForm: React.FC<OnlyWinnersFormProps> = ({
               className="rounded-lg border bg-gray-50 p-4 shadow-md"
             >
               <h3 className="mb-4 text-lg font-semibold">
-                Winner #{index + 1}
+                Reward Type {index + 1}
               </h3>
 
               <FormSelect
@@ -104,10 +105,18 @@ const OnlyWinnersForm: React.FC<OnlyWinnersFormProps> = ({
                 value={winner.reward_id?.toString() || ""}
                 options={[
                   { value: "", label: "Select a reward" },
-                  ...rewards.map((reward) => ({
-                    value: reward.id.toString(),
-                    label: `${reward.name} (${reward.reward_type})`,
-                  })),
+                  ...rewards.map((reward) => {
+                    let isSelectedInAnother = false;
+                    if (formData.winners)
+                      isSelectedInAnother = formData.winners.some(
+                        (w, i) => i !== index && w.reward_id === reward.id,
+                      );
+                    return {
+                      value: reward.id.toString(),
+                      label: `${reward.name} (${reward.reward_type})`,
+                      disabled: isSelectedInAnother,
+                    };
+                  }),
                 ]}
                 onChange={(e) =>
                   updateWinner(index, {
@@ -116,6 +125,20 @@ const OnlyWinnersForm: React.FC<OnlyWinnersFormProps> = ({
                 }
                 required
               />
+
+              {rewards.find((r) => r.id == Number(winner.reward_id))
+                ?.reward_type !== "FEVER_BUCKS" && (
+                <FormInput
+                  label="Quantity"
+                  type="number"
+                  min="0"
+                  value={winner.qty?.toString() || "0"}
+                  onChange={(e) =>
+                    updateWinner(index, { qty: Number(e.target.value) })
+                  }
+                  required
+                />
+              )}
 
               {rewards.find((r) => r.id == Number(winner.reward_id))
                 ?.reward_type === "FEVER_BUCKS" && (

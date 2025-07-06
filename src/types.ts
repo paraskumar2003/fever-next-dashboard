@@ -64,6 +64,7 @@ export type RewardType = "PHYSICAL" | "COUPON_PDF" | "CODE";
 export interface WinnerReward {
   reward_id: number;
   bucks: number;
+  qty: number;
 }
 
 export interface ContestFormData {

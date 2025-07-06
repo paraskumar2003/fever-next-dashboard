@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Download, Upload, X } from "lucide-react";
+import { CheckCircle, Download, Upload, X } from "lucide-react";
 import { Modal } from "@mui/material";
 import Button from "../Button";
 import FormInput from "../FormInput";
@@ -27,6 +27,8 @@ const BulkUploadCoupons: React.FC<BulkUploadCouponsProps> = ({
   const [rewards, setRewards] = useState<Reward[]>([]);
   const [selectedRewardId, setSelectedRewardId] = useState<string>("");
   const [brandName, setBrandName] = useState<string>("");
+  const [uploadSuccess, setUploadSuccess] = useState(false);
+  const [uploadedCoupon, setUploadedCoupon] = useState(0);
 
   useEffect(() => {
     const fetchRewards = async () => {
@@ -89,9 +91,12 @@ const BulkUploadCoupons: React.FC<BulkUploadCouponsProps> = ({
 
       const response = await CouponServices.bulkUploadCoupons(formData);
 
+      let insertedCoupon = response.data.data.inserted;
+      setUploadSuccess(true);
+      setUploadedCoupon(insertedCoupon);
+
       if (response.data) {
         Notiflix.Notify.success("Coupons uploaded successfully!");
-        setShowBulkUploadModal(false);
         setSelectedExcelFile(null);
         setBrandName("");
         // Call the success callback to refresh the coupons list
@@ -175,11 +180,8 @@ const BulkUploadCoupons: React.FC<BulkUploadCouponsProps> = ({
         <div className="max-h-[90vh] w-full max-w-md overflow-y-auto rounded-lg bg-white shadow-xl">
           <div className="border-b border-gray-200 px-6 py-4">
             <div className="flex items-center justify-between">
-              <h2
-                className="text-xl font-semibold text-gray-800"
-                id="bulk-upload-modal-title"
-              >
-                Bulk Upload Coupons
+              <h2 className="text-xl font-semibold text-gray-800">
+                {uploadSuccess ? "Upload Successful" : "Bulk Upload Coupons"}
               </h2>
               <button
                 onClick={handleCloseBulkUploadModal}
@@ -192,79 +194,96 @@ const BulkUploadCoupons: React.FC<BulkUploadCouponsProps> = ({
           </div>
 
           <div className="p-6">
-            <div className="space-y-4">
-              <div className="text-sm text-gray-600">
-                <p className="mb-2">
-                  Upload an Excel file (.xlsx or .xls) containing coupons.
+            {uploadSuccess ? (
+              <div className="space-y-4 text-center">
+                <CheckCircle className="mx-auto h-12 w-12 text-green-500" />
+                <h3 className="text-lg font-medium text-gray-800">
+                  {uploadedCoupon} Coupons Uploaded Successfully!
+                </h3>
+                <p className="text-sm text-gray-600">
+                  Your coupon file was uploaded and processed successfully.
                 </p>
-                <p className="text-xs text-gray-500">
-                  Make sure your Excel file follows the required format with
-                  proper columns for coupon codes, pins, and other details.
-                </p>
-              </div>
-
-              <FormSelect
-                label="Reward"
-                value={selectedRewardId}
-                onChange={handleRewardChange}
-                options={[
-                  { value: "", label: "Select a reward" },
-                  ...rewards.map((reward) => ({
-                    value: reward.id,
-                    label: `${reward.name} (${reward.reward_type})`,
-                  })),
-                ]}
-                disabled={isUploading}
-                required
-              />
-
-              <FormInput
-                label="Brand Name"
-                value={brandName}
-                onChange={handleBrandNameChange}
-                placeholder="Enter brand name"
-                disabled={isUploading}
-                required
-              />
-
-              <FormInput
-                label="Select Excel File"
-                type="file"
-                accept=".xlsx,.xls"
-                onChange={handleFileChange}
-                disabled={isUploading}
-                required
-              />
-
-              {selectedExcelFile && (
-                <div className="text-sm text-green-600">
-                  Selected file: {selectedExcelFile.name}
+                <div className="mt-6 flex justify-center">
+                  <Button onClick={handleCloseBulkUploadModal}>Close</Button>
                 </div>
-              )}
-            </div>
+              </div>
+            ) : (
+              <>
+                <div className="space-y-4">
+                  <div className="text-sm text-gray-600">
+                    <p className="mb-2">
+                      Upload an Excel file (.xlsx or .xls) containing coupons.
+                    </p>
+                    <p className="text-xs text-gray-500">
+                      Make sure your Excel file follows the required format with
+                      proper columns for coupon codes, pins, and other details.
+                    </p>
+                  </div>
 
-            <div className="mt-6 flex justify-end space-x-3">
-              <Button
-                type="button"
-                variant="secondary"
-                onClick={handleCloseBulkUploadModal}
-                disabled={isUploading}
-              >
-                Cancel
-              </Button>
-              <Button
-                type="button"
-                onClick={handleBulkUpload}
-                disabled={
-                  !selectedExcelFile ||
-                  !selectedRewardId ||
-                  !brandName.trim() ||
-                  isUploading
-                }
-              >
-                {isUploading ? "Uploading..." : "Upload Coupons"}
-              </Button>
-            </div>
+                  <FormSelect
+                    label="Reward"
+                    value={selectedRewardId}
+                    onChange={handleRewardChange}
+                    options={[
+                      { value: "", label: "Select a reward" },
+                      ...rewards.map((reward) => ({
+                        value: reward.id,
+                        label: `${reward.name} (${reward.reward_type})`,
+                      })),
+                    ]}
+                    disabled={isUploading}
+                    required
+                  />
+
+                  <FormInput
+                    label="Brand Name"
+                    value={brandName}
+                    onChange={handleBrandNameChange}
+                    placeholder="Enter brand name"
+                    disabled={isUploading}
+                    required
+                  />
+
+                  <FormInput
+                    label="Select Excel File"
+                    type="file"
+                    accept=".xlsx,.xls"
+                    onChange={handleFileChange}
+                    disabled={isUploading}
+                    required
+                  />
+
+                  {selectedExcelFile && (
+                    <div className="text-sm text-green-600">
+                      Selected file: {selectedExcelFile.name}
+                    </div>
+                  )}
+                </div>
+
+                <div className="mt-6 flex justify-end space-x-3">
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    onClick={handleCloseBulkUploadModal}
+                    disabled={isUploading}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    type="button"
+                    onClick={handleBulkUpload}
+                    disabled={
+                      !selectedExcelFile ||
+                      !selectedRewardId ||
+                      !brandName.trim() ||
+                      isUploading
+                    }
+                  >
+                    {isUploading ? "Uploading..." : "Upload Coupons"}
+                  </Button>
+                </div>
+              </>
+            )}
           </div>
         </div>
       </Modal>

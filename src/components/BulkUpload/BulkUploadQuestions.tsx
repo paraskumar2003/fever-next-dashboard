@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Download, Upload, X } from "lucide-react";
+import { CheckCircle, Download, Upload, X } from "lucide-react";
 import { Modal } from "@mui/material";
 import Button from "../Button";
 import FormInput from "../FormInput";
@@ -36,6 +36,8 @@ const BulkUploadQuestions: React.FC<BulkUploadQuestionsProps> = ({
     null,
   );
   const [selectedSetId, setSelectedSetId] = useState<number | null>(null);
+  const [uploadSuccess, setUploadSuccess] = useState(false);
+  const [uploadedQuestionsCount, setUploadedQuestionsCount] = useState(0);
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -130,6 +132,10 @@ const BulkUploadQuestions: React.FC<BulkUploadQuestionsProps> = ({
       const response = await TriviaServices.bulkUploadQuestions(formData);
 
       if (response.data) {
+        let insertedQuestions = response.data.data?.inserted || 0;
+        setUploadSuccess(true);
+        setUploadedQuestionsCount(insertedQuestions);
+        
         Notiflix.Notify.success("Questions uploaded successfully!");
         setShowBulkUploadModal(false);
         setSelectedExcelFile(null);
@@ -153,6 +159,8 @@ const BulkUploadQuestions: React.FC<BulkUploadQuestionsProps> = ({
   const handleCloseBulkUploadModal = () => {
     setShowBulkUploadModal(false);
     setSelectedExcelFile(null);
+    setUploadSuccess(false);
+    setUploadedQuestionsCount(0);
   };
 
   const handleCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -238,85 +246,102 @@ const BulkUploadQuestions: React.FC<BulkUploadQuestionsProps> = ({
 
           <div className="p-6">
             <div className="space-y-4">
-              <div className="text-sm text-gray-600">
-                <p className="mb-2">
-                  Upload an Excel file (.xlsx or .xls) containing questions.
-                </p>
-                <p className="text-xs text-gray-500">
-                  Make sure your Excel file follows the required format with
-                  proper columns for questions, options, and correct answers.
-                </p>
+          {uploadSuccess ? (
+            <div className="space-y-4 text-center">
+              <CheckCircle className="mx-auto h-12 w-12 text-green-500" />
+              <h3 className="text-lg font-medium text-gray-800">
+                {uploadedQuestionsCount} Questions Uploaded Successfully!
+              </h3>
+              <p className="text-sm text-gray-600">
+                Your question file was uploaded and processed successfully.
+              </p>
+              <div className="mt-6 flex justify-center">
+                <Button onClick={handleCloseBulkUploadModal}>Close</Button>
               </div>
-
-              <FormSelect
-                label="Category"
-                value={selectedCategoryId?.toString() || ""}
-                onChange={handleCategoryChange}
-                options={[
-                  { value: "", label: "Select a category" },
-                  ...categories.map((category) => ({
-                    value: category.id.toString(),
-                    label: `${category.name} - ${category.questions.length} Questions`,
-                  })),
-                ]}
-                disabled={isUploading}
-                required
-              />
-
-              <FormSelect
-                label="Question Set"
-                value={selectedSetId?.toString() || ""}
-                onChange={handleSetChange}
-                options={[
-                  { value: "", label: "Select a question set" },
-                  ...questionSets.map((questionSet) => ({
-                    value: questionSet.id.toString(),
-                    label: questionSet.name,
-                  })),
-                ]}
-                disabled={isUploading || questionSets.length === 0}
-                required
-              />
-
-              <FormInput
-                label="Select Excel File"
-                type="file"
-                accept=".xlsx,.xls"
-                onChange={handleFileChange}
-                disabled={isUploading}
-                required
-              />
-
-              {selectedExcelFile && (
-                <div className="text-sm text-green-600">
-                  Selected file: {selectedExcelFile.name}
+            </div>
+          ) : (
+            <>
+              <div className="space-y-4">
+                <div className="text-sm text-gray-600">
+                  <p className="mb-2">
+                    Upload an Excel file (.xlsx or .xls) containing questions.
+                  </p>
+                  <p className="text-xs text-gray-500">
+                    Make sure your Excel file follows the required format with
+                    proper columns for questions, options, and correct answers.
+                  </p>
                 </div>
+              <FormSelect
+                <FormSelect
+                  label="Category"
+                  value={selectedCategoryId?.toString() || ""}
+                  onChange={handleCategoryChange}
+                  options={[
+                    { value: "", label: "Select a category" },
+                    ...categories.map((category) => ({
+                      value: category.id.toString(),
+                      label: `${category.name} - ${category.questions.length} Questions`,
+                    })),
+                  ]}
+                  disabled={isUploading}
+                  required
+                />
+              <FormSelect
+                <FormSelect
+                  label="Question Set"
+                  value={selectedSetId?.toString() || ""}
+                  onChange={handleSetChange}
+                  options={[
+                    { value: "", label: "Select a question set" },
+                    ...questionSets.map((questionSet) => ({
+                      value: questionSet.id.toString(),
+                      label: questionSet.name,
+                    })),
+                  ]}
+                  disabled={isUploading || questionSets.length === 0}
+                  required
+                />
+              <FormInput
+                <FormInput
+                  label="Select Excel File"
+                  type="file"
+                  accept=".xlsx,.xls"
+                  onChange={handleFileChange}
+                  disabled={isUploading}
+                  required
+                />
+              {selectedExcelFile && (
+                {selectedExcelFile && (
+                  <div className="text-sm text-green-600">
+                    Selected file: {selectedExcelFile.name}
+                  </div>
+                )}
               )}
-            </div>
-
             <div className="mt-6 flex justify-end space-x-3">
-              <Button
-                type="button"
-                variant="secondary"
-                onClick={handleCloseBulkUploadModal}
-                disabled={isUploading}
-              >
-                Cancel
-              </Button>
-              <Button
-                type="button"
-                onClick={handleBulkUpload}
-                disabled={
-                  !selectedExcelFile ||
-                  !selectedCategoryId ||
-                  !selectedSetId ||
-                  isUploading
-                }
-              >
-                {isUploading ? "Uploading..." : "Upload Questions"}
-              </Button>
-            </div>
-          </div>
+              <div className="mt-6 flex justify-end space-x-3">
+                <Button
+                  type="button"
+                  variant="secondary"
+                  onClick={handleCloseBulkUploadModal}
+                  disabled={isUploading}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="button"
+                  onClick={handleBulkUpload}
+                  disabled={
+                    !selectedExcelFile ||
+                    !selectedCategoryId ||
+                    !selectedSetId ||
+                    isUploading
+                  }
+                >
+                  {isUploading ? "Uploading..." : "Upload Questions"}
+                </Button>
+              </div>
+            </>
+          )}
         </div>
       </Modal>
     </>

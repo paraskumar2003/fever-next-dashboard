@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { AuthServices } from "@/services/auth";
 import { Eye, EyeOff } from "lucide-react";
+import Cookies from "js-cookie";
 
 export default function Login() {
   const [form, setForm] = useState({
@@ -27,7 +28,12 @@ export default function Login() {
     });
 
     if (response?.data?.data.accessToken) {
-      localStorage.setItem("token", response?.data?.data.accessToken);
+      // Set token in cookie with 7 days expiry
+      Cookies.set("authToken", response?.data?.data.accessToken, { 
+        expires: 7,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict"
+      });
       // Auto redirect after 5 seconds
       setShowModal(true);
       setTimeout(() => push("/home"), 5000);

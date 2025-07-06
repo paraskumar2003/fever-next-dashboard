@@ -17,11 +17,20 @@ class ApiServices {
       (config) => {
         // Add token or any other modifications here
         Notiflix.Loading.circle();
-        const token = Cookies.get("authToken");
+        // Get token from cookies (client-side) or from headers (server-side)
+        let token: string | undefined;
+        
+        if (typeof window !== "undefined") {
+          // Client-side: get from cookies
+          token = Cookies.get("authToken");
+        } else {
+          // Server-side: get from request headers if available
+          token = config.headers?.["Authorization"]?.replace("Bearer ", "");
+        }
+        
         if (token) {
           config.headers["Authorization"] = `Bearer ${token}`;
         }
-        // Notiflix.Loading.dots();
         return config;
       },
       (error) => {
@@ -43,7 +52,11 @@ class ApiServices {
 
         if (error.response?.status === 401) {
           console.error("Unauthorized! Redirecting to login...");
-          Cookies.remove("authToken");
+          // Remove token from cookies and redirect to login
+          if (typeof window !== "undefined") {
+            Cookies.remove("authToken");
+            window.location.href = "/login";
+          }
         } else {
           Notiflix.Notify.info(
             error?.response?.data?.message || error?.message,

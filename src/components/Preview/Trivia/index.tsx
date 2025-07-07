@@ -88,27 +88,21 @@ export function TriviaGamePlay({
   };
 
   const handleAnswer = async (id: number, answer: string): Promise<boolean> => {
-    if (contest_id) {
-      let data = {
-        data: {
-          correct: true,
-          rewardGiven: null,
-        },
-      };
-      displayNextQuestion(1000); //=> Milliseconds delay while changing question
-      if (currentQIndex + 1 == questions.length) {
-        setTimeout(() => {
-          setGame({ state: GameState.ENDED });
-        }, 1000);
-      }
-      if (!data.data.rewardGiven) return data.data.correct;
-      else {
-        return data.data.correct;
-      }
+    // Get the selected option and check if it's correct
+    const selectedOption = currentQuestion.options[id];
+    const isCorrect = selectedOption?.is_correct || false;
+
+    // Display next question after a delay for visual feedback
+    displayNextQuestion(1000);
+    
+    // Check if this is the last question
+    if (currentQIndex + 1 === questions.length) {
+      setTimeout(() => {
+        setGame({ state: GameState.ENDED });
+      }, 1000);
     }
-    {
-      return false;
-    }
+
+    return isCorrect; // Return actual correctness based on the option's is_correct flag
   };
 
   const handleMissedQuestion = async (): Promise<boolean> => {

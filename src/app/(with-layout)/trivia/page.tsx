@@ -88,95 +88,95 @@ export default function CreateContest() {
   });
 
   // Fetch questions for preview when category and set are selected
-  useEffect(() => {
-    const fetchPreviewQuestions = async () => {
-      if (formData.QuestionCategoryId && formData.set_id) {
-        try {
-          const { data } =
-            await QuestionSetServices.getQuestionSetsByCategoryId(
-              formData.QuestionCategoryId,
-            );
+  const fetchPreviewQuestions = async () => {
+    if (formData.QuestionCategoryId) {
+      try {
+        const { data } = await QuestionSetServices.getQuestionSetsByCategoryId(
+          formData.QuestionCategoryId,
+        );
 
-          if (data?.data?.rows) {
-            // Find the specific question set matching formData.set_id
-            const selectedQuestionSet = data.data.rows.find(
-              (set: any) => set.id === formData.set_id,
-            );
+        if (data?.data?.rows) {
+          // Find the specific question set matching formData.set_id
+          // const selectedQuestionSet = data.data.rows.find(
+          //   (set: any) => set.id === formData.set_id,
+          // );
 
-            if (selectedQuestionSet && selectedQuestionSet.questions) {
-              // Map API questions to preview format
-              const mappedQuestions: PreviewQuestion[] =
-                selectedQuestionSet.questions
-                  .filter((q: any) => q.status === 1) // Only include active questions
-                  .slice(0, formData.questions?.length || 10) // Limit to selected number of questions
-                  .map((question: any, index: number) => {
-                    // Map question options to preview format
-                    const options: PreviewOption[] =
-                      question.questionOptions.map(
-                        (option: any, optionIndex: number) => ({
-                          option_text: option.answer,
-                          label: String.fromCharCode(65 + optionIndex), // A, B, C, D
-                          id: optionIndex,
-                          is_correct: option.is_correct,
-                        }),
-                      );
+          const selectedQuestionSet = data.data.rows[0];
+          console.log({ selectedQuestionSet });
 
-                    return {
-                      question_no: index + 1,
-                      question_text: question.question,
-                      options: options,
-                      timer:
-                        formData.game_time_level === "QUESTION"
-                          ? parseInt(
-                              formData.questions?.[index]?.timer || "10",
-                            ) * 1000
-                          : parseInt(formData.game_timer || "60") * 1000,
-                    };
-                  });
+          if (selectedQuestionSet && selectedQuestionSet.questions) {
+            // Map API questions to preview format
+            const mappedQuestions: PreviewQuestion[] =
+              selectedQuestionSet.questions
+                .filter((q: any) => q.status === 1) // Only include active questions
+                .slice(0, formData.questions?.length || 10) // Limit to selected number of questions
+                .map((question: any, index: number) => {
+                  // Map question options to preview format
+                  const options: PreviewOption[] = question.questionOptions.map(
+                    (option: any, optionIndex: number) => ({
+                      option_text: option.answer,
+                      label: String.fromCharCode(65 + optionIndex), // A, B, C, D
+                      id: optionIndex,
+                      is_correct: option.is_correct,
+                    }),
+                  );
 
-              setPreviewQuestions(mappedQuestions);
-            }
+                  return {
+                    question_no: index + 1,
+                    question_text: question.question,
+                    options: options,
+                    timer:
+                      formData.game_time_level === "QUESTION"
+                        ? parseInt(formData.questions?.[index]?.timer || "10") *
+                          1000
+                        : parseInt(formData.game_timer || "60") * 1000,
+                  };
+                });
+
+            setPreviewQuestions(mappedQuestions);
           }
-        } catch (error) {
-          console.error("Error fetching preview questions:", error);
-          // Fallback to dummy questions if API fails
-          setPreviewQuestions([
-            {
-              question_no: 1,
-              question_text: "Sample question - API data not available",
-              options: [
-                {
-                  option_text: "Option A",
-                  label: "A",
-                  id: 0,
-                  is_correct: true,
-                },
-                {
-                  option_text: "Option B",
-                  label: "B",
-                  id: 1,
-                  is_correct: false,
-                },
-                {
-                  option_text: "Option C",
-                  label: "C",
-                  id: 2,
-                  is_correct: false,
-                },
-                {
-                  option_text: "Option D",
-                  label: "D",
-                  id: 3,
-                  is_correct: false,
-                },
-              ],
-              timer: 10000,
-            },
-          ]);
         }
+      } catch (error) {
+        console.error("Error fetching preview questions:", error);
+        // Fallback to dummy questions if API fails
+        setPreviewQuestions([
+          {
+            question_no: 1,
+            question_text: "Sample question - API data not available",
+            options: [
+              {
+                option_text: "Option A",
+                label: "A",
+                id: 0,
+                is_correct: true,
+              },
+              {
+                option_text: "Option B",
+                label: "B",
+                id: 1,
+                is_correct: false,
+              },
+              {
+                option_text: "Option C",
+                label: "C",
+                id: 2,
+                is_correct: false,
+              },
+              {
+                option_text: "Option D",
+                label: "D",
+                id: 3,
+                is_correct: false,
+              },
+            ],
+            timer: 10000,
+          },
+        ]);
       }
-    };
+    }
+  };
 
+  useEffect(() => {
     fetchPreviewQuestions();
   }, [
     formData.QuestionCategoryId,
@@ -234,6 +234,7 @@ export default function CreateContest() {
           winners: details?.contestPrizes?.map((e: any) => ({
             reward_id: e?.reward?.id,
             bucks: e.fever_bucks,
+            qty: e.quantity,
           })),
           instructions:
             details?.instructions.length > 0
@@ -469,6 +470,7 @@ export default function CreateContest() {
       if (res) {
         setFormSubmissionStatus((prev) => ({ ...prev, gameQuestions: true }));
         Notiflix.Notify.success("Game Questions saved successfully!");
+        fetchPreviewQuestions();
         return true; // Indicate success
       }
       return false; // Indicate failure
@@ -506,6 +508,7 @@ export default function CreateContest() {
         prizes: formData.winners.map((winner) => ({
           reward_id: Number(winner.reward_id),
           bucks: Number(winner.bucks) || 0,
+          qty: Number(winner.qty) || 0,
         })),
       };
 

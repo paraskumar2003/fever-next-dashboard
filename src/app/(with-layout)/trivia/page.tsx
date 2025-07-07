@@ -17,6 +17,7 @@ import {
 import OnlyContestForm from "@/components/Forms/OnlyContestForm";
 import { useContest } from "@/context/ContestContext";
 import { ContestServices, TriviaServices } from "@/services";
+import { QuestionSetServices } from "@/services/trivia/sets.service";
 import { useRouter, useSearchParams } from "next/navigation";
 import moment from "moment";
 import Notiflix from "notiflix";
@@ -26,6 +27,10 @@ import {
   buildQuestionJsonData,
 } from "@/lib/utils";
 import { Instruction, WinnerReward } from "@/types";
+import {
+  Question as PreviewQuestion,
+  Option as PreviewOption,
+} from "@/components/Preview/Trivia/types";
 
 const steps = [
   "Contest Details",
@@ -53,6 +58,11 @@ export default function CreateContest() {
     questions: false,
   }); // New state for edit mode
 
+  // Add state for preview questions
+  const [previewQuestions, setPreviewQuestions] = useState<PreviewQuestion[]>(
+    [],
+  );
+
   // Add state for contest form errors
   const [contestFormErrors, setContestFormErrors] = useState<
     Record<string, string>
@@ -76,6 +86,105 @@ export default function CreateContest() {
     instructions: false,
     gameQuestions: false,
   });
+
+  // Fetch questions for preview when category and set are selected
+  useEffect(() => {
+    const fetchPreviewQuestions = async () => {
+      if (formData.QuestionCategoryId && formData.set_id) {
+        try {
+          const { data } =
+            await QuestionSetServices.getQuestionSetsByCategoryId(
+              formData.QuestionCategoryId,
+            );
+
+          if (data?.data?.rows) {
+            // Find the specific question set matching formData.set_id
+            const selectedQuestionSet = data.data.rows.find(
+              (set: any) => set.id === formData.set_id,
+            );
+
+            if (selectedQuestionSet && selectedQuestionSet.questions) {
+              // Map API questions to preview format
+              const mappedQuestions: PreviewQuestion[] =
+                selectedQuestionSet.questions
+                  .filter((q: any) => q.status === 1) // Only include active questions
+                  .slice(0, formData.questions?.length || 10) // Limit to selected number of questions
+                  .map((question: any, index: number) => {
+                    // Map question options to preview format
+                    const options: PreviewOption[] =
+                      question.questionOptions.map(
+                        (option: any, optionIndex: number) => ({
+                          option_text: option.answer,
+                          label: String.fromCharCode(65 + optionIndex), // A, B, C, D
+                          id: optionIndex,
+                          is_correct: option.is_correct,
+                        }),
+                      );
+
+                    return {
+                      question_no: index + 1,
+                      question_text: question.question,
+                      options: options,
+                      timer:
+                        formData.game_time_level === "QUESTION"
+                          ? parseInt(
+                              formData.questions?.[index]?.timer || "10",
+                            ) * 1000
+                          : parseInt(formData.game_timer || "60") * 1000,
+                    };
+                  });
+
+              setPreviewQuestions(mappedQuestions);
+            }
+          }
+        } catch (error) {
+          console.error("Error fetching preview questions:", error);
+          // Fallback to dummy questions if API fails
+          setPreviewQuestions([
+            {
+              question_no: 1,
+              question_text: "Sample question - API data not available",
+              options: [
+                {
+                  option_text: "Option A",
+                  label: "A",
+                  id: 0,
+                  is_correct: true,
+                },
+                {
+                  option_text: "Option B",
+                  label: "B",
+                  id: 1,
+                  is_correct: false,
+                },
+                {
+                  option_text: "Option C",
+                  label: "C",
+                  id: 2,
+                  is_correct: false,
+                },
+                {
+                  option_text: "Option D",
+                  label: "D",
+                  id: 3,
+                  is_correct: false,
+                },
+              ],
+              timer: 10000,
+            },
+          ]);
+        }
+      }
+    };
+
+    fetchPreviewQuestions();
+  }, [
+    formData.QuestionCategoryId,
+    formData.set_id,
+    formData.questions?.length,
+    formData.game_time_level,
+    formData.game_timer,
+  ]);
 
   const fetchContestDetails = async (contest_id: string) => {
     try {
@@ -438,31 +547,6 @@ export default function CreateContest() {
     }
   };
 
-  const questions = [
-    {
-      question_no: 1,
-      question_text: "What is the name of the game ?",
-      options: [
-        { option_text: "Trivia", label: "A" },
-        { option_text: "Trivia", label: "B" },
-        { option_text: "Trivia", label: "C" },
-        { option_text: "Trivia", label: "D" },
-      ],
-      timer: 10000,
-    },
-    {
-      question_no: 2,
-      question_text: "What is the capital of France ?",
-      options: [
-        { option_text: "Germany", label: "A" },
-        { option_text: "Mexico", label: "B" },
-        { option_text: "Paris", label: "C" },
-        { option_text: "Brazil", label: "D" },
-      ],
-      timer: 10000,
-    },
-  ];
-
   const handlePublish = () => {
     Notiflix.Notify.success("Game Published Successfully!");
     push("/view/trivia?category=upcoming");
@@ -518,7 +602,7 @@ export default function CreateContest() {
       case 4:
         return (
           <TriviaGamePlay
-            questions={questions}
+            questions={previewQuestions}
             formData={formData}
             addNewQuestion={() => {}}
             onPublish={handlePublish}

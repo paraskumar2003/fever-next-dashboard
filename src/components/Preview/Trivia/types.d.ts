@@ -5,6 +5,7 @@ export interface Option {
   option_text: string;
   label?: string;
   id?: any;
+  is_correct?: boolean; // Add this property for actual validation
 }
 
 export interface Question {

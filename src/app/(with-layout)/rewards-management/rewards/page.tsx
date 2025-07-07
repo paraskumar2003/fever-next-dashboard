@@ -1,7 +1,6 @@
 "use client";
 
 import { SearchBar } from "@/components";
-import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { RewardServices } from "@/services/rewards/reward";
 import { Reward } from "@/types/rewards";
@@ -10,7 +9,6 @@ import { useModal } from "@/hooks/useModal";
 import RewardModal from "@/components/Modal/RewardModal";
 
 export default function RewardsPage() {
-  const searchParams = useSearchParams();
   const [rewards, setRewards] = useState<Reward[]>([]);
   const [loading, setLoading] = useState(true);
   const [rowCount, setRowCount] = useState(0);
@@ -97,8 +95,11 @@ export default function RewardsPage() {
         rewardData={selectedReward}
         isViewMode={isViewMode}
         onSave={async () => {
+          console.log("function called after save!!");
           await fetchRewards();
           modal.close();
+
+          console.log("close called!!");
         }}
       />
     </div>

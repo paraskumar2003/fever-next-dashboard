@@ -59,6 +59,9 @@ const RewardList: React.FC<RewardListProps> = ({
                 Status
               </th> */}
               <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">
+                Description
+              </th>
+              <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">
                 Created At
               </th>
               <th className="px-4 py-3 text-center text-sm font-medium text-gray-600">

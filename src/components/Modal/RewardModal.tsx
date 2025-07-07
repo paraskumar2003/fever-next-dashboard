@@ -67,12 +67,18 @@ const RewardModal: React.FC<RewardModalProps> = ({
           reward_type: formData.reward_type as "DIGITAL" | "PHYSICAL",
           brand_name: formData.brand_name,
         });
-        Notiflix.Notify.success("Reward created successfully!");
+        // Notiflix.Notify.success("Reward created successfully!");
       }
 
       if (onSave) {
         await onSave();
       }
+      onClose();
+      setFormData({
+        name: "",
+        reward_type: "DIGITAL",
+        brand_name: "",
+      });
     } catch (error) {
       console.error("Error saving reward:", error);
       Notiflix.Notify.failure(

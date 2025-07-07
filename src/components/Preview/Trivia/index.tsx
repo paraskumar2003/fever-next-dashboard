@@ -1,4 +1,4 @@
-import { useLayoutEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Cookies from "js-cookie";
 import Notiflix from "notiflix";
@@ -24,7 +24,12 @@ export function TriviaGamePlay({
   const router = useRouter();
   let contest_id = Cookies.get("contest_id");
 
-  if (questions.length < 1) router.push("/dashboard");
+  if (questions.length < 1) {
+    Notiflix.Notify.failure("No questions found");
+    // router.push("/home");
+    console.log(questions);
+    return <></>;
+  }
 
   const [currentQuestion, setCurrentQuestion] = useState<QuestionType>(
     questions[0],
@@ -46,23 +51,6 @@ export function TriviaGamePlay({
       ? router.push("/dashboard")
       : setCurrentQuestion(questions[0]);
   }, [questions, router]);
-
-  // const displayNextQuestion = (time: number) => {
-  //   setTimeout(() => {
-  //     setCurrentQIndex((prev) => {
-  //       const newIndex = prev + 1;
-  //       setTimer({ ...timer, state: false });
-  //       setTimer({
-  //         timeOut: questions[newIndex]?.timer || 10000,
-  //         state: true,
-  //       });
-  //       return newIndex;
-  //     });
-  //     if (questions[currentQIndex + 1])
-  //       setCurrentQuestion(questions[currentQIndex + 1]);
-  //     else console.log("Quiz finished");
-  //   }, time);
-  // };
 
   const displayNextQuestion = (time: number) => {
     setTimeout(() => {
@@ -94,7 +82,7 @@ export function TriviaGamePlay({
 
     // Display next question after a delay for visual feedback
     displayNextQuestion(1000);
-    
+
     // Check if this is the last question
     if (currentQIndex + 1 === questions.length) {
       setTimeout(() => {
@@ -143,6 +131,9 @@ export function TriviaGamePlay({
       displayNextQuestion(1000);
     }
   };
+  useEffect(() => {
+    console.log(currentQuestion, questions);
+  }, [currentQuestion, questions]);
 
   return (
     <FormSection title="Preview" onSave={onPublish} saveButtonText="Publish">

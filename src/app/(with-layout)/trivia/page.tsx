@@ -27,7 +27,10 @@ import {
   buildQuestionJsonData,
 } from "@/lib/utils";
 import { Instruction, WinnerReward } from "@/types";
-import { Question as PreviewQuestion, Option as PreviewOption } from "@/components/Preview/Trivia/types";
+import {
+  Question as PreviewQuestion,
+  Option as PreviewOption,
+} from "@/components/Preview/Trivia/types";
 
 const steps = [
   "Contest Details",
@@ -54,9 +57,11 @@ export default function CreateContest() {
     instruction: false,
     questions: false,
   }); // New state for edit mode
-  
+
   // Add state for preview questions
-  const [previewQuestions, setPreviewQuestions] = useState<PreviewQuestion[]>([]);
+  const [previewQuestions, setPreviewQuestions] = useState<PreviewQuestion[]>(
+    [],
+  );
 
   // Add state for contest form errors
   const [contestFormErrors, setContestFormErrors] = useState<
@@ -87,42 +92,48 @@ export default function CreateContest() {
     const fetchPreviewQuestions = async () => {
       if (formData.QuestionCategoryId && formData.set_id) {
         try {
-          const { data } = await QuestionSetServices.getQuestionSetsByCategoryId(
-            formData.QuestionCategoryId
-          );
-          
+          const { data } =
+            await QuestionSetServices.getQuestionSetsByCategoryId(
+              formData.QuestionCategoryId,
+            );
+
           if (data?.data?.rows) {
             // Find the specific question set matching formData.set_id
             const selectedQuestionSet = data.data.rows.find(
-              (set: any) => set.id === formData.set_id
+              (set: any) => set.id === formData.set_id,
             );
-            
+
             if (selectedQuestionSet && selectedQuestionSet.questions) {
               // Map API questions to preview format
-              const mappedQuestions: PreviewQuestion[] = selectedQuestionSet.questions
-                .filter((q: any) => q.status === 1) // Only include active questions
-                .slice(0, formData.questions?.length || 10) // Limit to selected number of questions
-                .map((question: any, index: number) => {
-                  // Map question options to preview format
-                  const options: PreviewOption[] = question.questionOptions.map(
-                    (option: any, optionIndex: number) => ({
-                      option_text: option.answer,
-                      label: String.fromCharCode(65 + optionIndex), // A, B, C, D
-                      id: optionIndex,
-                      is_correct: option.is_correct,
-                    })
-                  );
+              const mappedQuestions: PreviewQuestion[] =
+                selectedQuestionSet.questions
+                  .filter((q: any) => q.status === 1) // Only include active questions
+                  .slice(0, formData.questions?.length || 10) // Limit to selected number of questions
+                  .map((question: any, index: number) => {
+                    // Map question options to preview format
+                    const options: PreviewOption[] =
+                      question.questionOptions.map(
+                        (option: any, optionIndex: number) => ({
+                          option_text: option.answer,
+                          label: String.fromCharCode(65 + optionIndex), // A, B, C, D
+                          id: optionIndex,
+                          is_correct: option.is_correct,
+                        }),
+                      );
 
-                  return {
-                    question_no: index + 1,
-                    question_text: question.question,
-                    options: options,
-                    timer: formData.game_time_level === "QUESTION" 
-                      ? parseInt(formData.questions?.[index]?.timer || "10") * 1000
-                      : parseInt(formData.game_timer || "60") * 1000,
-                  };
-                });
-              
+                    return {
+                      question_no: index + 1,
+                      question_text: question.question,
+                      options: options,
+                      timer:
+                        formData.game_time_level === "QUESTION"
+                          ? parseInt(
+                              formData.questions?.[index]?.timer || "10",
+                            ) * 1000
+                          : parseInt(formData.game_timer || "60") * 1000,
+                    };
+                  });
+
               setPreviewQuestions(mappedQuestions);
             }
           }
@@ -134,10 +145,30 @@ export default function CreateContest() {
               question_no: 1,
               question_text: "Sample question - API data not available",
               options: [
-                { option_text: "Option A", label: "A", id: 0, is_correct: true },
-                { option_text: "Option B", label: "B", id: 1, is_correct: false },
-                { option_text: "Option C", label: "C", id: 2, is_correct: false },
-                { option_text: "Option D", label: "D", id: 3, is_correct: false },
+                {
+                  option_text: "Option A",
+                  label: "A",
+                  id: 0,
+                  is_correct: true,
+                },
+                {
+                  option_text: "Option B",
+                  label: "B",
+                  id: 1,
+                  is_correct: false,
+                },
+                {
+                  option_text: "Option C",
+                  label: "C",
+                  id: 2,
+                  is_correct: false,
+                },
+                {
+                  option_text: "Option D",
+                  label: "D",
+                  id: 3,
+                  is_correct: false,
+                },
               ],
               timer: 10000,
             },
@@ -147,7 +178,13 @@ export default function CreateContest() {
     };
 
     fetchPreviewQuestions();
-  }, [formData.QuestionCategoryId, formData.set_id, formData.questions?.length, formData.game_time_level, formData.game_timer]);
+  }, [
+    formData.QuestionCategoryId,
+    formData.set_id,
+    formData.questions?.length,
+    formData.game_time_level,
+    formData.game_timer,
+  ]);
 
   const fetchContestDetails = async (contest_id: string) => {
     try {

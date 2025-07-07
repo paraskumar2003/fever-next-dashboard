@@ -2,7 +2,7 @@ import React, { SelectHTMLAttributes } from "react";
 
 interface FormSelectProps extends SelectHTMLAttributes<HTMLSelectElement> {
   label: string;
-  options: { value: string; label: string }[];
+  options: { value: string; label: string; disabled?: boolean }[];
   error?: string;
 }
 
@@ -25,7 +25,7 @@ const FormSelect: React.FC<FormSelectProps> = ({
         {...props}
       >
         {options.map((option) => (
-          <option key={option.value} value={option.value}>
+          <option key={option.value} value={option.value} disabled={option.disabled}>
             {option.label}
           </option>
         ))}

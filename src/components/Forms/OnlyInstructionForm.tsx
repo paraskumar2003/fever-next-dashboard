@@ -112,7 +112,6 @@ const OnlyInstructionForm: React.FC<OnlyInstructionFormProps> = ({
                 updateInstruction(index, { title: e.target.value })
               }
               error={errors[`instructions[${index}].title`]}
-              required
             />
 
             <FormInput

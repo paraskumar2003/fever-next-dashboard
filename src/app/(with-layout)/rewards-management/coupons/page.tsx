@@ -55,6 +55,15 @@ export default function CouponsPage() {
     // Implement delete logic
   };
 
+  const onStatusChange = async (couponId: number, status: number) => {
+    try {
+      await CouponServices.updateCouponStatus(couponId, status);
+      fetchCoupons();
+    } catch (error) {
+      console.error("Error updating coupon status:", error);
+    }
+  };
+
   const handlePaginationModelChange = (page: number) => {
     fetchCoupons({ page });
   };
@@ -68,13 +77,13 @@ export default function CouponsPage() {
   return (
     <div className="min-h-screen p-8">
       <h1 className="mb-8 text-xl">Coupons Management</h1>
-      
+
       <BulkUploadCoupons
         searchString={search}
         onSearchChange={setSearch}
         onUploadSuccess={handleUploadSuccess}
       />
-      
+
       <div className="py-2"></div>
       <CouponSection
         coupons={coupons}
@@ -83,6 +92,7 @@ export default function CouponsPage() {
         onDelete={handleDelete}
         rowCount={rowCount}
         onPaginationModelChange={handlePaginationModelChange}
+        onStatusChange={onStatusChange}
         onSave={async () => {
           await fetchCoupons();
         }}

@@ -1,8 +1,7 @@
-import React from "react";
-import { Eye, Pencil, Trash2 } from "lucide-react";
+import React, { useState } from "react";
+import { Eye, Pencil } from "lucide-react";
 import Button from "../Button";
 import { Coupon } from "@/types/coupon";
-import moment from "moment";
 
 interface CouponRowProps {
   coupon: Coupon;
@@ -10,6 +9,7 @@ interface CouponRowProps {
   onEdit?: (coupon: Coupon) => void;
   onDelete?: (id: number) => void;
   onView?: (coupon: Coupon) => void;
+  onStatusChange?: (id: number, status: number) => void;
 }
 
 const CouponRow: React.FC<CouponRowProps> = ({
@@ -18,7 +18,21 @@ const CouponRow: React.FC<CouponRowProps> = ({
   onEdit,
   onDelete,
   onView,
+  onStatusChange,
 }) => {
+  const [loadingStatus, setLoadingStatus] = useState(false);
+
+  const handleStatusToggle = async () => {
+    setLoadingStatus(true);
+    try {
+      await onStatusChange?.(coupon.id, coupon.status ? 0 : 1);
+    } catch (error) {
+      console.error("Error updating coupon status:", error);
+    } finally {
+      setLoadingStatus(false);
+    }
+  };
+
   return (
     <tr className="transition-colors hover:bg-gray-50">
       <td className="px-4 py-3 text-sm text-gray-600">#{index + 1}</td>
@@ -27,16 +41,25 @@ const CouponRow: React.FC<CouponRowProps> = ({
       </td>
       <td className="px-4 py-3 text-sm text-gray-600">{coupon.coupon_code}</td>
       <td className="px-4 py-3 text-sm text-gray-600">{coupon.type}</td>
-      <td className="px-4 py-3 text-sm text-gray-600">
-        <span
-          className={`inline-flex rounded-full px-2 text-xs font-semibold leading-5 ${
-            coupon.status === "ACTIVE"
-              ? "bg-green-100 text-green-800"
-              : "bg-red-100 text-red-800"
+      {/* active/inactive buttons */}
+      <td className="px-4 py-3 text-sm">
+        <button
+          onClick={handleStatusToggle}
+          disabled={loadingStatus}
+          className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-medium transition-colors ${
+            loadingStatus
+              ? "cursor-wait bg-gray-100 text-gray-400"
+              : !coupon.status
+                ? "bg-green-100 text-green-700 hover:bg-green-200"
+                : "bg-red-100 text-red-700 hover:bg-red-200"
           }`}
         >
-          {coupon.status}
-        </span>
+          {loadingStatus
+            ? "Updating..."
+            : !coupon.status
+              ? "Active"
+              : "Inactive"}
+        </button>
       </td>
       <td className="px-4 py-3 text-sm">
         <div className="flex items-center justify-center space-x-2">

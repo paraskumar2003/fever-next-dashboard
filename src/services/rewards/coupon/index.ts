@@ -106,4 +106,30 @@ export class CouponServices extends ApiServices {
       return { data: null, err: err.message, response: err?.response?.data };
     }
   }
+
+  /**
+   * Update the status of a specific coupon
+   * @param couponId - ID of the coupon
+   * @param status - New status value (e.g., 1 for active)
+   * @returns Promise with API response
+   */
+  static async updateCouponStatus(
+    couponId: number,
+    status: number,
+  ): Promise<any> {
+    try {
+      const response = await this.post(
+        `/v1/rewards/coupon/${couponId}/status`,
+        { status },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        },
+      );
+      return response;
+    } catch (err: any) {
+      return { data: null, err: err.message, response: err?.response?.data };
+    }
+  }
 }

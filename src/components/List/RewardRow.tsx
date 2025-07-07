@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Eye, Pencil, Trash2 } from "lucide-react";
 import Button from "../Button";
 import { Reward } from "@/types/rewards";
@@ -10,6 +10,7 @@ interface RewardRowProps {
   onEdit?: (reward: Reward) => void;
   onDelete?: (id: string) => void;
   onView?: (reward: Reward) => void;
+  onStatusChange?: (id: string, status: number) => void;
 }
 
 const RewardRow: React.FC<RewardRowProps> = ({
@@ -18,14 +19,47 @@ const RewardRow: React.FC<RewardRowProps> = ({
   onEdit,
   onDelete,
   onView,
+  onStatusChange,
 }) => {
+  const [loadingStatus, setLoadingStatus] = useState(false);
+
+  const handleStatusToggle = async () => {
+    if (onStatusChange) {
+      setLoadingStatus(true);
+      await onStatusChange(reward.id, reward.status === 1 ? 0 : 1);
+      setLoadingStatus(false);
+    }
+  };
+
   return (
     <tr className="transition-colors hover:bg-gray-50">
       <td className="px-4 py-3 text-sm text-gray-600">#{index + 1}</td>
       <td className="px-4 py-3 text-sm text-gray-600">
         <div className="font-medium">{reward.name}</div>
       </td>
+      <td className="px-4 py-3 text-sm text-gray-600">
+        <div className="font-medium">{reward.brand_name}</div>
+      </td>
       <td className="px-4 py-3 text-sm text-gray-600">{reward.reward_type}</td>
+      {/* <td className="px-4 py-3 text-sm">
+        <button
+          onClick={handleStatusToggle}
+          disabled={loadingStatus}
+          className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-medium transition-colors ${
+            loadingStatus
+              ? "cursor-wait bg-gray-100 text-gray-400"
+              : !reward.status
+                ? "bg-green-100 text-green-700 hover:bg-green-200"
+                : "bg-red-100 text-red-700 hover:bg-red-200"
+          }`}
+        >
+          {loadingStatus
+            ? "Updating..."
+            : !reward.status
+              ? "Active"
+              : "Inactive"}
+        </button>
+      </td> */}
       <td className="px-4 py-3 text-sm text-gray-600">
         {moment(reward.createdAt).format("YYYY-MM-DD HH:mm")}
       </td>

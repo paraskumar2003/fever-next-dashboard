@@ -385,7 +385,11 @@ export default function CreateContest() {
       console.log(errors);
 
       if (!isValid) {
-        console.log("error in winners form", errors);
+        setContestFormErrors(errors);
+        Notiflix.Notify.warning(
+          "Please fix the validation errors before proceeding.",
+        );
+        return false;
       }
 
       const payload = {
@@ -485,6 +489,7 @@ export default function CreateContest() {
             onSave={() => {
               handleChangeIndex(currentStep);
             }}
+            errors={contestFormErrors}
           />
         );
       case 2:

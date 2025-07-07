@@ -4,14 +4,15 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Menu, LogOut } from "lucide-react";
 import { HeaderProps } from "./types";
+import Cookies from "js-cookie";
 
 export function Header({ onHambugerClick }: HeaderProps) {
   const [isOpen, setIsOpen] = useState(false);
   const router = useRouter();
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
-    sessionStorage.removeItem("token");
+    // Remove token from cookies
+    Cookies.remove("authToken");
     router.push("/login");
   };
 

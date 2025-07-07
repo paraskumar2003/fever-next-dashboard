@@ -21,7 +21,7 @@ const OnlyWinnersForm: React.FC<OnlyWinnersFormProps> = ({
 }) => {
   const [rewards, setRewards] = useState<any[]>([]);
   const [duplicateError, setDuplicateError] = useState<string | null>(null);
-  const { winners } = formData;
+  const { winners, contestPrizes } = formData;
 
   // Helper function to check for duplicate reward IDs
   const checkForDuplicateRewardIds = (winnersArray: typeof winners) => {
@@ -78,7 +78,7 @@ const OnlyWinnersForm: React.FC<OnlyWinnersFormProps> = ({
       const newWinners = Array.from({ length: count }, (_, index) => ({
         reward_id: winners[index]?.reward_id, //parseInt(rewards[0]?.id) || 0
         bucks: winners[index]?.bucks || 0,
-        qty: winners[index]?.qty || 0,
+        qty: winners[index]?.qty,
       }));
       updateFormData({ winners: newWinners });
       // Check for duplicates after updating winners array
@@ -197,20 +197,17 @@ const OnlyWinnersForm: React.FC<OnlyWinnersFormProps> = ({
                 error={errors?.["winners"]?.[index]?.reward_id}
               />
 
-              {rewards.find((r) => r.id == Number(winner.reward_id))
-                ?.reward_type !== "FEVER_BUCKS" && (
-                <FormInput
-                  label="Quantity"
-                  type="number"
-                  min="0"
-                  value={winner.qty?.toString() || "0"}
-                  onChange={(e) =>
-                    updateWinner(index, { qty: Number(e.target.value) })
-                  }
-                  required
-                  error={errors?.["winners"]?.[index]?.qty}
-                />
-              )}
+              <FormInput
+                label="Quantity"
+                type="number"
+                min="0"
+                value={winner.qty?.toString() || "0"}
+                onChange={(e) =>
+                  updateWinner(index, { qty: Number(e.target.value) })
+                }
+                required
+                error={errors?.["winners"]?.[index]?.qty}
+              />
 
               {rewards.find((r) => r.id == Number(winner.reward_id))
                 ?.reward_type === "FEVER_BUCKS" && (

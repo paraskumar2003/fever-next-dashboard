@@ -1,3 +1,5 @@
+import { Reward } from "./types/rewards";
+
 export interface GradientColor {
   direction: "to-right" | "to-left" | "to-top" | "to-bottom";
   start: string;
@@ -106,6 +108,17 @@ export interface ContestFormData {
   flipSet: number;
   isPopular: number;
   set_id: number;
+  contestPrizes: ContestPrizeItem[];
+}
+
+export interface ContestPrizeItem {
+  id: number;
+  prize_name: string;
+  current_quantity: number;
+  quantity: number;
+  fever_bucks: number;
+  reward: Reward;
+  coupon_type: string | null;
 }
 
 export interface TambolaFormData {

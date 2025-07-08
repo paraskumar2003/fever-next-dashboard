@@ -15,6 +15,12 @@ interface OnlyContestFormProps {
   errors?: Record<string, string>;
 }
 
+const getTomorrowDate = () => {
+  const tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  return tomorrow.toISOString().split("T")[0]; // returns YYYY-MM-DD
+};
+
 const OnlyContestForm: React.FC<OnlyContestFormProps> = ({
   formData,
   updateFormData,
@@ -53,6 +59,7 @@ const OnlyContestForm: React.FC<OnlyContestFormProps> = ({
             onChange={(e) => updateFormData({ start_date: e.target.value })}
             error={errors.start_date}
             required
+            min={getTomorrowDate()}
           />
         </div>
         <div>
@@ -75,6 +82,7 @@ const OnlyContestForm: React.FC<OnlyContestFormProps> = ({
             onChange={(e) => updateFormData({ end_date: e.target.value })}
             error={errors.end_date}
             required
+            min={getTomorrowDate()}
           />
         </div>
         <div>
@@ -159,7 +167,6 @@ const OnlyContestForm: React.FC<OnlyContestFormProps> = ({
           }
           onChange={(base64) => updateFormData({ contest_hero_logo: base64 })}
           error={errors.contest_hero_logo}
-          required
         />
       </div>
 

@@ -60,6 +60,7 @@ const RewardRow: React.FC<RewardRowProps> = ({
               : "Inactive"}
         </button>
       </td> */}
+      <td className="px-4 py-3 text-sm text-gray-600">{reward.description}</td>
       <td className="px-4 py-3 text-sm text-gray-600">
         {moment(reward.createdAt).format("YYYY-MM-DD HH:mm")}
       </td>

@@ -124,6 +124,9 @@ const BulkUploadCoupons: React.FC<BulkUploadCouponsProps> = ({
 
   const handleRewardChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedRewardId(e.target.value);
+    setBrandName(
+      rewards.find((reward) => reward.id === e.target.value)?.brand_name || "",
+    );
   };
 
   const handleBrandNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {

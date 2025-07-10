@@ -2,7 +2,7 @@
 
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { Paper } from "@mui/material";
-import React, { useEffect, useState } from "react";
+import React from "react";
 
 type DataTableProps<T> = {
   rows: any;

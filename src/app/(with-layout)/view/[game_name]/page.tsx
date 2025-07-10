@@ -1,6 +1,6 @@
 "use client";
 
-import { PageLayout, SearchBar } from "@/components";
+import { SearchBar } from "@/components";
 import { Table } from "@/components/Tables";
 import { TriviaServices } from "@/services";
 import { Contest } from "@/types/contest";
@@ -8,7 +8,7 @@ import { useParams, useRouter, useSearchParams } from "next/navigation";
 import moment from "moment";
 import { useEffect, useState } from "react";
 import Button from "@/components/Button";
-import { ChartColumnBig, Eye, SquarePen, Trash2 } from "lucide-react";
+import { Eye, SquarePen, Trash2 } from "lucide-react";
 
 export default function ViewContest() {
   const router = useRouter();
@@ -35,8 +35,22 @@ export default function ViewContest() {
     {
       field: "contest_sponsor_logo",
       headerName: "Contest Sponsor Logo",
-
       width: 200,
+      renderCell: (params: any) => (
+        <>
+          {params.value ? (
+            <img
+              src={params.value}
+              alt="Sponsor Logo"
+              style={{ width: 60, height: 40, objectFit: "contain" }}
+            />
+          ) : (
+            <></>
+          )}
+        </>
+      ),
+      sortable: false,
+      filterable: false,
     },
     { field: "contest_time", headerName: "Contest Time", width: 200 },
     { field: "contest_date", headerName: "Contest Date", width: 200 },
@@ -91,14 +105,16 @@ export default function ViewContest() {
           >
             <SquarePen className="text-xs" />
           </Button>
-          <Button
-            variant="danger"
-            color="error"
-            size="sm"
-            onClick={() => handleAction("delete", params.row.id)}
-          >
-            <Trash2 />
-          </Button>
+          {searchParams.get("category") !== "old" && (
+            <Button
+              variant="danger"
+              color="error"
+              size="sm"
+              onClick={() => handleAction("delete", params.row.id)}
+            >
+              <Trash2 />
+            </Button>
+          )}
         </div>
       ),
     },

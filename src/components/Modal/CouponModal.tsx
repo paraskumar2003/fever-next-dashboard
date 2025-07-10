@@ -233,7 +233,6 @@ const CouponModal: React.FC<CouponModalProps> = ({
                 }
                 placeholder="Enter coupon PIN"
                 disabled={isViewMode}
-                required
               />
             )}
 

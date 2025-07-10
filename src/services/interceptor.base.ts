@@ -60,7 +60,7 @@ class ApiServices {
             window.location.href = "/login";
           }
         } else {
-          Notiflix.Notify.info(
+          Notiflix.Notify.failure(
             error?.response?.data?.message || error?.message,
           );
         }

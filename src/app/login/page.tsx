@@ -34,9 +34,9 @@ export default function Login() {
         secure: process.env.NODE_ENV === "production",
         sameSite: "strict",
       });
+      push("/home");
       // Auto redirect after 5 seconds
-      setShowModal(true);
-      setTimeout(() => push("/home"), 5000);
+      // setShowModal(true);
     }
 
     // Show modal

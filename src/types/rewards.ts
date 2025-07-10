@@ -7,4 +7,5 @@ export interface Reward {
   brand_name: string;
   name: string;
   status: number;
+  description: string;
 }

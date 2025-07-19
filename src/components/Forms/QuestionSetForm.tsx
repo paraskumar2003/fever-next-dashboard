@@ -108,17 +108,20 @@ const QuestionSetForm: React.FC<QuestionSetFormProps> = ({
         description: formState.description,
       };
 
+      let res: any;
       if (questionSetData?.id) {
-        await QuestionSetServices.updateQuestionSet(
+        res = await QuestionSetServices.updateQuestionSet(
           questionSetData.id,
           payload,
         );
       } else {
-        await QuestionSetServices.createQuestionSet(payload);
+        res = await QuestionSetServices.createQuestionSet(payload);
       }
 
-      setSuccess(true);
-      if (onSave) await onSave(formState);
+      if (res.data) {
+        if (onSave) await onSave(formState);
+        setSuccess(true);
+      }
     } catch (err: any) {
       setError(
         err.message || "An error occurred while saving the question set",

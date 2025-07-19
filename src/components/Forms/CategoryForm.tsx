@@ -79,14 +79,20 @@ const CategoryForm: React.FC<CategoryFormProps> = ({
       };
 
       // Call the API to create or update the category
+      let res: any;
       if (formState.id) {
-        await CategoryServices.updateCategory(formState.id.toString(), payload);
+        res = await CategoryServices.updateCategory(
+          formState.id.toString(),
+          payload,
+        );
       } else {
-        await CategoryServices.createCategory(payload);
+        res = await CategoryServices.createCategory(payload);
       }
 
-      setSuccess(true);
-      if (onSave) await onSave(formState);
+      if (res.data) {
+        setSuccess(true);
+        if (onSave) await onSave(formState);
+      }
     } catch (err: any) {
       setError(err.message || "An error occurred while saving the category");
     } finally {

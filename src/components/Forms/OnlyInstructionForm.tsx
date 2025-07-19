@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React from "react";
 import FormSection from "@/components/FormSection";
 import FormInput from "@/components/FormInput";
 import ImageUpload from "@/components/ImageUpload";
 import { ContestFormData, Instruction } from "@/types";
+import FormCheckbox from "../FormCheckbox";
 
 interface OnlyInstructionFormProps {
   formData: Partial<ContestFormData>;
@@ -15,12 +16,6 @@ const MAX_INSTRUCTIONS = 5;
 const MAX_FILE_SIZE_MB = 1;
 const REQUIRED_WIDTH = 200;
 const REQUIRED_HEIGHT = 100;
-
-const DEFAULT_INSTRUCTIONS: Instruction[] = [
-  { title: "Step 1", description: "Predict the outcome" },
-  { title: "Step 2", description: "Wait for result" },
-  { title: "Step 3", description: "Claim your reward" },
-];
 
 const OnlyInstructionForm: React.FC<OnlyInstructionFormProps> = ({
   formData,
@@ -135,6 +130,15 @@ const OnlyInstructionForm: React.FC<OnlyInstructionFormProps> = ({
           error={errors.sponsor_logo}
           required
         />
+      </div>
+
+      <div className="mb-6 mt-6">
+        <FormCheckbox
+          onChange={(e) => {
+            updateFormData({ fever_logo: e.target.checked });
+          }}
+          label="Show Fever logo as Default Sponsor Logo"
+        ></FormCheckbox>
       </div>
     </FormSection>
   );

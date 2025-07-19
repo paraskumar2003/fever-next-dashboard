@@ -24,7 +24,6 @@ export function TriviaGamePlay({
   const router = useRouter();
   const contest_id = Cookies.get("contest_id");
 
-  // Define all hooks at the top (unconditionally)
   const [currentQIndex, setCurrentQIndex] = useState<number>(0);
   const [currentQuestion, setCurrentQuestion] = useState<QuestionType>(
     questions[0] || ({} as QuestionType),

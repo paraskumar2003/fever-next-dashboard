@@ -76,7 +76,6 @@ const CouponModal: React.FC<CouponModalProps> = ({
   }, []);
 
   useEffect(() => {
-    console.log({ couponData });
     if (couponData) {
       setFormData({
         ...formData,
@@ -108,31 +107,32 @@ const CouponModal: React.FC<CouponModalProps> = ({
     setLoading(true);
     try {
       const formDataToSend = buildCouponFormData(formData);
+      let res: any;
       if (couponData?.id) {
-        let res = await CouponServices.updateCoupon(
-          couponData.id,
-          formDataToSend,
-        );
+        res = await CouponServices.updateCoupon(couponData.id, formDataToSend);
         if (res.data) Notiflix.Notify.success("Coupon updated successfully!");
       } else {
-        let res = await CouponServices.createCoupon(formDataToSend);
+        res = await CouponServices.createCoupon(formDataToSend);
 
         if (res.data) Notiflix.Notify.success("Coupon created successfully!");
       }
-      setFormData({
-        brand_name: "",
-        rewardId: 1,
-        couponTypeId: "1",
-        coupon_code: "",
-        coupon_pin: "",
-        status: 1,
-        coupon_attachment: undefined,
-      });
 
-      if (onSave) {
-        await onSave();
+      if (res.data) {
+        setFormData({
+          brand_name: "",
+          rewardId: 1,
+          couponTypeId: "1",
+          coupon_code: "",
+          coupon_pin: "",
+          status: 1,
+          coupon_attachment: undefined,
+        });
+
+        if (onSave) {
+          await onSave();
+        }
+        onClose();
       }
-      onClose();
     } catch (error) {
       console.error("Error saving coupon:", error);
       Notiflix.Notify.failure(

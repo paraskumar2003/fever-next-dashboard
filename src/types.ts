@@ -109,6 +109,8 @@ export interface ContestFormData {
   isPopular: number;
   set_id: number;
   contestPrizes: ContestPrizeItem[];
+  fever_logo: boolean;
+  QuestionCount: number;
 }
 
 export interface ContestPrizeItem {

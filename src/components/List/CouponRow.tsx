@@ -37,7 +37,7 @@ const CouponRow: React.FC<CouponRowProps> = ({
     <tr className="transition-colors hover:bg-gray-50">
       <td className="px-4 py-3 text-sm text-gray-600">#{index + 1}</td>
       <td className="px-4 py-3 text-sm text-gray-600">
-        <div className="font-medium">{coupon.brand_name}</div>
+        <div className="font-medium">{coupon?.reward?.brand_name}</div>
       </td>
       <td className="px-4 py-3 text-sm text-gray-600">{coupon.coupon_code}</td>
       <td className="px-4 py-3 text-sm text-gray-600">{coupon.type}</td>
@@ -49,14 +49,14 @@ const CouponRow: React.FC<CouponRowProps> = ({
           className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-medium transition-colors ${
             loadingStatus
               ? "cursor-wait bg-gray-100 text-gray-400"
-              : !coupon.status
+              : coupon.status
                 ? "bg-green-100 text-green-700 hover:bg-green-200"
                 : "bg-red-100 text-red-700 hover:bg-red-200"
           }`}
         >
           {loadingStatus
             ? "Updating..."
-            : !coupon.status
+            : coupon.status
               ? "Active"
               : "Inactive"}
         </button>

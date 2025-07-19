@@ -8,6 +8,9 @@ export interface Coupon {
   status: string;
   createdAt: Date;
   updatedAt: Date;
+  reward?: {
+    brand_name: string;
+  };
 }
 
 export interface CouponFormData {

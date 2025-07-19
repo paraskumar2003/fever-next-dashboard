@@ -76,14 +76,17 @@ const CouponModal: React.FC<CouponModalProps> = ({
   }, []);
 
   useEffect(() => {
+    console.log({ couponData });
     if (couponData) {
       setFormData({
         ...formData,
-        brand_name: couponData.brand_name || "",
+        brand_name: couponData?.reward?.brand_name || "",
         coupon_code: couponData.coupon_code || "",
         coupon_pin: couponData.coupon_pin || "",
-        status: couponData.status || 1,
-        couponTypeId: couponData.couponTypeId || "1",
+        status: couponData.status,
+        couponTypeId: couponData.type === "code" ? "2" : "1",
+        rewardId: couponData.reward.id || 1,
+        coupon_attachment: couponData.coupon_attachment,
       });
     } else {
       setFormData({
@@ -105,13 +108,15 @@ const CouponModal: React.FC<CouponModalProps> = ({
     setLoading(true);
     try {
       const formDataToSend = buildCouponFormData(formData);
-
       if (couponData?.id) {
-        await CouponServices.updateCoupon(couponData.id, formDataToSend);
-        Notiflix.Notify.success("Coupon updated successfully!");
+        let res = await CouponServices.updateCoupon(
+          couponData.id,
+          formDataToSend,
+        );
+        if (res.data) Notiflix.Notify.success("Coupon updated successfully!");
       } else {
-        await CouponServices.createCoupon(formDataToSend);
-        Notiflix.Notify.success("Coupon created successfully!");
+        let res = await CouponServices.createCoupon(formDataToSend);
+        if (res.data) Notiflix.Notify.success("Coupon created successfully!");
       }
 
       if (onSave) {
@@ -136,8 +141,8 @@ const CouponModal: React.FC<CouponModalProps> = ({
   };
 
   useEffect(() => {
-    console.log({ couponTypes });
-  }, [couponTypes]);
+    console.log({ formData });
+  }, [formData]);
 
   return (
     <Modal
@@ -171,7 +176,10 @@ const CouponModal: React.FC<CouponModalProps> = ({
               label="Reward"
               value={formData.rewardId}
               onChange={(e) =>
-                setFormData({ ...formData, rewardId: parseInt(e.target.value) })
+                setFormData({
+                  ...formData,
+                  rewardId: parseInt(e.target.value),
+                })
               }
               options={[
                 { value: "", label: "Select Coupon Type" },
@@ -198,18 +206,6 @@ const CouponModal: React.FC<CouponModalProps> = ({
               disabled={isViewMode}
               required
             />
-
-            {/* 
-            <FormInput
-              label="Brand Name"
-              value={formData.brand_name}
-              onChange={(e) =>
-                setFormData({ ...formData, brand_name: e.target.value })
-              }
-              placeholder="Enter brand name"
-              disabled={isViewMode}
-              required
-            /> */}
 
             {formData.couponTypeId == "2" && (
               <FormInput
@@ -246,6 +242,25 @@ const CouponModal: React.FC<CouponModalProps> = ({
                 required={!couponData?.id}
               />
             )}
+
+            <>
+              {couponData?.coupon_attachment && (
+                <div style={{ marginTop: "8px" }}>
+                  <a
+                    href={couponData.coupon_attachment}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <button
+                      type="button"
+                      className="rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
+                    >
+                      Download Attachment
+                    </button>
+                  </a>
+                </div>
+              )}
+            </>
 
             <FormSelect
               label="Status"

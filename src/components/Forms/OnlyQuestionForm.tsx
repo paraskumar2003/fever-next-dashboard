@@ -93,7 +93,7 @@ const OnlyQuestionForm: React.FC<OnlyQuestionFormProps> = ({
   }, []);
 
   useEffect(() => {
-    if (selectedCategory) fetchSets();
+    if (+selectedCategory!) fetchSets();
   }, [selectedCategory]);
 
   const fetchSets = async () => {
@@ -122,11 +122,6 @@ const OnlyQuestionForm: React.FC<OnlyQuestionFormProps> = ({
     if (!formData.questions) {
       throw new Error("Invalid question value in form!!");
     }
-    console.log(
-      formData.questions,
-      selected,
-      parseInt(selected?.questions as string) < formData?.questions?.length,
-    );
     if (formData.questions && selected) {
       if (parseInt(selected.questions as string) < formData.questions?.length)
         setError(

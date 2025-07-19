@@ -116,8 +116,18 @@ const CouponModal: React.FC<CouponModalProps> = ({
         if (res.data) Notiflix.Notify.success("Coupon updated successfully!");
       } else {
         let res = await CouponServices.createCoupon(formDataToSend);
+
         if (res.data) Notiflix.Notify.success("Coupon created successfully!");
       }
+      setFormData({
+        brand_name: "",
+        rewardId: 1,
+        couponTypeId: "1",
+        coupon_code: "",
+        coupon_pin: "",
+        status: 1,
+        coupon_attachment: undefined,
+      });
 
       if (onSave) {
         await onSave();

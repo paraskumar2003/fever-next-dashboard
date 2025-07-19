@@ -172,18 +172,14 @@ const CouponModal: React.FC<CouponModalProps> = ({
 
         <form onSubmit={handleSubmit} className="p-6">
           <div className="space-y-4">
-            <FormInput
-              label="Brand Name"
-              value={formData.brand_name}
-              disabled={true}
-              required
-            />
-
             <FormSelect
               label="Reward"
               value={formData.rewardId}
               onChange={(e) =>
-                setFormData({ ...formData, rewardId: parseInt(e.target.value) })
+                setFormData({
+                  ...formData,
+                  rewardId: parseInt(e.target.value),
+                })
               }
               options={[
                 { value: "", label: "Select Coupon Type" },

@@ -72,60 +72,60 @@ export const menuItems = [
       },
     ],
   },
-  {
-    id: "tambola",
-    label: "Tambola",
-    icon: HelpCircle, // You can use any icon you prefer for Tambola
-    children: [
-      {
-        id: "upcoming-contests",
-        label: "Upcoming Contests",
-        path: "/view/tambola",
-      },
-      {
-        id: "live-contests",
-        label: "Live Contests",
-        path: "/view/tambola",
-      },
-      {
-        id: "old-contests",
-        label: "Old Contests",
-        path: "/view/tambola",
-      },
-      {
-        id: "draft-contests",
-        label: "Draft Contests",
-        path: "/view/tambola",
-      },
-    ],
-  },
-  {
-    id: "wheel-of-fortune",
-    label: "Wheel of Fortune",
-    icon: Gamepad2, // You can use any icon you prefer for Wheel of Fortune
-    children: [
-      {
-        id: "upcoming-contests",
-        label: "Upcoming Contests",
-        path: "/view/wheel-of-fortune",
-      },
-      {
-        id: "live-contests",
-        label: "Live Contests",
-        path: "/view/wheel-of-fortune",
-      },
-      {
-        id: "old-contests",
-        label: "Old Contests",
-        path: "/view/wheel-of-fortune",
-      },
-      {
-        id: "draft-contests",
-        label: "Draft Contests",
-        path: "/view/wheel-of-fortune",
-      },
-    ],
-  },
+  // {
+  //   id: "tambola",
+  //   label: "Tambola",
+  //   icon: HelpCircle, // You can use any icon you prefer for Tambola
+  //   children: [
+  //     {
+  //       id: "upcoming-contests",
+  //       label: "Upcoming Contests",
+  //       path: "/view/tambola",
+  //     },
+  //     {
+  //       id: "live-contests",
+  //       label: "Live Contests",
+  //       path: "/view/tambola",
+  //     },
+  //     {
+  //       id: "old-contests",
+  //       label: "Old Contests",
+  //       path: "/view/tambola",
+  //     },
+  //     {
+  //       id: "draft-contests",
+  //       label: "Draft Contests",
+  //       path: "/view/tambola",
+  //     },
+  //   ],
+  // },
+  // {
+  //   id: "wheel-of-fortune",
+  //   label: "Wheel of Fortune",
+  //   icon: Gamepad2, // You can use any icon you prefer for Wheel of Fortune
+  //   children: [
+  //     {
+  //       id: "upcoming-contests",
+  //       label: "Upcoming Contests",
+  //       path: "/view/wheel-of-fortune",
+  //     },
+  //     {
+  //       id: "live-contests",
+  //       label: "Live Contests",
+  //       path: "/view/wheel-of-fortune",
+  //     },
+  //     {
+  //       id: "old-contests",
+  //       label: "Old Contests",
+  //       path: "/view/wheel-of-fortune",
+  //     },
+  //     {
+  //       id: "draft-contests",
+  //       label: "Draft Contests",
+  //       path: "/view/wheel-of-fortune",
+  //     },
+  //   ],
+  // },
 
   {
     id: "rewards-management",

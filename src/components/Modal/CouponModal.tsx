@@ -108,7 +108,6 @@ const CouponModal: React.FC<CouponModalProps> = ({
     setLoading(true);
     try {
       const formDataToSend = buildCouponFormData(formData);
-
       if (couponData?.id) {
         let res = await CouponServices.updateCoupon(
           couponData.id,

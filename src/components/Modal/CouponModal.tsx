@@ -110,11 +110,14 @@ const CouponModal: React.FC<CouponModalProps> = ({
       const formDataToSend = buildCouponFormData(formData);
 
       if (couponData?.id) {
-        await CouponServices.updateCoupon(couponData.id, formDataToSend);
-        Notiflix.Notify.success("Coupon updated successfully!");
+        let res = await CouponServices.updateCoupon(
+          couponData.id,
+          formDataToSend,
+        );
+        if (res.data) Notiflix.Notify.success("Coupon updated successfully!");
       } else {
-        await CouponServices.createCoupon(formDataToSend);
-        Notiflix.Notify.success("Coupon created successfully!");
+        let res = await CouponServices.createCoupon(formDataToSend);
+        if (res.data) Notiflix.Notify.success("Coupon created successfully!");
       }
 
       if (onSave) {

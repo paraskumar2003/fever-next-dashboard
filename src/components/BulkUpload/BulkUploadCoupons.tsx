@@ -245,6 +245,7 @@ const BulkUploadCoupons: React.FC<BulkUploadCouponsProps> = ({
                     placeholder="Enter brand name"
                     disabled={isUploading}
                     required
+                    readOnly={true}
                   />
 
                   <FormInput

@@ -18,6 +18,7 @@ const QuestionSetsPage = () => {
     useState<QuestionSet | null>(null);
   const [isViewMode, setIsViewMode] = useState(false);
   const [searchString, setSearchString] = useState("");
+  const [rowCount, setRowCount] = useState(0);
   const modal = useModal();
 
   const [paginationModel, setPaginationModel] = useState<{
@@ -31,10 +32,13 @@ const QuestionSetsPage = () => {
   const fetchQuestionSets = async (args?: fetchQuestionSetsArgs) => {
     try {
       const { data } = await QuestionSetServices.getAllQuestionSets({
-        ...args,
+        page: args?.page || paginationModel.page,
+        limit: args?.limit || paginationModel.pageSize,
+        ...(args?.q ? { q: args.q } : {}),
       });
       if (data?.data?.rows) {
         setQuestionSets(data.data.rows);
+        setRowCount(data.data.meta?.total || data.data.rows.length);
       }
     } catch (error) {
       console.error("Error fetching question sets:", error);
@@ -42,25 +46,22 @@ const QuestionSetsPage = () => {
   };
 
   useEffect(() => {
-    if (!searchString) {
+    if (searchString) {
+      const timerId = setTimeout(() => {
+        fetchQuestionSets({
+          q: searchString,
+          page: paginationModel.page,
+          limit: paginationModel.pageSize,
+        });
+      }, 500);
+      return () => clearTimeout(timerId);
+    } else {
       fetchQuestionSets({
         page: paginationModel.page,
         limit: paginationModel.pageSize,
       });
-      return;
     }
-    // Set a timer to delay the API call
-    const timerId = setTimeout(() => {
-      fetchQuestionSets({
-        q: searchString,
-      });
-    }, 500); // Adjust the delay (in milliseconds) as needed
-
-    // Clear the timer if the user types again before the delay is over
-    return () => {
-      clearTimeout(timerId);
-    };
-  }, [searchString, paginationModel]); // Re-run the effect when searchString
+  }, [searchString, paginationModel]);
 
   const handleQuestionSetView = (questionSet: QuestionSet) => {
     setIsViewMode(true);
@@ -90,10 +91,6 @@ const QuestionSetsPage = () => {
       page,
       pageSize,
     });
-    setPaginationModel({
-      page,
-      pageSize,
-    });
   };
 
   return (
@@ -119,8 +116,9 @@ const QuestionSetsPage = () => {
             onSave={async (formData: QuestionSetFormData) => {
               await fetchQuestionSets();
             }}
-            rowCount={questionSets.length}
+            rowCount={rowCount}
             onPaginationModelChange={handlePaginationModelChange}
+            paginationModel={paginationModel}
           />
 
           <QuestionSetModal

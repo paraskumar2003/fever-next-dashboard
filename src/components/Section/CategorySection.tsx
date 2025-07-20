@@ -15,6 +15,7 @@ interface CategorySectionProps {
   onSave: (formData: CategoryFormData) => Promise<void>;
   rowCount: number;
   onPaginationModelChange: (page: number, pageSize: number) => void;
+  paginationModel: { page: number; pageSize: number };
 }
 
 const CategorySection: React.FC<CategorySectionProps> = ({
@@ -25,6 +26,7 @@ const CategorySection: React.FC<CategorySectionProps> = ({
   onSave,
   rowCount,
   onPaginationModelChange,
+  paginationModel,
 }) => {
   const addCategoryModal = useModal();
 
@@ -45,6 +47,7 @@ const CategorySection: React.FC<CategorySectionProps> = ({
         onDelete={onDelete}
         rowCount={rowCount}
         onPaginationModelChange={onPaginationModelChange}
+        paginationModel={paginationModel}
       />
 
       <CategoryModal

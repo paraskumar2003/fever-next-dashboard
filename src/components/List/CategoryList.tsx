@@ -18,6 +18,7 @@ interface CategoryListProps {
   onStatusChange?: (id: number, status: number) => void;
   rowCount: number;
   onPaginationModelChange: (page: number, pageSize: number) => void;
+  paginationModel: { page: number; pageSize: number };
 }
 
 const CategoryList: React.FC<CategoryListProps> = ({
@@ -28,33 +29,28 @@ const CategoryList: React.FC<CategoryListProps> = ({
   onStatusChange,
   rowCount,
   onPaginationModelChange,
+  paginationModel,
 }) => {
-  const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
 
   const handlePageSizeChange = (newPageSize: number) => {
-    setPageSize(newPageSize);
-    setCurrentPage(1); // Reset to first page when page size changes
     onPaginationModelChange(1, newPageSize);
   };
 
   const handleNextPage = () => {
-    const nextPage = currentPage + 1;
-    setCurrentPage(nextPage);
-    onPaginationModelChange(nextPage, pageSize);
+    const nextPage = paginationModel.page + 1;
+    onPaginationModelChange(nextPage, paginationModel.pageSize);
   };
 
   const handlePreviousPage = () => {
-    const prevPage = currentPage - 1;
-    setCurrentPage(prevPage);
-    onPaginationModelChange(prevPage, pageSize);
+    const prevPage = paginationModel.page - 1;
+    onPaginationModelChange(prevPage, paginationModel.pageSize);
   };
 
-  const canGoNext = (currentPage - 1) * pageSize + categories.length < rowCount;
-  const canGoPrevious = currentPage > 1;
+  const canGoNext = (paginationModel.page - 1) * paginationModel.pageSize + categories.length < rowCount;
+  const canGoPrevious = paginationModel.page > 1;
 
-  const startItem = (currentPage - 1) * pageSize + 1;
-  const endItem = Math.min(rowCount, currentPage * pageSize);
+  const startItem = (paginationModel.page - 1) * paginationModel.pageSize + 1;
+  const endItem = Math.min(rowCount, paginationModel.page * paginationModel.pageSize);
 
   return (
     <div className="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-lg">
@@ -134,7 +130,7 @@ const CategoryList: React.FC<CategoryListProps> = ({
             <div className="flex items-center space-x-2">
               <select
                 id="pageSize"
-                value={pageSize}
+                value={paginationModel.pageSize}
                 onChange={(e) => handlePageSizeChange(Number(e.target.value))}
                 className="rounded-md border border-gray-300 bg-white px-3 py-1 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
               >

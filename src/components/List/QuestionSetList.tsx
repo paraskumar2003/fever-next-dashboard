@@ -22,7 +22,6 @@ const QuestionSetList: React.FC<QuestionSetListProps> = ({
   onPaginationModelChange,
   paginationModel,
 }) => {
-
   const handlePageSizeChange = (newPageSize: number) => {
     onPaginationModelChange(1, newPageSize);
   };
@@ -37,11 +36,17 @@ const QuestionSetList: React.FC<QuestionSetListProps> = ({
     onPaginationModelChange(prevPage, paginationModel.pageSize);
   };
 
-  const canGoNext = (paginationModel.page - 1) * paginationModel.pageSize + questionSets.length < rowCount;
+  const canGoNext =
+    (paginationModel.page - 1) * paginationModel.pageSize +
+      questionSets.length <
+    rowCount;
   const canGoPrevious = paginationModel.page > 1;
 
   const startItem = (paginationModel.page - 1) * paginationModel.pageSize + 1;
-  const endItem = Math.min(rowCount, paginationModel.page * paginationModel.pageSize);
+  const endItem = Math.min(
+    rowCount,
+    paginationModel.page * paginationModel.pageSize,
+  );
 
   return (
     <div className="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-lg">
@@ -74,7 +79,10 @@ const QuestionSetList: React.FC<QuestionSetListProps> = ({
               {questionSets.map((questionSet, index) => (
                 <QuestionSetRow
                   key={questionSet.id}
-                  index={index}
+                  index={
+                    (paginationModel.page - 1) * paginationModel.pageSize +
+                    index
+                  }
                   questionSet={questionSet}
                   onView={onView}
                   onEdit={onEdit}

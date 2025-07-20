@@ -2,12 +2,13 @@
 
 import { SearchBar } from "@/components";
 import ContestList from "@/components/List/ContestList";
-import { TriviaServices } from "@/services";
+import { TriviaServices, ContestServices } from "@/services";
 import { Contest } from "@/types/contest";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import moment from "moment";
 import { useEffect, useState } from "react";
 import FormSection from "@/components/FormSection";
+import Notiflix from "notiflix";
 
 export default function ViewContest() {
   const router = useRouter();
@@ -39,9 +40,23 @@ export default function ViewContest() {
     console.log("Delete contest:", id);
   };
 
-  const handleDuplicate = (contest: Contest) => {
-    // TODO: Implement duplicate functionality
-    console.log("Duplicate contest:", contest);
+  const handleDuplicate = async (contest: Contest) => {
+    try {
+      const response = await ContestServices.duplicateContest(contest.id);
+      
+      if (response.data) {
+        Notiflix.Notify.success("Contest duplicated successfully!");
+        // Refresh the contests list
+        await fetchContests();
+      } else {
+        Notiflix.Notify.failure(
+          response.response?.message || "Failed to duplicate contest"
+        );
+      }
+    } catch (error) {
+      console.error("Error duplicating contest:", error);
+      Notiflix.Notify.failure("An error occurred while duplicating the contest");
+    }
   };
 
   const { game_name } = useParams();

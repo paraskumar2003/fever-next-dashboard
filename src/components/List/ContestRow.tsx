@@ -3,6 +3,7 @@ import { Eye, Pencil, Trash2, Copy } from "lucide-react";
 import Button from "../Button";
 import { Contest } from "@/types/contest";
 import moment from "moment";
+import { useState } from "react";
 
 interface ContestRowProps {
   contest: Contest;
@@ -31,27 +32,15 @@ const ContestRow: React.FC<ContestRowProps> = ({
 }) => {
   const [loadingStatus, setLoadingStatus] = useState(false);
 
-  const getStatusInfo = (status: number) => {
-    switch (status) {
-      case 0:
-        return { label: "Draft", color: "bg-blue-100 text-blue-700 hover:bg-blue-200" };
-      case 1:
-        return { label: "Active", color: "bg-green-100 text-green-700 hover:bg-green-200" };
-      case 2:
-        return { label: "Inactive", color: "bg-red-100 text-red-700 hover:bg-red-200" };
-      default:
-        return { label: "Unknown", color: "bg-gray-100 text-gray-700 hover:bg-gray-200" };
-    }
+  const getStatusInfo = (isPublished: boolean) => {
+    return isPublished
+      ? { label: "Active", color: "bg-green-100 text-green-700 hover:bg-green-200" }
+      : { label: "Draft", color: "bg-blue-100 text-blue-700 hover:bg-blue-200" };
   };
 
-  const getNextStatus = (currentStatus: number) => {
-    // Cycle through statuses: Draft -> Active -> Inactive -> Draft
-    switch (currentStatus) {
-      case 0: return 1; // Draft -> Active
-      case 1: return 2; // Active -> Inactive
-      case 2: return 0; // Inactive -> Draft
-      default: return 1;
-    }
+  const getNextStatus = (isPublished: boolean) => {
+    // Toggle between Draft (0) and Active (1)
+    return isPublished ? 0 : 1;
   };
 
   const handleStatusToggle = async () => {
@@ -59,7 +48,7 @@ const ContestRow: React.FC<ContestRowProps> = ({
     
     setLoadingStatus(true);
     try {
-      const nextStatus = getNextStatus(contest.status);
+      const nextStatus = getNextStatus(contest.isPublished);
       await onStatusChange(contest.id, nextStatus);
     } catch (error) {
       console.error("Error updating contest status:", error);
@@ -68,7 +57,7 @@ const ContestRow: React.FC<ContestRowProps> = ({
     }
   };
 
-  const statusInfo = getStatusInfo(contest.status);
+  const statusInfo = getStatusInfo(contest.isPublished);
   const canChangeStatus = category === "live" || category === "upcoming";
 
   return (

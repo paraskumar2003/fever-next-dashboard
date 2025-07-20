@@ -32,21 +32,30 @@ const ContestRow: React.FC<ContestRowProps> = ({
 }) => {
   const [loadingStatus, setLoadingStatus] = useState(false);
 
-  const getStatusInfo = (isPublished: boolean) => {
+  const getStatusInfo = (isPublished: boolean, currentCategory?: string) => {
+    if (currentCategory === "draft") {
+      return {
+        displayLabel: "Draft",
+        buttonLabel: "Activate",
+        color: "bg-blue-100 text-blue-700 hover:bg-green-200",
+        nextStatus: 1, // Always activate (set to active)
+      };
+    }
+    
+    // For live and upcoming categories - toggle behavior
     return isPublished
       ? {
-          label: "Click to Draft",
-          color: "bg-green-100 text-green-700 hover:bg-green-200",
+          displayLabel: "Active",
+          buttonLabel: "Set to Draft",
+          color: "bg-green-100 text-green-700 hover:bg-blue-200",
+          nextStatus: 0, // Set to draft
         }
       : {
-          label: "Draft",
-          color: "bg-blue-100 text-blue-700 hover:bg-blue-200",
+          displayLabel: "Draft", 
+          buttonLabel: "Activate",
+          color: "bg-blue-100 text-blue-700 hover:bg-green-200",
+          nextStatus: 1, // Set to active
         };
-  };
-
-  const getNextStatus = (isPublished: boolean) => {
-    // Toggle between Draft (0) and Active (1)
-    return isPublished ? 0 : 1;
   };
 
   const handleStatusToggle = async () => {
@@ -54,8 +63,8 @@ const ContestRow: React.FC<ContestRowProps> = ({
 
     setLoadingStatus(true);
     try {
-      const nextStatus = getNextStatus(contest.isPublished);
-      await onStatusChange(contest.id, nextStatus);
+      const statusInfo = getStatusInfo(contest.isPublished, category);
+      await onStatusChange(contest.id, statusInfo.nextStatus);
     } catch (error) {
       console.error("Error updating contest status:", error);
     } finally {
@@ -63,8 +72,8 @@ const ContestRow: React.FC<ContestRowProps> = ({
     }
   };
 
-  const statusInfo = getStatusInfo(contest.isPublished);
-  const canChangeStatus = category === "live" || category === "upcoming";
+  const statusInfo = getStatusInfo(contest.isPublished, category);
+  const canChangeStatus = category === "live" || category === "upcoming" || category === "draft";
 
   return (
     <tr className="transition-colors hover:bg-gray-50">
@@ -116,13 +125,13 @@ const ContestRow: React.FC<ContestRowProps> = ({
                 : statusInfo.color
             }`}
           >
-            {loadingStatus ? "Updating..." : statusInfo.label}
+            {loadingStatus ? "Updating..." : statusInfo.buttonLabel}
           </button>
         ) : (
           <span
             className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-medium ${statusInfo.color.replace("hover:", "")}`}
           >
-            {statusInfo.label}
+            {statusInfo.displayLabel}
           </span>
         )}
       </td>

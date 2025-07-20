@@ -1,60 +1,56 @@
 import React, { useState } from "react";
-import CategoryRow from "./CategoryRow";
+import ContestRow from "./ContestRow";
 import ListWrapper from "./ListWrapper";
+import { Contest } from "@/types/contest";
 
-export interface Category {
-  id: number;
-  name: string;
-  description: string;
-  questions: any[];
-  status?: number;
-}
-
-interface CategoryListProps {
-  categories: Category[];
-  onEdit?: (category: Category) => void;
-  onDelete?: (id: number) => void;
-  onView?: (category: Category) => void;
-  onStatusChange?: (id: number, status: number) => void;
+interface ContestListProps {
+  contests: Contest[];
+  category?: string;
+  onView?: (contest: Contest) => void;
+  onEdit?: (contest: Contest) => void;
+  onDelete?: (id: string) => void;
+  onDuplicate?: (contest: Contest) => void;
+  onStatusChange?: (id: string, status: number) => void;
   rowCount: number;
   onPaginationModelChange: (page: number, pageSize: number) => void;
   paginationModel: { page: number; pageSize: number };
 }
 
-const CategoryList: React.FC<CategoryListProps> = ({
-  categories,
+const ContestList: React.FC<ContestListProps> = ({
+  contests,
+  category,
+  onView,
   onEdit,
   onDelete,
-  onView,
+  onDuplicate,
   onStatusChange,
   rowCount,
   onPaginationModelChange,
   paginationModel,
 }) => {
+  const [pageSize, setPageSize] = useState(10);
+
   const handlePageSizeChange = (newPageSize: number) => {
+    setPageSize(newPageSize);
     onPaginationModelChange(1, newPageSize);
   };
 
   const handleNextPage = () => {
     const nextPage = paginationModel.page + 1;
-    onPaginationModelChange(nextPage, paginationModel.pageSize);
+    onPaginationModelChange(nextPage, pageSize);
   };
 
   const handlePreviousPage = () => {
     const prevPage = paginationModel.page - 1;
-    onPaginationModelChange(prevPage, paginationModel.pageSize);
+    onPaginationModelChange(prevPage, pageSize);
   };
 
   const canGoNext =
-    (paginationModel.page - 1) * paginationModel.pageSize + categories.length <
-    rowCount;
+    (paginationModel.page - 1) * pageSize + contests.length < rowCount;
   const canGoPrevious = paginationModel.page > 1;
 
-  const startItem = (paginationModel.page - 1) * paginationModel.pageSize + 1;
-  const endItem = Math.min(
-    rowCount,
-    paginationModel.page * paginationModel.pageSize,
-  );
+  const startItem = (paginationModel.page - 1) * pageSize + 1;
+  const endItem = Math.min(rowCount, paginationModel.page * pageSize);
 
   return (
     <div className="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-lg">
@@ -67,13 +63,34 @@ const CategoryList: React.FC<CategoryListProps> = ({
                   ID
                 </th>
                 <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">
-                  Name
+                  Contest Name
                 </th>
                 <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">
-                  Description
+                  Contest Fee
                 </th>
                 <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">
-                  Questions Count
+                  Sponsor Logo
+                </th>
+                <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">
+                  Start Date
+                </th>
+                <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">
+                  Start Time
+                </th>
+                <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">
+                  End Date
+                </th>
+                <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">
+                  End Time
+                </th>
+                <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">
+                  Contest Type
+                </th>
+                <th className="px-8 py-3 text-left text-sm font-medium text-gray-600">
+                  Status
+                </th>
+                <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">
+                  Sponsor Name
                 </th>
                 <th className="px-4 py-3 text-center text-sm font-medium text-gray-600">
                   Actions
@@ -81,26 +98,27 @@ const CategoryList: React.FC<CategoryListProps> = ({
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              {categories.map((category, index) => (
-                <CategoryRow
-                  key={category.id}
-                  index={
-                    (paginationModel.page - 1) * paginationModel.pageSize +
-                    index
-                  }
+              {contests.map((contest, index) => (
+                <ContestRow
+                  key={contest.id}
+                  index={index}
+                  contest={contest}
                   category={category}
                   onView={onView}
                   onEdit={onEdit}
                   onDelete={onDelete}
+                  onDuplicate={onDuplicate}
                   onStatusChange={onStatusChange}
+                  page={paginationModel.page}
+                  pageSize={paginationModel.pageSize}
                 />
               ))}
             </tbody>
           </table>
 
-          {categories.length === 0 && (
+          {contests.length === 0 && (
             <div className="py-8 text-center text-gray-500">
-              No categories found
+              No contests found
             </div>
           )}
         </div>
@@ -137,14 +155,14 @@ const CategoryList: React.FC<CategoryListProps> = ({
             <div className="flex items-center space-x-2">
               <select
                 id="pageSize"
-                value={paginationModel.pageSize}
+                value={pageSize}
                 onChange={(e) => handlePageSizeChange(Number(e.target.value))}
                 className="rounded-md border border-gray-300 bg-white px-3 py-1 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
               >
+                <option value={5}>5</option>
                 <option value={10}>10</option>
-                <option value={20}>20</option>
+                <option value={25}>25</option>
                 <option value={50}>50</option>
-                <option value={100}>100</option>
               </select>
             </div>
             <nav
@@ -197,4 +215,4 @@ const CategoryList: React.FC<CategoryListProps> = ({
   );
 };
 
-export default CategoryList;
+export default ContestList;

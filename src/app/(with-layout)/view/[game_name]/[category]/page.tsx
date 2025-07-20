@@ -4,7 +4,7 @@ import { SearchBar } from "@/components";
 import ContestList from "@/components/List/ContestList";
 import { TriviaServices, ContestServices } from "@/services";
 import { Contest } from "@/types/contest";
-import { useParams, useRouter, useSearchParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import moment from "moment";
 import { useEffect, useState } from "react";
 import FormSection from "@/components/FormSection";
@@ -13,7 +13,6 @@ import Notiflix from "notiflix";
 export default function ViewContest() {
   const router = useRouter();
   const params = useParams();
-  const searchParams = useSearchParams();
 
   const [contests, setContests] = useState<Contest[]>([]);
   const [totalCount, setTotalCount] = useState<number>(0);
@@ -59,7 +58,27 @@ export default function ViewContest() {
     }
   };
 
-  const { game_name } = useParams();
+  const handleStatusChange = async (contestId: string, status: number) => {
+    try {
+      const response = await TriviaServices.updateContestStatus(contestId, status);
+      
+      if (response.data) {
+        const statusLabels = { 0: "Draft", 1: "Active", 2: "Inactive" };
+        Notiflix.Notify.success(`Contest status updated to ${statusLabels[status as keyof typeof statusLabels]}!`);
+        // Refresh the contests list
+        await fetchContests();
+      } else {
+        Notiflix.Notify.failure(
+          response.response?.message || "Failed to update contest status"
+        );
+      }
+    } catch (error) {
+      console.error("Error updating contest status:", error);
+      Notiflix.Notify.failure("An error occurred while updating the contest status");
+    }
+  };
+
+  const { game_name, category } = params;
 
   const fetchContests = async () => {
     setLoading(true);
@@ -73,7 +92,7 @@ export default function ViewContest() {
         filter.q = search;
       }
 
-      filter.category = searchParams.get("category") ?? undefined;
+      filter.category = category ?? undefined;
 
       const { data } = await TriviaServices.getContests(filter);
 
@@ -100,7 +119,7 @@ export default function ViewContest() {
     } else {
       fetchContests();
     }
-  }, [search, paginationModel, searchParams]);
+  }, [search, paginationModel, category]);
 
   const handlePaginationModelChange = (page: number, pageSize: number) => {
     console.log("call for change", page, pageSize);
@@ -120,7 +139,7 @@ export default function ViewContest() {
           Contest Overview - (
           {String(game_name).charAt(0).toUpperCase() +
             String(game_name).slice(1).toLowerCase()}
-          )
+          ) - {String(category).charAt(0).toUpperCase() + String(category).slice(1)}
         </h1>
       </div>
 
@@ -136,11 +155,12 @@ export default function ViewContest() {
       <FormSection title="Contests">
         <ContestList
           contests={contests}
-          category={searchParams.get("category") || undefined}
+          category={category as string || undefined}
           onView={handleView}
           onEdit={handleEdit}
           onDelete={handleDelete}
           onDuplicate={handleDuplicate}
+          onStatusChange={handleStatusChange}
           rowCount={totalCount}
           onPaginationModelChange={handlePaginationModelChange}
           paginationModel={paginationModel}

@@ -10,6 +10,7 @@ interface QuestionSetListProps {
   onView?: (questionSet: QuestionSet) => void;
   rowCount: number;
   onPaginationModelChange: (page: number, pageSize: number) => void;
+  paginationModel: { page: number; pageSize: number };
 }
 
 const QuestionSetList: React.FC<QuestionSetListProps> = ({
@@ -19,33 +20,33 @@ const QuestionSetList: React.FC<QuestionSetListProps> = ({
   onView,
   rowCount,
   onPaginationModelChange,
+  paginationModel,
 }) => {
-  const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
-
   const handlePageSizeChange = (newPageSize: number) => {
-    setPageSize(newPageSize);
-    setCurrentPage(1);
     onPaginationModelChange(1, newPageSize);
   };
 
   const handleNextPage = () => {
-    const nextPage = currentPage + 1;
-    setCurrentPage(nextPage);
-    onPaginationModelChange(nextPage, pageSize);
+    const nextPage = paginationModel.page + 1;
+    onPaginationModelChange(nextPage, paginationModel.pageSize);
   };
 
   const handlePreviousPage = () => {
-    const prevPage = currentPage - 1;
-    setCurrentPage(prevPage);
-    onPaginationModelChange(prevPage, pageSize);
+    const prevPage = paginationModel.page - 1;
+    onPaginationModelChange(prevPage, paginationModel.pageSize);
   };
 
-  const canGoNext = (currentPage - 1) * pageSize + questionSets.length < rowCount;
-  const canGoPrevious = currentPage > 1;
+  const canGoNext =
+    (paginationModel.page - 1) * paginationModel.pageSize +
+      questionSets.length <
+    rowCount;
+  const canGoPrevious = paginationModel.page > 1;
 
-  const startItem = (currentPage - 1) * pageSize + 1;
-  const endItem = Math.min(rowCount, currentPage * pageSize);
+  const startItem = (paginationModel.page - 1) * paginationModel.pageSize + 1;
+  const endItem = Math.min(
+    rowCount,
+    paginationModel.page * paginationModel.pageSize,
+  );
 
   return (
     <div className="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-lg">
@@ -78,7 +79,10 @@ const QuestionSetList: React.FC<QuestionSetListProps> = ({
               {questionSets.map((questionSet, index) => (
                 <QuestionSetRow
                   key={questionSet.id}
-                  index={index}
+                  index={
+                    (paginationModel.page - 1) * paginationModel.pageSize +
+                    index
+                  }
                   questionSet={questionSet}
                   onView={onView}
                   onEdit={onEdit}
@@ -127,7 +131,7 @@ const QuestionSetList: React.FC<QuestionSetListProps> = ({
             <div className="flex items-center space-x-2">
               <select
                 id="pageSize"
-                value={pageSize}
+                value={paginationModel.pageSize}
                 onChange={(e) => handlePageSizeChange(Number(e.target.value))}
                 className="rounded-md border border-gray-300 bg-white px-3 py-1 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
               >

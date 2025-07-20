@@ -15,6 +15,7 @@ interface QuestionSetSectionProps {
   onSave: (formData: QuestionSetFormData) => Promise<void>;
   rowCount: number;
   onPaginationModelChange: (page: number, pageSize: number) => void;
+  paginationModel: { page: number; pageSize: number };
 }
 
 const QuestionSetSection: React.FC<QuestionSetSectionProps> = ({
@@ -25,6 +26,7 @@ const QuestionSetSection: React.FC<QuestionSetSectionProps> = ({
   onSave,
   rowCount,
   onPaginationModelChange,
+  paginationModel,
 }) => {
   const addQuestionSetModal = useModal();
 
@@ -45,6 +47,7 @@ const QuestionSetSection: React.FC<QuestionSetSectionProps> = ({
         onDelete={onDelete}
         rowCount={rowCount}
         onPaginationModelChange={onPaginationModelChange}
+        paginationModel={paginationModel}
       />
 
       <QuestionSetModal

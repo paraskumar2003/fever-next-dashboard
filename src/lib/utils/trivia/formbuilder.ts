@@ -74,6 +74,7 @@ export function buildInstructionFormData(
 
   fd.append("contestId", contest_id || formData.contest_id); // Note: 'contest_id' seems to be a global variable here.
   fd.append("megaPrizeName", formData.mega_prize_name || "");
+  fd.append("fever_logo", formData.fever_logo || "");
   if (formData.sponsor_logo instanceof File) {
     fd.append(
       "sponsored_logo",

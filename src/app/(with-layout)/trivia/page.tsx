@@ -383,7 +383,6 @@ export default function CreateContest() {
     try {
       // Validate form data
       let { isValid, errors } = await validateContestFormData(formData);
-      console.log({ errors });
 
       if (!isValid) {
         // Set errors in state for display
@@ -403,10 +402,11 @@ export default function CreateContest() {
       push(`/trivia?contest_id=${data?.data.id}`);
       if (data?.data?.id) {
         updateFormData({ contest_id: data.data.id });
+        Notiflix.Notify.success("Contest Details saved successfully!");
+        setFormSubmissionStatus((prev) => ({ ...prev, contestDetails: true }));
+        return true; // Indicate success
       }
-      setFormSubmissionStatus((prev) => ({ ...prev, contestDetails: true }));
-      Notiflix.Notify.success("Contest Details saved successfully!");
-      return true; // Indicate success
+      return false;
     } catch (error: any) {
       Notiflix.Notify.failure("Failed to save Contest Details.");
       console.error("Error saving contest:", error);
@@ -420,8 +420,6 @@ export default function CreateContest() {
     Notiflix.Loading.circle();
     try {
       let { isValid, errors } = await validateInstructionFormData(formData);
-
-      console.log({ errors });
 
       if (!isValid) {
         // Set errors in state for display
@@ -454,6 +452,8 @@ export default function CreateContest() {
     Notiflix.Loading.circle();
     try {
       let { isValid, errors } = await validateQuestionFormData(formData);
+
+      console.log({ errors });
 
       if (!isValid) {
         // Set errors in state for display

@@ -53,22 +53,22 @@ export const menuItems = [
       {
         id: "upcoming-contests",
         label: "Upcoming Contests",
-        path: "/view/trivia?category=upcoming",
+        path: "/view/trivia/upcoming",
       },
       {
         id: "live-contests",
         label: "Live Contests",
-        path: "/view/trivia?category=live",
+        path: "/view/trivia/live",
       },
       {
         id: "old-contests",
         label: "Old Contests",
-        path: "/view/trivia?category=old",
+        path: "/view/trivia/old",
       },
       {
         id: "draft-contests",
         label: "Draft Contests",
-        path: "/view/trivia?category=draft",
+        path: "/view/trivia/draft",
       },
     ],
   },

@@ -35,6 +35,18 @@ export class ContestServices extends ApiServices {
     }
   }
 
+  static async duplicateContest(contest_id: string) {
+    try {
+      const response = await this.post<T>(
+        `/v1/trivia/duplicate-contest/${contest_id}`,
+        {},
+      );
+      return response;
+    } catch (err: any) {
+      return { data: null, err: err.message, response: err?.response?.data };
+    }
+  }
+
   static async createContestPrize(payload: ContestPrizePayload) {
     try {
       // Ensure bucks has a default value of 0

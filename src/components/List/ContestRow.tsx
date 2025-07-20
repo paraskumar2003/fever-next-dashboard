@@ -1,0 +1,226 @@
+import React from "react";
+import { Eye, Pencil, Trash2, Copy } from "lucide-react";
+import Button from "../Button";
+import { Contest } from "@/types/contest";
+import moment from "moment";
+import { useState } from "react";
+
+interface ContestRowProps {
+  contest: Contest;
+  index: number;
+  category?: string;
+  onView?: (contest: Contest) => void;
+  onEdit?: (contest: Contest) => void;
+  onDelete?: (id: string) => void;
+  onDuplicate?: (contest: Contest) => void;
+  onStatusChange?: (id: string, status: number) => void;
+  page: number;
+  pageSize: number;
+}
+
+const ContestRow: React.FC<ContestRowProps> = ({
+  contest,
+  index,
+  category,
+  onView,
+  onEdit,
+  onDelete,
+  onDuplicate,
+  onStatusChange,
+  page,
+  pageSize,
+}) => {
+  const [loadingStatus, setLoadingStatus] = useState(false);
+
+  const getStatusInfo = (isPublished: boolean, currentCategory?: string) => {
+    // Handle different categories with specific logic
+    switch (currentCategory) {
+      case "draft":
+        return {
+          displayLabel: "Draft",
+          buttonLabel: "Activate",
+          color: "bg-blue-100 text-blue-700 hover:bg-green-200",
+          nextStatus: 1, // Always activate (set to active)
+        };
+
+      case "live":
+        // For live page: toggle between Active (status: 1) and Inactive (status: 2)
+        return contest.status === 1
+          ? {
+              displayLabel: "Active",
+              buttonLabel: "Deactivate",
+              color: "bg-green-100 text-green-700 hover:bg-red-200",
+              nextStatus: 2, // Set to inactive
+            }
+          : {
+              displayLabel: "Inactive",
+              buttonLabel: "Activate",
+              color: "bg-red-100 text-red-700 hover:bg-green-200",
+              nextStatus: 1, // Set to active
+            };
+
+      case "upcoming":
+        // For upcoming page: toggle between Active (status: 1) and Draft (status: 0)
+        return isPublished
+          ? {
+              displayLabel: "Active",
+              buttonLabel: "Set to Draft",
+              color: "bg-green-100 text-green-700 hover:bg-blue-200",
+              nextStatus: 0, // Set to draft
+            }
+          : {
+              displayLabel: "Draft",
+              buttonLabel: "Activate",
+              color: "bg-blue-100 text-blue-700 hover:bg-green-200",
+              nextStatus: 1, // Set to active
+            };
+
+      default:
+        // For other categories (like "old") - read-only display
+        return isPublished
+          ? {
+              displayLabel: "Active",
+              buttonLabel: "Active",
+              color: "bg-green-100 text-green-700",
+              nextStatus: 1,
+            }
+          : {
+              displayLabel: "Draft",
+              buttonLabel: "Draft",
+              color: "bg-blue-100 text-blue-700",
+              nextStatus: 0,
+            };
+    }
+  };
+
+  const handleStatusToggle = async () => {
+    if (!onStatusChange) return;
+
+    setLoadingStatus(true);
+    try {
+      const statusInfo = getStatusInfo(contest.isPublished, category);
+      await onStatusChange(contest.id, statusInfo.nextStatus);
+    } catch (error) {
+      console.error("Error updating contest status:", error);
+    } finally {
+      setLoadingStatus(false);
+    }
+  };
+
+  const statusInfo = getStatusInfo(contest.isPublished, category);
+  const canChangeStatus =
+    category === "live" || category === "upcoming" || category === "draft";
+
+  return (
+    <tr className="transition-colors hover:bg-gray-50">
+      <td className="px-4 py-3 text-sm text-gray-600">
+        #{(page - 1) * pageSize + index + 1}
+      </td>
+      <td className="px-4 py-3 text-sm text-gray-600">
+        <div className="max-w-[200px] truncate font-medium">{contest.name}</div>
+      </td>
+      <td className="px-4 py-3 text-sm text-gray-600">
+        ${contest.contestFee || 0}
+      </td>
+      <td className="px-4 py-3 text-sm text-gray-600">
+        {contest.sponsored_logo ? (
+          <img
+            src={contest.sponsored_logo}
+            alt="Sponsor Logo"
+            className="h-10 w-15 object-contain"
+          />
+        ) : (
+          <span className="text-gray-400">No logo</span>
+        )}
+      </td>
+      <td className="px-4 py-3 text-sm text-gray-600">
+        {moment(contest.startDate).format("YYYY-MM-DD")}
+      </td>
+      <td className="px-4 py-3 text-sm text-gray-600">
+        {moment(contest.startDate).format("HH:mm")}
+      </td>
+      <td className="px-4 py-3 text-sm text-gray-600">
+        {moment(contest.endDate).format("YYYY-MM-DD")}
+      </td>
+      <td className="px-4 py-3 text-sm text-gray-600">
+        {moment(contest.endDate).format("HH:mm")}
+      </td>
+      <td className="px-4 py-3 text-sm text-gray-600">
+        <span className="inline-flex items-center rounded-full bg-blue-100 px-2 py-1 text-xs font-medium text-blue-800">
+          {contest.contestTypeName}
+        </span>
+      </td>
+      <td className="px-4 py-3 text-sm">
+        {canChangeStatus ? (
+          <button
+            onClick={handleStatusToggle}
+            disabled={loadingStatus}
+            className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-medium transition-colors ${
+              loadingStatus
+                ? "cursor-wait bg-gray-100 text-gray-400"
+                : statusInfo.color
+            }`}
+          >
+            {loadingStatus ? "Updating..." : statusInfo.buttonLabel}
+          </button>
+        ) : (
+          <span
+            className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-medium ${statusInfo.color.replace("hover:", "")}`}
+          >
+            {statusInfo.displayLabel}
+          </span>
+        )}
+      </td>
+      <td className="px-4 py-3 text-sm text-gray-600">
+        <div className="max-w-[150px] truncate">{contest.sponsored_name}</div>
+      </td>
+      <td className="px-4 py-3 text-sm">
+        <div className="flex items-center justify-center space-x-2">
+          <Button
+            variant="primary"
+            size="sm"
+            onClick={() => onView?.(contest)}
+            title="View Contest"
+          >
+            <Eye className="h-4 w-4" />
+          </Button>
+
+          {category !== "live" && (
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() => onEdit?.(contest)}
+              title="Edit Contest"
+            >
+              <Pencil className="h-4 w-4" />
+            </Button>
+          )}
+
+          {category !== "old" && (
+            <Button
+              variant="danger"
+              size="sm"
+              onClick={() => onDelete?.(contest.id)}
+              title="Delete Contest"
+            >
+              <Trash2 className="h-4 w-4" />
+            </Button>
+          )}
+
+          {category === "old" && (
+            <Button
+              variant="primary"
+              size="sm"
+              onClick={() => onDuplicate?.(contest)}
+              title="Duplicate Contest"
+            >
+              <Copy className="h-4 w-4" />
+            </Button>
+          )}
+        </div>
+      </td>
+    </tr>
+  );
+};
+
+export default ContestRow;

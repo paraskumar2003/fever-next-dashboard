@@ -21,7 +21,6 @@ const OnlyQuestionForm: React.FC<OnlyQuestionFormProps> = ({
   formData,
   updateFormData,
   onSave,
-  handleFlipSetModalOpen,
   errors,
 }) => {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(
@@ -85,6 +84,7 @@ const OnlyQuestionForm: React.FC<OnlyQuestionFormProps> = ({
         })),
       );
       formData.QuestionCategoryId ??= categoriesData[0].id;
+      formData.QuestionCount ??= Number(categoriesData[0].questions);
     }
   };
 
@@ -110,6 +110,7 @@ const OnlyQuestionForm: React.FC<OnlyQuestionFormProps> = ({
         })),
       );
       formData.QuestionCategoryId ??= setsData[0].id;
+      formData.QuestionCount ??= setsData[0].questions;
     }
   };
 
@@ -130,6 +131,7 @@ const OnlyQuestionForm: React.FC<OnlyQuestionFormProps> = ({
       else {
         updateFormData({
           QuestionCategoryId: selected.id,
+          QuestionCount: Number(selected.questions),
         });
         setSelectedCategory(String(selected.id));
       }
@@ -222,10 +224,12 @@ const OnlyQuestionForm: React.FC<OnlyQuestionFormProps> = ({
         <FormSelect
           label="Choose Set"
           value={formData.set_id}
-          options={sets.map((set: any) => ({
-            value: set.id,
-            label: `${set.name}`,
-          }))}
+          options={[{ value: "", label: "Select Question Set" }].concat(
+            sets.map((set: any) => ({
+              value: set.id,
+              label: `${set.name}`,
+            })),
+          )}
           onChange={(e) => handleSetSelection(e.target.value)}
           error={errors.set_id}
           required

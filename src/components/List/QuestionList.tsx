@@ -11,6 +11,7 @@ interface QuestionListProps {
   onStatusChange?: (id: number, status: number) => void;
   rowCount: number;
   onPaginationModelChange: (page: number, pageSize: number) => void;
+  paginationModel: { page: number; pageSize: number };
 }
 
 const QuestionList: React.FC<QuestionListProps> = ({
@@ -21,33 +22,32 @@ const QuestionList: React.FC<QuestionListProps> = ({
   onStatusChange,
   rowCount,
   onPaginationModelChange,
+  paginationModel,
 }) => {
-  const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
-
   const handleNextPage = () => {
-    const nextPage = currentPage + 1;
-    setCurrentPage(nextPage);
-    onPaginationModelChange(nextPage, pageSize);
+    const nextPage = paginationModel.page + 1;
+    onPaginationModelChange(nextPage, paginationModel.pageSize);
   };
 
   const handlePreviousPage = () => {
-    const prevPage = currentPage - 1;
-    setCurrentPage(prevPage);
-    onPaginationModelChange(prevPage, pageSize);
+    const prevPage = paginationModel.page - 1;
+    onPaginationModelChange(prevPage, paginationModel.pageSize);
   };
 
   const handlePageSizeChange = (newPageSize: number) => {
-    setPageSize(newPageSize);
-    setCurrentPage(1); // Reset to first page when page size changes
-    onPaginationModelChange(1, newPageSize);
+    onPaginationModelChange(1, newPageSize); // Reset to first page when page size changes
   };
 
-  const canGoNext = (currentPage - 1) * pageSize + questions.length < rowCount;
-  const canGoPrevious = currentPage > 1;
+  const canGoNext =
+    (paginationModel.page - 1) * paginationModel.pageSize + questions.length <
+    rowCount;
+  const canGoPrevious = paginationModel.page > 1;
 
-  const startItem = (currentPage - 1) * pageSize + 1;
-  const endItem = Math.min(rowCount, currentPage * pageSize);
+  const startItem = (paginationModel.page - 1) * paginationModel.pageSize + 1;
+  const endItem = Math.min(
+    rowCount,
+    paginationModel.page * paginationModel.pageSize,
+  );
 
   return (
     <div className="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-lg">
@@ -83,7 +83,10 @@ const QuestionList: React.FC<QuestionListProps> = ({
               {questions.map((question, index) => (
                 <QuestionRow
                   key={question.id}
-                  index={index}
+                  index={
+                    (paginationModel.page - 1) * paginationModel.pageSize +
+                    index
+                  }
                   question={question}
                   onView={onView}
                   onEdit={onEdit}
@@ -133,7 +136,7 @@ const QuestionList: React.FC<QuestionListProps> = ({
             <div className="flex items-center space-x-2">
               <select
                 id="pageSize"
-                value={pageSize}
+                value={paginationModel.pageSize}
                 onChange={(e) => handlePageSizeChange(Number(e.target.value))}
                 className="rounded-md border border-gray-300 bg-white px-3 py-1 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
               >

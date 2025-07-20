@@ -24,7 +24,6 @@ export function TriviaGamePlay({
   const router = useRouter();
   const contest_id = Cookies.get("contest_id");
 
-  // Define all hooks at the top (unconditionally)
   const [currentQIndex, setCurrentQIndex] = useState<number>(0);
   const [currentQuestion, setCurrentQuestion] = useState<QuestionType>(
     questions[0] || ({} as QuestionType),
@@ -84,15 +83,12 @@ export function TriviaGamePlay({
   const handleAnswer = async (id: number, answer: string): Promise<boolean> => {
     const selectedOption = currentQuestion.options[id];
     const isCorrect = selectedOption?.is_correct || false;
-
     displayNextQuestion(1000);
-
     if (currentQIndex + 1 === questions.length) {
       setTimeout(() => {
         setGame({ state: GameState.ENDED });
       }, 1000);
     }
-
     return isCorrect;
   };
 
@@ -154,14 +150,14 @@ export function TriviaGamePlay({
                 options={currentQuestion.options}
                 onSelect={handleAnswer}
               />
-              <div className="bottom-0 left-0 flex w-full justify-center px-12 py-8">
+              {/* <div className="bottom-0 left-0 flex w-full justify-center px-12 py-8">
                 <Flip
                   flipCharge={100}
                   onClick={() => {
                     handleFlipQuestion(currentQuestion.question_no);
                   }}
                 />
-              </div>
+              </div> */}
             </>
           )}
         </>

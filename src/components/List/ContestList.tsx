@@ -12,6 +12,7 @@ interface ContestListProps {
   onDuplicate?: (contest: Contest) => void;
   rowCount: number;
   onPaginationModelChange: (page: number, pageSize: number) => void;
+  paginationModel: { page: number; pageSize: number };
 }
 
 const ContestList: React.FC<ContestListProps> = ({
@@ -23,33 +24,31 @@ const ContestList: React.FC<ContestListProps> = ({
   onDuplicate,
   rowCount,
   onPaginationModelChange,
+  paginationModel,
 }) => {
-  const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
 
   const handlePageSizeChange = (newPageSize: number) => {
     setPageSize(newPageSize);
-    setCurrentPage(1); // Reset to first page when page size changes
     onPaginationModelChange(1, newPageSize);
   };
 
   const handleNextPage = () => {
-    const nextPage = currentPage + 1;
-    setCurrentPage(nextPage);
+    const nextPage = paginationModel.page + 1;
     onPaginationModelChange(nextPage, pageSize);
   };
 
   const handlePreviousPage = () => {
-    const prevPage = currentPage - 1;
-    setCurrentPage(prevPage);
+    const prevPage = paginationModel.page - 1;
     onPaginationModelChange(prevPage, pageSize);
   };
 
-  const canGoNext = (currentPage - 1) * pageSize + contests.length < rowCount;
-  const canGoPrevious = currentPage > 1;
+  const canGoNext =
+    (paginationModel.page - 1) * pageSize + contests.length < rowCount;
+  const canGoPrevious = paginationModel.page > 1;
 
-  const startItem = (currentPage - 1) * pageSize + 1;
-  const endItem = Math.min(rowCount, currentPage * pageSize);
+  const startItem = (paginationModel.page - 1) * pageSize + 1;
+  const endItem = Math.min(rowCount, paginationModel.page * pageSize);
 
   return (
     <div className="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-lg">
@@ -104,6 +103,8 @@ const ContestList: React.FC<ContestListProps> = ({
                   onEdit={onEdit}
                   onDelete={onDelete}
                   onDuplicate={onDuplicate}
+                  page={paginationModel.page}
+                  pageSize={paginationModel.pageSize}
                 />
               ))}
             </tbody>

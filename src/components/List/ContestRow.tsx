@@ -12,6 +12,8 @@ interface ContestRowProps {
   onEdit?: (contest: Contest) => void;
   onDelete?: (id: string) => void;
   onDuplicate?: (contest: Contest) => void;
+  page: number;
+  pageSize: number;
 }
 
 const ContestRow: React.FC<ContestRowProps> = ({
@@ -22,10 +24,14 @@ const ContestRow: React.FC<ContestRowProps> = ({
   onEdit,
   onDelete,
   onDuplicate,
+  page,
+  pageSize,
 }) => {
   return (
     <tr className="transition-colors hover:bg-gray-50">
-      <td className="px-4 py-3 text-sm text-gray-600">#{index + 1}</td>
+      <td className="px-4 py-3 text-sm text-gray-600">
+        #{(page - 1) * pageSize + index + 1}
+      </td>
       <td className="px-4 py-3 text-sm text-gray-600">
         <div className="max-w-[200px] truncate font-medium">{contest.name}</div>
       </td>
@@ -56,7 +62,7 @@ const ContestRow: React.FC<ContestRowProps> = ({
         {moment(contest.endDate).format("HH:mm")}
       </td>
       <td className="px-4 py-3 text-sm text-gray-600">
-        <span className="inline-flex items-center rounded-full px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800">
+        <span className="inline-flex items-center rounded-full bg-blue-100 px-2 py-1 text-xs font-medium text-blue-800">
           {contest.contestTypeName}
         </span>
       </td>
@@ -73,7 +79,7 @@ const ContestRow: React.FC<ContestRowProps> = ({
           >
             <Eye className="h-4 w-4" />
           </Button>
-          
+
           {category !== "live" && (
             <Button
               variant="secondary"
@@ -84,7 +90,7 @@ const ContestRow: React.FC<ContestRowProps> = ({
               <Pencil className="h-4 w-4" />
             </Button>
           )}
-          
+
           {category !== "old" && (
             <Button
               variant="danger"
@@ -95,7 +101,7 @@ const ContestRow: React.FC<ContestRowProps> = ({
               <Trash2 className="h-4 w-4" />
             </Button>
           )}
-          
+
           {category === "old" && (
             <Button
               variant="primary"

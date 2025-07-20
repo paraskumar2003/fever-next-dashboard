@@ -53,19 +53,19 @@ export default function ViewContest() {
         page: paginationModel.page,
         limit: paginationModel.pageSize,
       };
-      
+
       if (search) {
         filter.q = search;
       }
-      
+
       filter.category = searchParams.get("category") ?? undefined;
-      
+
       const { data } = await TriviaServices.getContests(filter);
-      
+
       if (data?.data?.meta) {
         setTotalCount(data.data.meta.total);
       }
-      
+
       if (data?.data?.rows) {
         setContests(data.data.rows);
       }
@@ -88,6 +88,7 @@ export default function ViewContest() {
   }, [search, paginationModel, searchParams]);
 
   const handlePaginationModelChange = (page: number, pageSize: number) => {
+    console.log("call for change", page, pageSize);
     setPaginationModel({ page, pageSize });
   };
 
@@ -127,6 +128,7 @@ export default function ViewContest() {
           onDuplicate={handleDuplicate}
           rowCount={totalCount}
           onPaginationModelChange={handlePaginationModelChange}
+          paginationModel={paginationModel}
         />
       </FormSection>
     </div>

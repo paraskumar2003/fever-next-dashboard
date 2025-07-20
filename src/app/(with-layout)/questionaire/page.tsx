@@ -21,9 +21,12 @@ const TriviaPage = () => {
   const { updateFormData } = useContest();
   const [questions, setQuestions] = useState<Question[]>([]);
   const [rowCount, setRowCount] = useState(0);
-  const [paginationModel, setPaginationModel] = useState({
+  const [paginationModel, setPaginationModel] = useState<{
+    page: number;
+    pageSize: number;
+  }>({
     page: 1,
-    limit: 10,
+    pageSize: 10,
   });
   const [contestQuestionIds, setContestQuestionIds] = useState<number[]>([]);
 
@@ -51,7 +54,9 @@ const TriviaPage = () => {
     try {
       if (contestQuestionIds) {
         const { data } = await TriviaServices.getAllQuestions({
-          ...args,
+          page: args?.page || paginationModel.page,
+          limit: args?.limit || paginationModel.pageSize,
+          ...(args?.q ? { q: args.q } : {}),
         });
         if (data?.data?.rows) {
           // Map the new API structure to include computed properties
@@ -90,12 +95,17 @@ const TriviaPage = () => {
       const timerId = setTimeout(() => {
         fetchQuestions({
           q: searchString,
+          page: paginationModel.page,
+          limit: paginationModel.pageSize,
           ...paginationModel,
         });
       }, 1000);
       return () => clearTimeout(timerId);
     } else {
-      fetchQuestions(paginationModel);
+      fetchQuestions({
+        page: paginationModel.page,
+        limit: paginationModel.pageSize,
+      });
     }
   }, [searchString, paginationModel]);
 
@@ -160,7 +170,7 @@ const TriviaPage = () => {
   };
 
   const handlePaginationModelChange = (page: number, pageSize: number) => {
-    setPaginationModel({ ...paginationModel, page, limit: pageSize });
+    setPaginationModel({ page, pageSize });
   };
 
   const handleUploadSuccess = () => {
@@ -189,6 +199,7 @@ const TriviaPage = () => {
             onStatusChange={handleStatusChange}
             onPagninationModelChange={handlePaginationModelChange}
             rowCount={rowCount}
+            paginationModel={paginationModel}
             onSave={async () => {
               await fetchQuestions();
             }}

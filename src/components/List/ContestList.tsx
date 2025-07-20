@@ -10,6 +10,7 @@ interface ContestListProps {
   onEdit?: (contest: Contest) => void;
   onDelete?: (id: string) => void;
   onDuplicate?: (contest: Contest) => void;
+  onStatusChange?: (id: string, status: number) => void;
   rowCount: number;
   onPaginationModelChange: (page: number, pageSize: number) => void;
   paginationModel: { page: number; pageSize: number };
@@ -22,6 +23,7 @@ const ContestList: React.FC<ContestListProps> = ({
   onEdit,
   onDelete,
   onDuplicate,
+  onStatusChange,
   rowCount,
   onPaginationModelChange,
   paginationModel,
@@ -85,6 +87,9 @@ const ContestList: React.FC<ContestListProps> = ({
                   Contest Type
                 </th>
                 <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">
+                  Status
+                </th>
+                <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">
                   Sponsor Name
                 </th>
                 <th className="px-4 py-3 text-center text-sm font-medium text-gray-600">
@@ -103,6 +108,7 @@ const ContestList: React.FC<ContestListProps> = ({
                   onEdit={onEdit}
                   onDelete={onDelete}
                   onDuplicate={onDuplicate}
+                  onStatusChange={onStatusChange}
                   page={paginationModel.page}
                   pageSize={paginationModel.pageSize}
                 />

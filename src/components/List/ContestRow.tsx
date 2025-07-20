@@ -12,6 +12,7 @@ interface ContestRowProps {
   onEdit?: (contest: Contest) => void;
   onDelete?: (id: string) => void;
   onDuplicate?: (contest: Contest) => void;
+  onStatusChange?: (id: string, status: number) => void;
   page: number;
   pageSize: number;
 }
@@ -24,9 +25,52 @@ const ContestRow: React.FC<ContestRowProps> = ({
   onEdit,
   onDelete,
   onDuplicate,
+  onStatusChange,
   page,
   pageSize,
 }) => {
+  const [loadingStatus, setLoadingStatus] = useState(false);
+
+  const getStatusInfo = (status: number) => {
+    switch (status) {
+      case 0:
+        return { label: "Draft", color: "bg-blue-100 text-blue-700 hover:bg-blue-200" };
+      case 1:
+        return { label: "Active", color: "bg-green-100 text-green-700 hover:bg-green-200" };
+      case 2:
+        return { label: "Inactive", color: "bg-red-100 text-red-700 hover:bg-red-200" };
+      default:
+        return { label: "Unknown", color: "bg-gray-100 text-gray-700 hover:bg-gray-200" };
+    }
+  };
+
+  const getNextStatus = (currentStatus: number) => {
+    // Cycle through statuses: Draft -> Active -> Inactive -> Draft
+    switch (currentStatus) {
+      case 0: return 1; // Draft -> Active
+      case 1: return 2; // Active -> Inactive
+      case 2: return 0; // Inactive -> Draft
+      default: return 1;
+    }
+  };
+
+  const handleStatusToggle = async () => {
+    if (!onStatusChange) return;
+    
+    setLoadingStatus(true);
+    try {
+      const nextStatus = getNextStatus(contest.status);
+      await onStatusChange(contest.id, nextStatus);
+    } catch (error) {
+      console.error("Error updating contest status:", error);
+    } finally {
+      setLoadingStatus(false);
+    }
+  };
+
+  const statusInfo = getStatusInfo(contest.status);
+  const canChangeStatus = category === "live" || category === "upcoming";
+
   return (
     <tr className="transition-colors hover:bg-gray-50">
       <td className="px-4 py-3 text-sm text-gray-600">
@@ -65,6 +109,25 @@ const ContestRow: React.FC<ContestRowProps> = ({
         <span className="inline-flex items-center rounded-full bg-blue-100 px-2 py-1 text-xs font-medium text-blue-800">
           {contest.contestTypeName}
         </span>
+      </td>
+      <td className="px-4 py-3 text-sm">
+        {canChangeStatus ? (
+          <button
+            onClick={handleStatusToggle}
+            disabled={loadingStatus}
+            className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-medium transition-colors ${
+              loadingStatus
+                ? "cursor-wait bg-gray-100 text-gray-400"
+                : statusInfo.color
+            }`}
+          >
+            {loadingStatus ? "Updating..." : statusInfo.label}
+          </button>
+        ) : (
+          <span className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-medium ${statusInfo.color.replace('hover:', '')}`}>
+            {statusInfo.label}
+          </span>
+        )}
       </td>
       <td className="px-4 py-3 text-sm text-gray-600">
         <div className="max-w-[150px] truncate">{contest.sponsored_name}</div>

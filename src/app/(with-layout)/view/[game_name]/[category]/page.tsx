@@ -58,6 +58,26 @@ export default function ViewContest() {
     }
   };
 
+  const handleStatusChange = async (contestId: string, status: number) => {
+    try {
+      const response = await TriviaServices.updateContestStatus(contestId, status);
+      
+      if (response.data) {
+        const statusLabels = { 0: "Draft", 1: "Active", 2: "Inactive" };
+        Notiflix.Notify.success(`Contest status updated to ${statusLabels[status as keyof typeof statusLabels]}!`);
+        // Refresh the contests list
+        await fetchContests();
+      } else {
+        Notiflix.Notify.failure(
+          response.response?.message || "Failed to update contest status"
+        );
+      }
+    } catch (error) {
+      console.error("Error updating contest status:", error);
+      Notiflix.Notify.failure("An error occurred while updating the contest status");
+    }
+  };
+
   const { game_name, category } = params;
 
   const fetchContests = async () => {
@@ -140,6 +160,7 @@ export default function ViewContest() {
           onEdit={handleEdit}
           onDelete={handleDelete}
           onDuplicate={handleDuplicate}
+          onStatusChange={handleStatusChange}
           rowCount={totalCount}
           onPaginationModelChange={handlePaginationModelChange}
           paginationModel={paginationModel}

@@ -261,4 +261,27 @@ export class TriviaServices extends ApiServices {
       return { data: null, err: err.message, response: err?.response?.data };
     }
   }
+
+  /**
+   * Update contest status
+   * @param contest_id - ID of the contest to update
+   * @param status - 0 for Draft, 1 for Active, 2 for Inactive
+   * @returns Promise with API response
+   */
+  static async updateContestStatus(
+    contest_id: string,
+    status: number,
+  ): Promise<any> {
+    try {
+      const response = await this.post<T>(
+        `/v1/trivia/update-status/${contest_id}`,
+        {
+          status: status,
+        },
+      );
+      return response;
+    } catch (err: any) {
+      return { data: null, err: err.message, response: err?.response?.data };
+    }
+  }
 }

@@ -20,4 +20,5 @@ export interface Contest {
   isSponsored: boolean;
   sponsored_name: string;
   sponsored_logo: string;
+  status: number; // 0 for Draft, 1 for Active, 2 for Inactive
 }

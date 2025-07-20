@@ -38,11 +38,16 @@ const QuestionList: React.FC<QuestionListProps> = ({
     onPaginationModelChange(1, newPageSize); // Reset to first page when page size changes
   };
 
-  const canGoNext = (paginationModel.page - 1) * paginationModel.pageSize + questions.length < rowCount;
+  const canGoNext =
+    (paginationModel.page - 1) * paginationModel.pageSize + questions.length <
+    rowCount;
   const canGoPrevious = paginationModel.page > 1;
 
   const startItem = (paginationModel.page - 1) * paginationModel.pageSize + 1;
-  const endItem = Math.min(rowCount, paginationModel.page * paginationModel.pageSize);
+  const endItem = Math.min(
+    rowCount,
+    paginationModel.page * paginationModel.pageSize,
+  );
 
   return (
     <div className="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-lg">
@@ -78,7 +83,10 @@ const QuestionList: React.FC<QuestionListProps> = ({
               {questions.map((question, index) => (
                 <QuestionRow
                   key={question.id}
-                  index={index}
+                  index={
+                    (paginationModel.page - 1) * paginationModel.pageSize +
+                    index
+                  }
                   question={question}
                   onView={onView}
                   onEdit={onEdit}

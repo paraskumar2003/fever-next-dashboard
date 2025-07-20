@@ -34,8 +34,14 @@ const ContestRow: React.FC<ContestRowProps> = ({
 
   const getStatusInfo = (isPublished: boolean) => {
     return isPublished
-      ? { label: "Active", color: "bg-green-100 text-green-700 hover:bg-green-200" }
-      : { label: "Draft", color: "bg-blue-100 text-blue-700 hover:bg-blue-200" };
+      ? {
+          label: "Click to Draft",
+          color: "bg-green-100 text-green-700 hover:bg-green-200",
+        }
+      : {
+          label: "Draft",
+          color: "bg-blue-100 text-blue-700 hover:bg-blue-200",
+        };
   };
 
   const getNextStatus = (isPublished: boolean) => {
@@ -45,7 +51,7 @@ const ContestRow: React.FC<ContestRowProps> = ({
 
   const handleStatusToggle = async () => {
     if (!onStatusChange) return;
-    
+
     setLoadingStatus(true);
     try {
       const nextStatus = getNextStatus(contest.isPublished);
@@ -113,7 +119,9 @@ const ContestRow: React.FC<ContestRowProps> = ({
             {loadingStatus ? "Updating..." : statusInfo.label}
           </button>
         ) : (
-          <span className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-medium ${statusInfo.color.replace('hover:', '')}`}>
+          <span
+            className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-medium ${statusInfo.color.replace("hover:", "")}`}
+          >
             {statusInfo.label}
           </span>
         )}

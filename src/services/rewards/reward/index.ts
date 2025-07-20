@@ -50,8 +50,12 @@ export class RewardServices extends ApiServices {
 
   static async updateReward(
     id: number,
-    payload: { reward_type: string; name: string; brand_name: string },
-    payload: { reward_type: string; name: string; brand_name: string; description: string },
+    payload: {
+      reward_type: string;
+      name: string;
+      brand_name: string;
+      description: string;
+    },
   ) {
     try {
       const response = await this.post<T>(

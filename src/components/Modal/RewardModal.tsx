@@ -3,6 +3,7 @@ import { Modal } from "@mui/material";
 import Button from "../Button";
 import FormInput from "../FormInput";
 import FormSelect from "../FormSelect";
+import FormTextarea from "../FormTextarea";
 import { Save, X } from "lucide-react";
 import { RewardServices } from "@/services/rewards/reward";
 import Notiflix from "notiflix";
@@ -26,6 +27,7 @@ const RewardModal: React.FC<RewardModalProps> = ({
     name: "",
     reward_type: "DIGITAL",
     brand_name: "",
+    description: "",
   });
 
   const [loading, setLoading] = useState(false);
@@ -36,12 +38,14 @@ const RewardModal: React.FC<RewardModalProps> = ({
         name: rewardData.name || "",
         reward_type: rewardData.reward_type || "DIGITAL",
         brand_name: rewardData.brand_name || "",
+        description: rewardData.description || "",
       });
     } else {
       setFormData({
         name: "",
         reward_type: "DIGITAL",
         brand_name: "",
+        description: "",
       });
     }
   }, [rewardData]);
@@ -58,6 +62,7 @@ const RewardModal: React.FC<RewardModalProps> = ({
           name: formData.name,
           reward_type: formData.reward_type as "DIGITAL" | "PHYSICAL",
           brand_name: formData.brand_name,
+          description: formData.description,
         });
         Notiflix.Notify.success("Reward updated successfully!");
       } else {
@@ -66,6 +71,7 @@ const RewardModal: React.FC<RewardModalProps> = ({
           name: formData.name,
           reward_type: formData.reward_type as "DIGITAL" | "PHYSICAL",
           brand_name: formData.brand_name,
+          description: formData.description,
         });
         // Notiflix.Notify.success("Reward created successfully!");
       }
@@ -78,6 +84,7 @@ const RewardModal: React.FC<RewardModalProps> = ({
         name: "",
         reward_type: "DIGITAL",
         brand_name: "",
+        description: "",
       });
     } catch (error) {
       console.error("Error saving reward:", error);
@@ -137,6 +144,17 @@ const RewardModal: React.FC<RewardModalProps> = ({
               placeholder="Enter brand name"
               disabled={isViewMode}
               required
+            />
+
+            <FormTextarea
+              label="Description"
+              value={formData.description}
+              onChange={(e) =>
+                setFormData({ ...formData, description: e.target.value })
+              }
+              placeholder="Enter reward description"
+              disabled={isViewMode}
+              rows={4}
             />
 
             <FormSelect

@@ -453,6 +453,8 @@ export default function CreateContest() {
     try {
       let { isValid, errors } = await validateQuestionFormData(formData);
 
+      console.log({ errors });
+
       if (!isValid) {
         // Set errors in state for display
         setContestFormErrors(errors);

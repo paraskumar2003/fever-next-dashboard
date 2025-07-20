@@ -8,7 +8,7 @@ import { useParams, useRouter, useSearchParams } from "next/navigation";
 import moment from "moment";
 import { useEffect, useState } from "react";
 import Button from "@/components/Button";
-import { Eye, SquarePen, Trash2 } from "lucide-react";
+import { Copy, Eye, SquarePen, Trash2 } from "lucide-react";
 
 export default function ViewContest() {
   const router = useRouter();
@@ -18,7 +18,7 @@ export default function ViewContest() {
   const handleMetricsModal = (contest_id: string | number) => {};
 
   const handleAction = (
-    action: "view" | "edit" | "delete" | "metrics",
+    action: "view" | "edit" | "delete" | "metrics" | "duplicate",
     contest_id: string | number,
   ) => {
     if (action == "view")
@@ -52,34 +52,16 @@ export default function ViewContest() {
       sortable: false,
       filterable: false,
     },
-    { field: "contest_time", headerName: "Contest Time", width: 200 },
-    { field: "contest_date", headerName: "Contest Date", width: 200 },
+    { field: "contest_date", headerName: "Contest Start Date", width: 200 },
+    { field: "contest_time", headerName: "Contest Start Time", width: 200 },
+    { field: "contest_end_date", headerName: "Contest End Date", width: 200 },
+    { field: "contest_end_time", headerName: "Contest End Time", width: 200 },
     { field: "contest_type", headerName: "Contest Type", width: 200 },
     {
       field: "sponsored_name",
       headerName: "Sponsor Name",
       width: 150,
     },
-    // {
-    //   field: "metrics",
-    //   headerName: "Metrics",
-    //   flex: 2,
-    //   sortable: false,
-    //   filterable: false,
-    //   disableColumnMenu: true,
-    //   renderCell: (params: { row: Contest }) => (
-    //     <div className="flex h-full items-center justify-center gap-2">
-    //       <Button
-    //         variant="primary"
-    //         color="primary"
-    //         size="sm"
-    //         onClick={() => handleAction("metrics", params.row.id as string)}
-    //       >
-    //         <ChartColumnBig />
-    //       </Button>
-    //     </div>
-    //   ),
-    // },
     {
       field: "actions",
       headerName: "Actions",
@@ -97,14 +79,18 @@ export default function ViewContest() {
           >
             <Eye />
           </Button>
-          <Button
-            variant="secondary"
-            color="secondary"
-            size="sm"
-            onClick={() => handleAction("edit", params.row.id as string)}
-          >
-            <SquarePen className="text-xs" />
-          </Button>
+
+          {searchParams.get("category") !== "live" && (
+            <Button
+              variant="secondary"
+              color="secondary"
+              size="sm"
+              onClick={() => handleAction("edit", params.row.id as string)}
+            >
+              <SquarePen className="text-xs" />
+            </Button>
+          )}
+
           {searchParams.get("category") !== "old" && (
             <Button
               variant="danger"
@@ -113,6 +99,19 @@ export default function ViewContest() {
               onClick={() => handleAction("delete", params.row.id)}
             >
               <Trash2 />
+            </Button>
+          )}
+
+          {/* Duplicate button only for category == "old" */}
+          {searchParams.get("category") === "old" && (
+            <Button
+              variant="primary"
+              color="info"
+              size="sm"
+              onClick={() => handleAction("duplicate", params.row.id)}
+            >
+              {/* use any icon you want, e.g., Copy or Duplicate */}
+              <Copy className="text-xs" />
             </Button>
           )}
         </div>
@@ -128,7 +127,7 @@ export default function ViewContest() {
     page: number;
     pageSize: number;
   }>({
-    page: 1,
+    page: 0,
     pageSize: 10,
   });
 
@@ -136,7 +135,7 @@ export default function ViewContest() {
     const fetchData = async () => {
       try {
         let filter: Record<string, any> = {
-          page: paginationModel.page,
+          page: paginationModel.page + 1,
           limit: paginationModel.pageSize,
         };
         filter.category = searchParams.get("category") ?? undefined;
@@ -145,13 +144,18 @@ export default function ViewContest() {
         if (data.data) {
           setRows(
             data.data.rows.map((e: Contest, index: number) => ({
-              seq_no: index + 1,
+              seq_no:
+                paginationModel.page * paginationModel.pageSize + index + 1,
               id: e.id,
               contest_name: e.name,
               contest_fee: e.contestFee,
               contest_sponsor_logo: e.sponsored_logo,
               contest_date: moment(new Date(e.startDate)).format("YYYY-MM-DD"),
               contest_time: moment(new Date(e.startDate)).format("HH:mm"),
+              contest_end_date: moment(new Date(e.endDate)).format(
+                "YYYY-MM-DD",
+              ),
+              contest_end_time: moment(new Date(e.endDate)).format("HH:mm"),
               sponsored_name: e.sponsored_name,
               contest_type: e.contestTypeName,
             })),

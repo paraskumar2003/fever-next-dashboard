@@ -1,138 +1,137 @@
 "use client";
 
 import { SearchBar } from "@/components";
-import { Table } from "@/components/Tables";
+import ContestList from "@/components/List/ContestList";
 import { TriviaServices } from "@/services";
 import { Contest } from "@/types/contest";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import moment from "moment";
 import { useEffect, useState } from "react";
-import Button from "@/components/Button";
-import { Copy, Eye, SquarePen, Trash2 } from "lucide-react";
+import FormSection from "@/components/FormSection";
 
 export default function ViewContest() {
   const router = useRouter();
   const params = useParams();
   const searchParams = useSearchParams();
 
-  const handleMetricsModal = (contest_id: string | number) => {};
-
-  const handleAction = (
-    action: "view" | "edit" | "delete" | "metrics" | "duplicate",
-    contest_id: string | number,
-  ) => {
-    if (action == "view")
-      router.push(`/${params.game_name}?contest_id=${contest_id}`);
-    if (action == "edit")
-      router.push(`/${params.game_name}?contest_id=${contest_id}`);
-    if (action == "metrics") handleMetricsModal(contest_id);
-  };
-
-  const columns = [
-    { field: "seq_no", headerName: "ID", width: 30 },
-    { field: "contest_name", headerName: "Contest Name", width: 200 },
-    { field: "contest_fee", headerName: "Contest Fee", width: 200 },
-    {
-      field: "contest_sponsor_logo",
-      headerName: "Contest Sponsor Logo",
-      width: 200,
-      renderCell: (params: any) => (
-        <>
-          {params.value ? (
-            <img
-              src={params.value}
-              alt="Sponsor Logo"
-              style={{ width: 60, height: 40, objectFit: "contain" }}
-            />
-          ) : (
-            <></>
-          )}
-        </>
-      ),
-      sortable: false,
-      filterable: false,
-    },
-    { field: "contest_date", headerName: "Contest Start Date", width: 200 },
-    { field: "contest_time", headerName: "Contest Start Time", width: 200 },
-    { field: "contest_end_date", headerName: "Contest End Date", width: 200 },
-    { field: "contest_end_time", headerName: "Contest End Time", width: 200 },
-    { field: "contest_type", headerName: "Contest Type", width: 200 },
-    {
-      field: "sponsored_name",
-      headerName: "Sponsor Name",
-      width: 150,
-    },
-    {
-      field: "actions",
-      headerName: "Actions",
-      sortable: false,
-      filterable: false,
-      disableColumnMenu: true,
-      width: 300,
-      renderCell: (params: { row: Contest }) => (
-        <div className="flex h-full items-center justify-center gap-2">
-          <Button
-            variant="primary"
-            color="primary"
-            size="sm"
-            onClick={() => handleAction("view", params.row.id as string)}
-          >
-            <Eye />
-          </Button>
-
-          {searchParams.get("category") !== "live" && (
-            <Button
-              variant="secondary"
-              color="secondary"
-              size="sm"
-              onClick={() => handleAction("edit", params.row.id as string)}
-            >
-              <SquarePen className="text-xs" />
-            </Button>
-          )}
-
-          {searchParams.get("category") !== "old" && (
-            <Button
-              variant="danger"
-              color="error"
-              size="sm"
-              onClick={() => handleAction("delete", params.row.id)}
-            >
-              <Trash2 />
-            </Button>
-          )}
-
-          {/* Duplicate button only for category == "old" */}
-          {searchParams.get("category") === "old" && (
-            <Button
-              variant="primary"
-              color="info"
-              size="sm"
-              onClick={() => handleAction("duplicate", params.row.id)}
-            >
-              {/* use any icon you want, e.g., Copy or Duplicate */}
-              <Copy className="text-xs" />
-            </Button>
-          )}
-        </div>
-      ),
-    },
-  ];
-
-  const { game_name } = useParams();
-  const [rows, setRows] = useState<any[]>([]);
+  const [contests, setContests] = useState<Contest[]>([]);
   const [totalCount, setTotalCount] = useState<number>(0);
   const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState("");
   const [paginationModel, setPaginationModel] = useState<{
     page: number;
     pageSize: number;
   }>({
-    page: 0,
+    page: 1,
     pageSize: 10,
   });
 
+  const handleView = (contest: Contest) => {
+    router.push(`/${params.game_name}?contest_id=${contest.id}`);
+  };
+
+  const handleEdit = (contest: Contest) => {
+    router.push(`/${params.game_name}?contest_id=${contest.id}`);
+  };
+
+  const handleDelete = async (id: string) => {
+    // TODO: Implement delete functionality
+    console.log("Delete contest:", id);
+  };
+
+  const handleDuplicate = (contest: Contest) => {
+    // TODO: Implement duplicate functionality
+    console.log("Duplicate contest:", contest);
+  };
+
+  const { game_name } = useParams();
+
+  const fetchContests = async () => {
+    setLoading(true);
+    try {
+      let filter: Record<string, any> = {
+        page: paginationModel.page,
+        limit: paginationModel.pageSize,
+      };
+      
+      if (search) {
+        filter.q = search;
+      }
+      
+      filter.category = searchParams.get("category") ?? undefined;
+      
+      const { data } = await TriviaServices.getContests(filter);
+      
+      if (data?.data?.meta) {
+        setTotalCount(data.data.meta.total);
+      }
+      
+      if (data?.data?.rows) {
+        setContests(data.data.rows);
+      }
+    } catch (error) {
+      console.error("Error fetching contests:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchData = async () => {
+    if (search) {
+      const timerId = setTimeout(() => {
+        fetchContests();
+      }, 500);
+      return () => clearTimeout(timerId);
+    } else {
+      fetchContests();
+    }
+  }, [search, paginationModel, searchParams]);
+
+  const handlePaginationModelChange = (page: number, pageSize: number) => {
+    setPaginationModel({ page, pageSize });
+  };
+
+  const handleSearch = () => {
+    console.log("Search term:", search);
+  };
+
+  if (loading) return <div>Loading...</div>;
+
+  return (
+    <div className="mx-auto py-8">
+      <div className="mb-6 flex items-center justify-between">
+        <h1 className="text-3xl font-bold">
+          Contest Overview - (
+          {String(game_name).charAt(0).toUpperCase() +
+            String(game_name).slice(1).toLowerCase()}
+          )
+        </h1>
+      </div>
+
+      <div className="my-4">
+        <SearchBar
+          value={search}
+          onChange={setSearch}
+          onSubmit={handleSearch}
+          placeholder="Search contests..."
+        />
+      </div>
+
+      <FormSection title="Contests">
+        <ContestList
+          contests={contests}
+          category={searchParams.get("category") || undefined}
+          onView={handleView}
+          onEdit={handleEdit}
+          onDelete={handleDelete}
+          onDuplicate={handleDuplicate}
+          rowCount={totalCount}
+          onPaginationModelChange={handlePaginationModelChange}
+        />
+      </FormSection>
+    </div>
+  );
+}
       try {
         let filter: Record<string, any> = {
           page: paginationModel.page + 1,

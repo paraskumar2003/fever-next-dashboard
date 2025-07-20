@@ -97,7 +97,6 @@ const TriviaPage = () => {
           q: searchString,
           page: paginationModel.page,
           limit: paginationModel.pageSize,
-          ...paginationModel,
         });
       }, 1000);
       return () => clearTimeout(timerId);

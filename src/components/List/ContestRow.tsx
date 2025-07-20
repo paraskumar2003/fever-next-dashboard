@@ -41,7 +41,7 @@ const ContestRow: React.FC<ContestRowProps> = ({
         nextStatus: 1, // Always activate (set to active)
       };
     }
-    
+
     // For live and upcoming categories - toggle behavior
     return isPublished
       ? {
@@ -51,7 +51,7 @@ const ContestRow: React.FC<ContestRowProps> = ({
           nextStatus: 0, // Set to draft
         }
       : {
-          displayLabel: "Draft", 
+          displayLabel: "Draft",
           buttonLabel: "Activate",
           color: "bg-blue-100 text-blue-700 hover:bg-green-200",
           nextStatus: 1, // Set to active
@@ -73,7 +73,8 @@ const ContestRow: React.FC<ContestRowProps> = ({
   };
 
   const statusInfo = getStatusInfo(contest.isPublished, category);
-  const canChangeStatus = category === "live" || category === "upcoming" || category === "draft";
+  const canChangeStatus =
+    category === "live" || category === "upcoming" || category === "draft";
 
   return (
     <tr className="transition-colors hover:bg-gray-50">

@@ -33,29 +33,64 @@ const ContestRow: React.FC<ContestRowProps> = ({
   const [loadingStatus, setLoadingStatus] = useState(false);
 
   const getStatusInfo = (isPublished: boolean, currentCategory?: string) => {
-    if (currentCategory === "draft") {
-      return {
-        displayLabel: "Draft",
-        buttonLabel: "Activate",
-        color: "bg-blue-100 text-blue-700 hover:bg-green-200",
-        nextStatus: 1, // Always activate (set to active)
-      };
-    }
-    
-    // For live and upcoming categories - toggle behavior
-    return isPublished
-      ? {
-          displayLabel: "Active",
-          buttonLabel: "Set to Draft",
-          color: "bg-green-100 text-green-700 hover:bg-blue-200",
-          nextStatus: 0, // Set to draft
-        }
-      : {
-          displayLabel: "Draft", 
+    // Handle different categories with specific logic
+    switch (currentCategory) {
+      case "draft":
+        return {
+          displayLabel: "Draft",
           buttonLabel: "Activate",
           color: "bg-blue-100 text-blue-700 hover:bg-green-200",
-          nextStatus: 1, // Set to active
+          nextStatus: 1, // Always activate (set to active)
         };
+      
+      case "live":
+        // For live page: toggle between Active (status: 1) and Inactive (status: 2)
+        return contest.status === 1
+          ? {
+              displayLabel: "Active",
+              buttonLabel: "Deactivate",
+              color: "bg-green-100 text-green-700 hover:bg-red-200",
+              nextStatus: 2, // Set to inactive
+            }
+          : {
+              displayLabel: "Inactive",
+              buttonLabel: "Activate",
+              color: "bg-red-100 text-red-700 hover:bg-green-200",
+              nextStatus: 1, // Set to active
+            };
+      
+      case "upcoming":
+        // For upcoming page: toggle between Active (status: 1) and Draft (status: 0)
+        return isPublished
+          ? {
+              displayLabel: "Active",
+              buttonLabel: "Set to Draft",
+              color: "bg-green-100 text-green-700 hover:bg-blue-200",
+              nextStatus: 0, // Set to draft
+            }
+          : {
+              displayLabel: "Draft",
+              buttonLabel: "Activate",
+              color: "bg-blue-100 text-blue-700 hover:bg-green-200",
+              nextStatus: 1, // Set to active
+            };
+      
+      default:
+        // For other categories (like "old") - read-only display
+        return isPublished
+          ? {
+              displayLabel: "Active",
+              buttonLabel: "Active",
+              color: "bg-green-100 text-green-700",
+              nextStatus: 1,
+            }
+          : {
+              displayLabel: "Draft",
+              buttonLabel: "Draft",
+              color: "bg-blue-100 text-blue-700",
+              nextStatus: 0,
+            };
+    }
   };
 
   const handleStatusToggle = async () => {

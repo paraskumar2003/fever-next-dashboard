@@ -150,6 +150,12 @@ const ContestRow: React.FC<ContestRowProps> = ({
           {contest.contestTypeName}
         </span>
       </td>
+      <td className="px-4 py-3 text-sm text-gray-600">
+        {contest.total_contest_played}
+      </td>
+      <td className="px-4 py-3 text-sm text-gray-600">
+        {contest.winners_announced}
+      </td>
       <td className="px-4 py-3 text-sm">
         {canChangeStatus ? (
           <button

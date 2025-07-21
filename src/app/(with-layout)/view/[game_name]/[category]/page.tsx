@@ -5,7 +5,6 @@ import ContestList from "@/components/List/ContestList";
 import { TriviaServices, ContestServices } from "@/services";
 import { Contest } from "@/types/contest";
 import { useParams, useRouter } from "next/navigation";
-import moment from "moment";
 import { useEffect, useState } from "react";
 import FormSection from "@/components/FormSection";
 import Notiflix from "notiflix";
@@ -42,39 +41,48 @@ export default function ViewContest() {
   const handleDuplicate = async (contest: Contest) => {
     try {
       const response = await ContestServices.duplicateContest(contest.id);
-      
+
       if (response.data) {
         Notiflix.Notify.success("Contest duplicated successfully!");
         // Refresh the contests list
         await fetchContests();
       } else {
         Notiflix.Notify.failure(
-          response.response?.message || "Failed to duplicate contest"
+          response.response?.message || "Failed to duplicate contest",
         );
       }
     } catch (error) {
       console.error("Error duplicating contest:", error);
-      Notiflix.Notify.failure("An error occurred while duplicating the contest");
+      Notiflix.Notify.failure(
+        "An error occurred while duplicating the contest",
+      );
     }
   };
 
   const handleStatusChange = async (contestId: string, status: number) => {
     try {
-      const response = await TriviaServices.updateContestStatus(contestId, status);
-      
+      const response = await TriviaServices.updateContestStatus(
+        contestId,
+        status,
+      );
+
       if (response.data) {
         const statusLabels = { 0: "Draft", 1: "Active", 2: "Inactive" };
-        Notiflix.Notify.success(`Contest status updated to ${statusLabels[status as keyof typeof statusLabels]}!`);
+        Notiflix.Notify.success(
+          `Contest status updated to ${statusLabels[status as keyof typeof statusLabels]}!`,
+        );
         // Refresh the contests list
         await fetchContests();
       } else {
         Notiflix.Notify.failure(
-          response.response?.message || "Failed to update contest status"
+          response.response?.message || "Failed to update contest status",
         );
       }
     } catch (error) {
       console.error("Error updating contest status:", error);
-      Notiflix.Notify.failure("An error occurred while updating the contest status");
+      Notiflix.Notify.failure(
+        "An error occurred while updating the contest status",
+      );
     }
   };
 
@@ -139,7 +147,8 @@ export default function ViewContest() {
           Contest Overview - (
           {String(game_name).charAt(0).toUpperCase() +
             String(game_name).slice(1).toLowerCase()}
-          ) - {String(category).charAt(0).toUpperCase() + String(category).slice(1)}
+          ) -{" "}
+          {String(category).charAt(0).toUpperCase() + String(category).slice(1)}
         </h1>
       </div>
 
@@ -155,7 +164,7 @@ export default function ViewContest() {
       <FormSection title="Contests">
         <ContestList
           contests={contests}
-          category={category as string || undefined}
+          category={(category as string) || undefined}
           onView={handleView}
           onEdit={handleEdit}
           onDelete={handleDelete}

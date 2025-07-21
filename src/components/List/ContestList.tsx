@@ -86,6 +86,12 @@ const ContestList: React.FC<ContestListProps> = ({
                 <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">
                   Contest Type
                 </th>
+                <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">
+                  Contest Played
+                </th>
+                <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">
+                  Winners Announced
+                </th>
                 <th className="px-8 py-3 text-left text-sm font-medium text-gray-600">
                   Status
                 </th>

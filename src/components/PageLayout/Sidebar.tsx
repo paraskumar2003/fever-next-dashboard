@@ -30,9 +30,14 @@ const Sidebar: React.FC<SidebarProps> = ({
     const hasChildren = item.children && item.children.length > 0;
     const isExpanded = expandedItems.includes(item.id);
     const isActive = item.path === pathname;
-    const hasActiveChild = hasChildren && item.children?.some(child => 
-      child.path === pathname || (child.children && child.children.some(grandChild => grandChild.path === pathname))
-    );
+    const hasActiveChild =
+      hasChildren &&
+      item.children?.some(
+        (child) =>
+          child.path === pathname ||
+          (child.children &&
+            child.children.some((grandChild) => grandChild.path === pathname)),
+      );
     const shouldExpand = isExpanded || hasActiveChild;
 
     return (
@@ -43,8 +48,8 @@ const Sidebar: React.FC<SidebarProps> = ({
             className={`flex items-center gap-2 rounded-lg px-4 py-2 transition-colors ${
               level > 0 ? "ml-4" : ""
             } ${
-              isActive 
-                ? "bg-blue-600 text-white hover:bg-blue-700" 
+              isActive
+                ? "bg-[#192847] text-white hover:bg-[#192847]"
                 : "text-blue-900 hover:bg-gray-100"
             }`}
             onClick={onClose}
@@ -62,14 +67,16 @@ const Sidebar: React.FC<SidebarProps> = ({
             className={`flex w-full items-center justify-between rounded-lg px-4 py-2 transition-colors ${
               level > 0 ? "ml-4" : ""
             } ${
-              hasActiveChild 
-                ? "bg-blue-100 text-blue-800 hover:bg-blue-200" 
+              hasActiveChild
+                ? "bg-blue-100 text-blue-800 hover:bg-blue-200"
                 : "text-blue-900 hover:bg-gray-100"
             }`}
           >
             <div className="flex items-center gap-2">
               {item.icon && (
-                <span className={hasActiveChild ? "text-blue-800" : "text-blue-900"}>
+                <span
+                  className={hasActiveChild ? "text-blue-800" : "text-blue-900"}
+                >
                   {React.createElement(item.icon, { className: "h-5 w-5" })}
                 </span>
               )}
@@ -77,9 +84,13 @@ const Sidebar: React.FC<SidebarProps> = ({
             </div>
             {hasChildren &&
               (shouldExpand ? (
-                <ChevronDown className={`h-4 w-4 ${hasActiveChild ? "text-blue-800" : "text-blue-900"}`} />
+                <ChevronDown
+                  className={`h-4 w-4 ${hasActiveChild ? "text-blue-800" : "text-blue-900"}`}
+                />
               ) : (
-                <ChevronRight className={`h-4 w-4 ${hasActiveChild ? "text-blue-800" : "text-blue-900"}`} />
+                <ChevronRight
+                  className={`h-4 w-4 ${hasActiveChild ? "text-blue-800" : "text-blue-900"}`}
+                />
               ))}
           </button>
         )}
@@ -97,29 +108,34 @@ const Sidebar: React.FC<SidebarProps> = ({
   React.useEffect(() => {
     const findParentWithActiveChild = (items: MenuItem[]): string[] => {
       const parentsToExpand: string[] = [];
-      
+
       const checkItem = (item: MenuItem) => {
         if (item.children) {
-          const hasActiveChild = item.children.some(child => 
-            child.path === pathname || (child.children && child.children.some(grandChild => grandChild.path === pathname))
+          const hasActiveChild = item.children.some(
+            (child) =>
+              child.path === pathname ||
+              (child.children &&
+                child.children.some(
+                  (grandChild) => grandChild.path === pathname,
+                )),
           );
-          
+
           if (hasActiveChild) {
             parentsToExpand.push(item.id);
           }
-          
+
           // Recursively check children
           item.children.forEach(checkItem);
         }
       };
-      
+
       items.forEach(checkItem);
       return parentsToExpand;
     };
-    
+
     const parentsToExpand = findParentWithActiveChild(menuItems);
     if (parentsToExpand.length > 0) {
-      setExpandedItems(prev => [...new Set([...prev, ...parentsToExpand])]);
+      setExpandedItems((prev) => [...new Set([...prev, ...parentsToExpand])]);
     }
   }, [pathname, menuItems]);
 

@@ -84,7 +84,7 @@ const CouponModal: React.FC<CouponModalProps> = ({
         coupon_pin: couponData.coupon_pin || "",
         status: couponData.status,
         couponTypeId: couponData.type === "code" ? "2" : "1",
-        rewardId: couponData.reward.id || 1,
+        rewardId: couponData?.reward?.id || 1,
         coupon_attachment: couponData.coupon_attachment,
       });
     } else {

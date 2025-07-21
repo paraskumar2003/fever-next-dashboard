@@ -43,19 +43,21 @@ export default function ViewContest() {
   const handleDuplicate = async (contest: Contest) => {
     try {
       const response = await ContestServices.duplicateContest(contest.id);
-      
+
       if (response.data) {
         Notiflix.Notify.success("Contest duplicated successfully!");
         // Refresh the contests list
         await fetchContests();
       } else {
         Notiflix.Notify.failure(
-          response.response?.message || "Failed to duplicate contest"
+          response.response?.message || "Failed to duplicate contest",
         );
       }
     } catch (error) {
       console.error("Error duplicating contest:", error);
-      Notiflix.Notify.failure("An error occurred while duplicating the contest");
+      Notiflix.Notify.failure(
+        "An error occurred while duplicating the contest",
+      );
     }
   };
 

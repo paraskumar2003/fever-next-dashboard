@@ -289,6 +289,7 @@ export default function CreateContest() {
             details?.questionSet?.timerType === "GAME"
               ? details?.questionSet?.timerValues[0]
               : "0",
+          fever_logo: details?.fever_logo,
         });
         // If contest details are fetched, assume this step is "submitted"
         setFormSubmissionStatus((prev) => ({ ...prev, contestDetails: true }));

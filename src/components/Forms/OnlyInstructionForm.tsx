@@ -128,7 +128,7 @@ const OnlyInstructionForm: React.FC<OnlyInstructionFormProps> = ({
           value={formData.sponsor_logo_preview || ""}
           onChange={handleImageChange}
           error={errors.sponsor_logo}
-          required
+          required={!formData.fever_logo}
         />
       </div>
 

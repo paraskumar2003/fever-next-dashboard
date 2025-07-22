@@ -21,16 +21,23 @@ export const instructionFormSchema = Yup.object().shape({
           .max(100, "Title must be less than 100 characters"),
       }),
     )
-    .min(3, "At least three instruction is required")
+    .min(3, "At least three instructions are required")
     .required("Instructions are required"),
 
-  sponsor_logo: Yup.mixed()
-    .test(
-      "is-file",
-      "Sponsor logo must be a file",
-      (value) => value instanceof File,
-    )
-    .nullable(), // in case it's optional
+  fever_logo: Yup.boolean().required("Fever logo selection is required"),
+
+  sponsor_logo: Yup.mixed().when("fever_logo", {
+    is: false,
+    then: (schema) =>
+      schema
+        .test(
+          "is-file",
+          "Sponsor logo must be a file",
+          (value) => value instanceof File,
+        )
+        .required("Sponsor logo is required when Fever logo is not used"),
+    otherwise: (schema) => schema.nullable(),
+  }),
 });
 
 export async function validateInstructionFormData(formData: any): Promise<{

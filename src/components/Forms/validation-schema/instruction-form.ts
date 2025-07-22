@@ -38,6 +38,15 @@ export const instructionFormSchema = Yup.object().shape({
         .required("Sponsor logo is required when Fever logo is not used"),
     otherwise: (schema) => schema.nullable(),
   }),
+
+  sponsor_name: Yup.string().when("fever_logo", {
+    is: false,
+    then: (schema) =>
+      schema
+        .required("Sponsor Name is required")
+        .max(100, "Sponsor Name must be less than 100 characters"),
+    otherwise: (schema) => schema.nullable(),
+  }),
 });
 
 export async function validateInstructionFormData(formData: any): Promise<{

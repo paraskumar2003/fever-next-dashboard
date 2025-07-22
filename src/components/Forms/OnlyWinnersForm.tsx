@@ -148,9 +148,9 @@ const OnlyWinnersForm: React.FC<OnlyWinnersFormProps> = ({
           <FormSelect
             label="Types of Rewards"
             value={winners.length.toString()}
-            options={Array.from({ length: 100 }, (_, i) => ({
-              value: (i + 1).toString(),
-              label: `${i + 1}`,
+            options={Array.from({ length: 101 }, (_, i) => ({
+              value: i.toString(),
+              label: `${i}`,
             }))}
             onChange={handleWinnerCountChange}
             required

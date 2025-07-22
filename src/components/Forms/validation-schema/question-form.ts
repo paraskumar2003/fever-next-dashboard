@@ -58,20 +58,25 @@ export const questionFormSchema = Yup.object().shape({
       otherwise: (schema) => schema.notRequired().nullable(),
     }),
 
-  flipSet: Yup.number()
-    .typeError("Flip set must be a number")
-    .nullable()
-    .test(
-      "not-equal-set_id",
-      "Flip set must not be the same as Question Set",
-      function (value) {
-        const { set_id } = this.parent;
-        if (value != null && set_id != null) {
-          return value !== set_id;
-        }
-        return true;
-      },
-    ),
+  flipSet: Yup.number().when("flip_allowed", {
+    is: true,
+    then: (schema) =>
+      schema
+        .typeError("Flip set must be a number")
+        .required()
+        .test(
+          "not-equal-set_id",
+          "Flip set must not be the same as Question Set",
+          function (value) {
+            const { set_id } = this.parent;
+            if (value != null && set_id != null) {
+              return value !== set_id;
+            }
+            return true;
+          },
+        ),
+    otherwise: (schema) => schema.nullable(),
+  }),
 
   set_id: Yup.number()
     .typeError("Set ID must be a number")

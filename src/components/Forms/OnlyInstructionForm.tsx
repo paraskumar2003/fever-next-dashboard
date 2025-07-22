@@ -23,11 +23,7 @@ const OnlyInstructionForm: React.FC<OnlyInstructionFormProps> = ({
   onSave,
   errors,
 }) => {
-  const {
-    mega_prize_name = "",
-    instructions = [],
-    sponsor_logo = "",
-  } = formData;
+  const { mega_prize_name = "", instructions = [] } = formData;
 
   const handleMegaPrizeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     updateFormData({ mega_prize_name: e.target.value });
@@ -132,12 +128,24 @@ const OnlyInstructionForm: React.FC<OnlyInstructionFormProps> = ({
         />
       </div>
 
+      <div className="mt-6">
+        <FormInput
+          label="Sponsor Name"
+          placeholder="Enter instruction detail"
+          value={formData.sponsor_name}
+          onChange={(e) => updateFormData({ sponsor_name: e.target.value })}
+          error={errors[`sponsor_name`]}
+          required
+        />
+      </div>
+
       <div className="mb-6 mt-6">
         <FormCheckbox
           onChange={(e) => {
             updateFormData({ fever_logo: e.target.checked });
           }}
-          label="Show Fever logo as Default Sponsor Logo"
+          checked={formData.fever_logo}
+          label="Show Fever as Default Sponsor"
         ></FormCheckbox>
       </div>
     </FormSection>

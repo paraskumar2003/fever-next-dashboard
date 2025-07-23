@@ -76,9 +76,10 @@ const OnlyWinnersForm: React.FC<OnlyWinnersFormProps> = ({
     const count = parseInt(e.target.value);
     if (winners) {
       const newWinners = Array.from({ length: count }, (_, index) => ({
-        reward_id: winners[index]?.reward_id, //parseInt(rewards[0]?.id) || 0
+        reward_id: winners[index]?.reward_id,
         bucks: winners[index]?.bucks || 0,
         qty: winners[index]?.qty,
+        fever_bucks: false,
       }));
       updateFormData({ winners: newWinners });
       // Check for duplicates after updating winners array

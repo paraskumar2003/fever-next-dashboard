@@ -120,7 +120,7 @@ const ContestRow: React.FC<ContestRowProps> = ({
         <div className="max-w-[200px] truncate font-medium">{contest.name}</div>
       </td>
       <td className="px-4 py-3 text-sm text-gray-600">
-        ${contest.contestFee || 0}
+        ₹{contest.contestFee || 0}
       </td>
       <td className="px-4 py-3 text-sm text-gray-600">
         {contest.sponsored_logo ? (

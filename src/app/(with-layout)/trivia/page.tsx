@@ -400,11 +400,11 @@ export default function CreateContest() {
       const form = buildContestFormData(formData, contest_id);
       const { data } = await ContestServices.createContest(form);
       // Assuming the new contest_id is returned and should be set
-      push(`/trivia?contest_id=${data?.data.id}`);
       if (data?.data?.id) {
         updateFormData({ contest_id: data.data.id });
         Notiflix.Notify.success("Contest Details saved successfully!");
         setFormSubmissionStatus((prev) => ({ ...prev, contestDetails: true }));
+        push(`/trivia?contest_id=${data?.data.id}`);
         return true; // Indicate success
       }
       return false;
@@ -467,8 +467,8 @@ export default function CreateContest() {
 
       setContestFormErrors({});
       const form = buildQuestionJsonData(formData, contest_id);
-      let res = await TriviaServices.postGameQuestionForm(form);
-      if (res) {
+      let { data } = await TriviaServices.postGameQuestionForm(form);
+      if (data) {
         setFormSubmissionStatus((prev) => ({ ...prev, gameQuestions: true }));
         Notiflix.Notify.success("Game Questions saved successfully!");
         fetchPreviewQuestions();

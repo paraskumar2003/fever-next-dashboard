@@ -65,6 +65,7 @@ export const ContestProvider: React.FC<{ children: ReactNode }> = ({
     flip_allowed: 1,
     flip_count: 1,
     isPopular: 0,
+    fever_logo: false,
   });
 
   const [tambolaFormData, setTambolaFormData] = useState<
@@ -191,6 +192,7 @@ export const ContestProvider: React.FC<{ children: ReactNode }> = ({
       flip_allowed: 1,
       flip_count: 0,
       isPopular: 0,
+      fever_logo: false,
     });
   };
 

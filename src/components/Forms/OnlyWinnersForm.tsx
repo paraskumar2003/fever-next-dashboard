@@ -42,9 +42,9 @@ const OnlyWinnersForm: React.FC<OnlyWinnersFormProps> = ({
         const reward = rewards.find((r) => r.id === id);
         return reward ? reward.name : `ID: ${id}`;
       });
-      setDuplicateError(
-        `Duplicate rewards detected: ${duplicateRewardNames.join(", ")}. Each reward can only be assigned once.`,
-      );
+      // setDuplicateError(
+      //   `Duplicate rewards detected: ${duplicateRewardNames.join(", ")}. Each reward can only be assigned once.`,
+      // );
     } else {
       setDuplicateError(null);
     }

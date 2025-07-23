@@ -61,7 +61,9 @@ class ApiServices {
           }
         } else {
           Notiflix.Notify.failure(
-            error?.response?.data?.message || error?.message,
+            typeof error?.response?.data?.message == "string"
+              ? error?.response?.data?.message
+              : error.response.data.message[0] || error?.message,
           );
         }
         return Promise.reject(error);

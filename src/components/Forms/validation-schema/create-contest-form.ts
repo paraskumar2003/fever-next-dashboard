@@ -23,7 +23,7 @@ export const contestFormSchema = Yup.object().shape({
 
   contest_type_name: Yup.string().required("Contest type name is required"),
 
-  thumbnail: Yup.mixed().when("contest_id", {
+  thumbnail: Yup.mixed().when("thumbnail_preview", {
     is: (val: any) => !!val, // if contest_id is truthy
     then: (schema) => schema.nullable(), // allow null
     otherwise: (schema) =>
@@ -32,7 +32,7 @@ export const contestFormSchema = Yup.object().shape({
       }),
   }),
 
-  contest_image: Yup.mixed().when("contest_id", {
+  contest_image: Yup.mixed().when("contest_image_preview", {
     is: (val: any) => !!val, // if contest_id is truthy
     then: (schema) => schema.nullable(),
     otherwise: (schema) =>

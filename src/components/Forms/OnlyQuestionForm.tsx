@@ -110,7 +110,7 @@ const OnlyQuestionForm: React.FC<OnlyQuestionFormProps> = ({
         })),
       );
       formData.QuestionCategoryId ??= setsData[0].id;
-      formData.QuestionCount ??= setsData[0].questions;
+      formData.QuestionCount ??= setsData[0].questions.length;
     }
   };
 
@@ -209,10 +209,12 @@ const OnlyQuestionForm: React.FC<OnlyQuestionFormProps> = ({
         <FormSelect
           label="Choose Category"
           value={formData.QuestionCategoryId}
-          options={categories.map((category: any) => ({
-            value: category.id,
-            label: `${category.name}`,
-          }))}
+          options={[{ value: "", label: "" }].concat(
+            categories.map((category: any) => ({
+              value: category.id,
+              label: `${category.name}`,
+            })),
+          )}
           onChange={(e) => handleCategorySelection(e.target.value)}
           error={errors.QuestionCategoryId}
           required
@@ -332,12 +334,14 @@ const OnlyQuestionForm: React.FC<OnlyQuestionFormProps> = ({
               <FormSelect
                 label="Choose Flip Set"
                 value={formData.flipSet || ""}
-                options={sets
-                  .filter((e) => e.id != formData.QuestionCategoryId)
-                  .map((set: any) => ({
-                    value: set.id,
-                    label: `${set.name}`,
-                  }))}
+                options={[{ value: "", label: "Choose Flip Set" }].concat(
+                  sets
+                    .filter((e) => e.id != formData.QuestionCategoryId)
+                    .map((set: any) => ({
+                      value: set.id,
+                      label: `${set.name}`,
+                    })),
+                )}
                 onChange={(e) => handleFlipSetSelection(e.target.value)}
                 error={errors.flipSet}
                 required

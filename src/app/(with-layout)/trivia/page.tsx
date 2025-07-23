@@ -75,10 +75,6 @@ export default function CreateContest() {
     }
   }, [searchParams]);
 
-  useEffect(() => {
-    console.log(editMode);
-  }, [editMode]);
-
   // New state to track submission status for each form
   const [formSubmissionStatus, setFormSubmissionStatus] = useState({
     contestDetails: false,
@@ -289,6 +285,7 @@ export default function CreateContest() {
             details?.questionSet?.timerType === "GAME"
               ? details?.questionSet?.timerValues[0]
               : "0",
+          fever_logo: !details?.isSponsored,
         });
         // If contest details are fetched, assume this step is "submitted"
         setFormSubmissionStatus((prev) => ({ ...prev, contestDetails: true }));
@@ -378,15 +375,38 @@ export default function CreateContest() {
     setCurrentStep(e);
   };
 
+  const checkInstructionForm = async () => {
+    let { isValid, errors } = await validateInstructionFormData(formData);
+    console.log({ errors });
+    setContestFormErrors(errors);
+    return { isValid, errors };
+  };
+
+  const checkWinnersForm = async () => {
+    let { isValid, errors } = await validateWinnersForm(formData);
+    setContestFormErrors(errors);
+    return { isValid, errors };
+  };
+
+  const checkQuestionsForm = async () => {
+    let { isValid, errors } = await validateQuestionFormData(formData);
+    setContestFormErrors(errors);
+    return { isValid, errors };
+  };
+
+  const checkContestForm = async () => {
+    let { isValid, errors } = await validateContestFormData(formData);
+    setContestFormErrors(errors);
+    return { isValid, errors };
+  };
+
   const handleContestSave = async () => {
     Notiflix.Loading.circle();
     try {
       // Validate form data
-      let { isValid, errors } = await validateContestFormData(formData);
+      let { isValid } = await checkContestForm();
 
       if (!isValid) {
-        // Set errors in state for display
-        setContestFormErrors(errors);
         Notiflix.Notify.warning(
           "Please fix the validation errors before proceeding.",
         );
@@ -399,11 +419,11 @@ export default function CreateContest() {
       const form = buildContestFormData(formData, contest_id);
       const { data } = await ContestServices.createContest(form);
       // Assuming the new contest_id is returned and should be set
-      push(`/trivia?contest_id=${data?.data.id}`);
       if (data?.data?.id) {
         updateFormData({ contest_id: data.data.id });
         Notiflix.Notify.success("Contest Details saved successfully!");
         setFormSubmissionStatus((prev) => ({ ...prev, contestDetails: true }));
+        push(`/trivia?contest_id=${data?.data.id}`);
         return true; // Indicate success
       }
       return false;
@@ -419,11 +439,9 @@ export default function CreateContest() {
   const handleInstructionSave = async () => {
     Notiflix.Loading.circle();
     try {
-      let { isValid, errors } = await validateInstructionFormData(formData);
+      let { isValid } = await checkInstructionForm();
 
       if (!isValid) {
-        // Set errors in state for display
-        setContestFormErrors(errors);
         Notiflix.Notify.warning(
           "Please fix the validation errors before proceeding.",
         );
@@ -451,13 +469,9 @@ export default function CreateContest() {
   const handleGameQuestionSave = async () => {
     Notiflix.Loading.circle();
     try {
-      let { isValid, errors } = await validateQuestionFormData(formData);
-
-      console.log({ errors });
+      let { isValid, errors } = await checkQuestionsForm();
 
       if (!isValid) {
-        // Set errors in state for display
-        setContestFormErrors(errors);
         Notiflix.Notify.warning(
           "Please fix the validation errors before proceeding.",
         );
@@ -466,8 +480,8 @@ export default function CreateContest() {
 
       setContestFormErrors({});
       const form = buildQuestionJsonData(formData, contest_id);
-      let res = await TriviaServices.postGameQuestionForm(form);
-      if (res) {
+      let { data } = await TriviaServices.postGameQuestionForm(form);
+      if (data) {
         setFormSubmissionStatus((prev) => ({ ...prev, gameQuestions: true }));
         Notiflix.Notify.success("Game Questions saved successfully!");
         fetchPreviewQuestions();
@@ -491,12 +505,8 @@ export default function CreateContest() {
         return false;
       }
 
-      let { isValid, errors } = await validateWinnersForm(formData);
-
-      console.log(errors);
-
+      let { isValid } = await checkWinnersForm();
       if (!isValid) {
-        setContestFormErrors(errors);
         Notiflix.Notify.warning(
           "Please fix the validation errors before proceeding.",
         );
@@ -615,6 +625,23 @@ export default function CreateContest() {
         return null;
     }
   };
+
+  /** realtime validations */
+  useEffect(() => {
+    if (currentStep !== undefined && currentStep !== null) {
+      switch (currentStep) {
+        case 0:
+          checkContestForm();
+        case 1:
+          checkWinnersForm();
+        case 2:
+          checkInstructionForm();
+        case 4:
+          checkQuestionsForm();
+      }
+      console.log({ currentStep });
+    }
+  }, [formData]);
 
   return (
     <div className="mx-auto p-6">

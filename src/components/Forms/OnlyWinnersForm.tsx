@@ -76,9 +76,10 @@ const OnlyWinnersForm: React.FC<OnlyWinnersFormProps> = ({
     const count = parseInt(e.target.value);
     if (winners) {
       const newWinners = Array.from({ length: count }, (_, index) => ({
-        reward_id: winners[index]?.reward_id, //parseInt(rewards[0]?.id) || 0
+        reward_id: winners[index]?.reward_id,
         bucks: winners[index]?.bucks || 0,
         qty: winners[index]?.qty,
+        fever_bucks: false,
       }));
       updateFormData({ winners: newWinners });
       // Check for duplicates after updating winners array
@@ -148,9 +149,9 @@ const OnlyWinnersForm: React.FC<OnlyWinnersFormProps> = ({
           <FormSelect
             label="Types of Rewards"
             value={winners.length.toString()}
-            options={Array.from({ length: 100 }, (_, i) => ({
-              value: (i + 1).toString(),
-              label: `${i + 1}`,
+            options={Array.from({ length: 101 }, (_, i) => ({
+              value: i.toString(),
+              label: `${i}`,
             }))}
             onChange={handleWinnerCountChange}
             required

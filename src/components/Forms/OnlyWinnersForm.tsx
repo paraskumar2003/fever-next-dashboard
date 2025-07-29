@@ -190,7 +190,6 @@ const OnlyWinnersForm: React.FC<OnlyWinnersFormProps> = ({
                     return {
                       value: reward.id.toString(),
                       label: `${reward.name} (${reward.reward_type})`,
-                      disabled: isSelectedInAnother,
                     };
                   }),
                 ]}

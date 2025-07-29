@@ -53,24 +53,29 @@ export default function Dashboard() {
   ];
 
   return (
-    <FormSection title="Overview">
+    <div className="space-y-8">
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-gray-900">Dashboard Overview</h1>
+        <p className="mt-2 text-gray-600">Welcome back! Here's what's happening with your platform.</p>
+      </div>
+      
       <div className="space-y-8">
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           {stats.map((stat, i) => (
-            <Card key={i}>
+            <Card key={i} className="border-0 shadow-lg hover:shadow-xl transition-shadow duration-200">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">
+                <CardTitle className="text-sm font-semibold text-gray-600">
                   {stat.title}
                 </CardTitle>
-                <stat.icon className="text-muted-foreground h-4 w-4" />
+                <stat.icon className="h-5 w-5 text-gray-400" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{stat.value}</div>
-                <p className="text-muted-foreground flex items-center text-xs">
+                <div className="text-3xl font-bold text-gray-900">{stat.value}</div>
+                <p className="flex items-center text-sm">
                   <span
                     className={cn(
                       "mr-1 flex items-center",
-                      stat.increasing ? "text-emerald-500" : "text-red-500",
+                      stat.increasing ? "text-accent-600" : "text-red-600",
                     )}
                   >
                     {stat.increasing ? (
@@ -80,7 +85,7 @@ export default function Dashboard() {
                     )}
                     {stat.change}
                   </span>
-                  from last month
+                  <span className="text-gray-500">from last month</span>
                 </p>
               </CardContent>
             </Card>
@@ -88,24 +93,24 @@ export default function Dashboard() {
         </div>
 
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-          <Card className="col-span-4">
+          <Card className="col-span-4 border-0 shadow-lg">
             <CardHeader>
-              <CardTitle>Revenue Overview</CardTitle>
-              <CardDescription>
+              <CardTitle className="text-xl font-bold text-gray-900">Revenue Overview</CardTitle>
+              <CardDescription className="text-gray-600">
                 Monthly revenue over the last 12 months
               </CardDescription>
             </CardHeader>
-            <CardContent className="flex h-[300px] items-center justify-center">
-              <LineChart className="text-muted-foreground/50 h-16 w-16" />
-              <p className="text-muted-foreground ml-4 text-sm">
+            <CardContent className="flex h-[300px] items-center justify-center bg-gray-50 rounded-lg">
+              <LineChart className="h-16 w-16 text-gray-300" />
+              <p className="ml-4 text-sm text-gray-500">
                 Revenue chart visualization would be displayed here
               </p>
             </CardContent>
           </Card>
-          <Card className="col-span-3">
+          <Card className="col-span-3 border-0 shadow-lg">
             <CardHeader>
-              <CardTitle>Recent Activity</CardTitle>
-              <CardDescription>
+              <CardTitle className="text-xl font-bold text-gray-900">Recent Activity</CardTitle>
+              <CardDescription className="text-gray-600">
                 The last 5 activities in your account
               </CardDescription>
             </CardHeader>
@@ -113,14 +118,14 @@ export default function Dashboard() {
               <div className="space-y-4">
                 {[1, 2, 3, 4, 5].map((i) => (
                   <div key={i} className="flex items-center gap-4">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10">
-                      <Users className="h-4 w-4 text-primary" />
+                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary-100">
+                      <Users className="h-5 w-5 text-primary-600" />
                     </div>
                     <div className="space-y-1">
-                      <p className="text-sm font-medium leading-none">
+                      <p className="text-sm font-semibold text-gray-900">
                         New user registered
                       </p>
-                      <p className="text-muted-foreground text-xs">
+                      <p className="text-xs text-gray-500">
                         {i} hour{i !== 1 ? "s" : ""} ago
                       </p>
                     </div>
@@ -132,32 +137,32 @@ export default function Dashboard() {
         </div>
 
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          <Card>
+          <Card className="border-0 shadow-lg">
             <CardHeader>
-              <CardTitle>User Distribution</CardTitle>
-              <CardDescription>User breakdown by region</CardDescription>
+              <CardTitle className="text-lg font-bold text-gray-900">User Distribution</CardTitle>
+              <CardDescription className="text-gray-600">User breakdown by region</CardDescription>
             </CardHeader>
-            <CardContent className="flex h-[200px] items-center justify-center">
-              <BarChart className="text-muted-foreground/50 h-12 w-12" />
-              <p className="text-muted-foreground ml-4 text-sm">
+            <CardContent className="flex h-[200px] items-center justify-center bg-gray-50 rounded-lg">
+              <BarChart className="h-12 w-12 text-gray-300" />
+              <p className="ml-4 text-sm text-gray-500">
                 Distribution chart would be displayed here
               </p>
             </CardContent>
           </Card>
-          <Card>
+          <Card className="border-0 shadow-lg">
             <CardHeader>
-              <CardTitle>Popular Products</CardTitle>
-              <CardDescription>Top selling products this month</CardDescription>
+              <CardTitle className="text-lg font-bold text-gray-900">Popular Products</CardTitle>
+              <CardDescription className="text-gray-600">Top selling products this month</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
                 {[1, 2, 3, 4].map((i) => (
                   <div key={i} className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <div className="bg-muted h-8 w-8 rounded"></div>
-                      <span className="text-sm font-medium">Product {i}</span>
+                      <div className="h-8 w-8 rounded bg-gray-200"></div>
+                      <span className="text-sm font-semibold text-gray-900">Product {i}</span>
                     </div>
-                    <span className="text-sm font-medium">
+                    <span className="text-sm font-semibold text-gray-700">
                       ${Math.floor(Math.random() * 100) + 10}.99
                     </span>
                   </div>
@@ -165,10 +170,10 @@ export default function Dashboard() {
               </div>
             </CardContent>
           </Card>
-          <Card>
+          <Card className="border-0 shadow-lg">
             <CardHeader>
-              <CardTitle>Quick Links</CardTitle>
-              <CardDescription>Access frequently used pages</CardDescription>
+              <CardTitle className="text-lg font-bold text-gray-900">Quick Links</CardTitle>
+              <CardDescription className="text-gray-600">Access frequently used pages</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-2 gap-2">
@@ -176,7 +181,7 @@ export default function Dashboard() {
                   (link, i) => (
                     <button
                       key={i}
-                      className="hover:bg-muted rounded-md border p-2 text-sm transition-colors"
+                      className="rounded-lg border border-gray-200 p-3 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 hover:border-gray-300"
                     >
                       {link}
                     </button>
@@ -187,6 +192,6 @@ export default function Dashboard() {
           </Card>
         </div>
       </div>
-    </FormSection>
+    </div>
   );
 }

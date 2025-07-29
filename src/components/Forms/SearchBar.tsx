@@ -32,11 +32,11 @@ const SearchBar: React.FC<SearchBarProps> = ({
           value={value}
           onChange={(e) => onChange(e.target.value)}
           onKeyDown={handleKeyDown}
-          className="w-full rounded-md border border-gray-300 px-4 py-2 pl-10 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 pl-11 text-gray-900 placeholder-gray-400 shadow-sm transition-colors focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-opacity-50"
           placeholder={placeholder}
         />
-        <div className="absolute left-3 top-1/2 -translate-y-1/2 transform text-gray-400">
-          {icon}
+        <div className="absolute left-3 top-1/2 -translate-y-1/2 transform text-gray-400 text-lg">
+          {typeof icon === 'string' ? icon : '🔍'}
         </div>
       </div>
     </div>

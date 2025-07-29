@@ -53,52 +53,52 @@ const ContestList: React.FC<ContestListProps> = ({
   const endItem = Math.min(rowCount, paginationModel.page * pageSize);
 
   return (
-    <div className="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-lg">
+    <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-lg">
       <ListWrapper>
         <div className="overflow-x-auto">
           <table className="w-full border-collapse">
             <thead>
-              <tr className="border-b border-gray-200 bg-gray-50">
-                <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">
+              <tr className="border-b border-gray-200 bg-gray-50/50">
+                <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
                   ID
                 </th>
-                <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">
+                <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
                   Contest Name
                 </th>
-                <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">
+                <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
                   Contest Fee
                 </th>
-                <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">
+                <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
                   Sponsor Logo
                 </th>
-                <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">
+                <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
                   Start Date
                 </th>
-                <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">
+                <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
                   Start Time
                 </th>
-                <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">
+                <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
                   End Date
                 </th>
-                <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">
+                <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
                   End Time
                 </th>
-                <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">
+                <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
                   Contest Type
                 </th>
-                <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">
+                <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
                   Contest Played
                 </th>
-                <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">
+                <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
                   Winners Announced
                 </th>
-                <th className="px-8 py-3 text-left text-sm font-medium text-gray-600">
+                <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
                   Status
                 </th>
-                <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">
+                <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
                   Sponsor Name
                 </th>
-                <th className="px-4 py-3 text-center text-sm font-medium text-gray-600">
+                <th className="px-6 py-4 text-center text-xs font-semibold uppercase tracking-wider text-gray-500">
                   Actions
                 </th>
               </tr>
@@ -123,34 +123,40 @@ const ContestList: React.FC<ContestListProps> = ({
           </table>
 
           {contests.length === 0 && (
-            <div className="py-8 text-center text-gray-500">
-              No contests found
+            <div className="py-12 text-center">
+              <div className="mx-auto h-12 w-12 text-gray-300">
+                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+              </div>
+              <h3 className="mt-4 text-lg font-semibold text-gray-900">No contests found</h3>
+              <p className="mt-2 text-gray-500">Get started by creating your first contest.</p>
             </div>
           )}
         </div>
       </ListWrapper>
 
       {/* Pagination Controls */}
-      <div className="flex items-center justify-between border-t border-gray-200 bg-white px-4 py-3 sm:px-6">
+      <div className="flex items-center justify-between border-t border-gray-200 bg-gray-50/50 px-6 py-4">
         <div className="flex flex-1 justify-between sm:hidden">
           <button
             onClick={handlePreviousPage}
             disabled={!canGoPrevious}
-            className="relative inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+            className="relative inline-flex items-center rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm hover:bg-gray-50 disabled:opacity-50"
           >
             Previous
           </button>
           <button
             onClick={handleNextPage}
             disabled={!canGoNext}
-            className="relative ml-3 inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+            className="relative ml-3 inline-flex items-center rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm hover:bg-gray-50 disabled:opacity-50"
           >
             Next
           </button>
         </div>
         <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
           <div className="flex items-center space-x-4">
-            <p className="text-sm text-gray-700">
+            <p className="text-sm font-medium text-gray-700">
               Showing <span className="font-medium">{startItem}</span> to{" "}
               <span className="font-medium">{endItem}</span> of{" "}
               <span className="font-medium">{rowCount}</span> results
@@ -159,11 +165,12 @@ const ContestList: React.FC<ContestListProps> = ({
 
           <div className="flex items-center space-x-2">
             <div className="flex items-center space-x-2">
+              <label className="text-sm font-medium text-gray-700">Show:</label>
               <select
                 id="pageSize"
                 value={pageSize}
                 onChange={(e) => handlePageSizeChange(Number(e.target.value))}
-                className="rounded-md border border-gray-300 bg-white px-3 py-1 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm font-medium focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
               >
                 <option value={5}>5</option>
                 <option value={10}>10</option>
@@ -172,13 +179,13 @@ const ContestList: React.FC<ContestListProps> = ({
               </select>
             </div>
             <nav
-              className="isolate inline-flex -space-x-px rounded-md shadow-sm"
+              className="isolate inline-flex -space-x-px rounded-lg shadow-sm"
               aria-label="Pagination"
             >
               <button
                 onClick={handlePreviousPage}
                 disabled={!canGoPrevious}
-                className="relative inline-flex items-center rounded-l-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 disabled:opacity-50"
+                className="relative inline-flex items-center rounded-l-lg px-3 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 disabled:opacity-50"
               >
                 <span className="sr-only">Previous</span>
                 <svg
@@ -197,7 +204,7 @@ const ContestList: React.FC<ContestListProps> = ({
               <button
                 onClick={handleNextPage}
                 disabled={!canGoNext}
-                className="relative inline-flex items-center rounded-r-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 disabled:opacity-50"
+                className="relative inline-flex items-center rounded-r-lg px-3 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 disabled:opacity-50"
               >
                 <span className="sr-only">Next</span>
                 <svg

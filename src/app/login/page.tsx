@@ -4,6 +4,8 @@ import { useRouter } from "next/navigation";
 import { AuthServices } from "@/services/auth";
 import { Eye, EyeOff } from "lucide-react";
 import Cookies from "js-cookie";
+import { toast } from "react-toastify";
+import Button from "@/components/Button";
 
 export default function Login() {
   const [form, setForm] = useState({
@@ -11,7 +13,7 @@ export default function Login() {
     password: "",
     remember: false,
   });
-  const [showModal, setShowModal] = useState(false);
+  const [loading, setLoading] = useState(false);
   const { push } = useRouter();
 
   const handleChange = (e: any) => {
@@ -21,25 +23,32 @@ export default function Login() {
 
   const handleSubmit = async (e: any) => {
     e.preventDefault();
+    setLoading(true);
 
-    const response = await AuthServices.dashboardLogin({
-      email: form.username,
-      password: form.password,
-    });
-
-    if (response?.data?.data.accessToken) {
-      // Set token in cookie with 7 days expiry
-      Cookies.set("authToken", response?.data?.data.accessToken, {
-        expires: 7,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "strict",
+    try {
+      const response = await AuthServices.dashboardLogin({
+        email: form.username,
+        password: form.password,
       });
-      push("/home");
-      // Auto redirect after 5 seconds
-      // setShowModal(true);
+
+      if (response?.data?.data.accessToken) {
+        // Set token in cookie with 7 days expiry
+        Cookies.set("authToken", response?.data?.data.accessToken, {
+          expires: 7,
+          secure: process.env.NODE_ENV === "production",
+          sameSite: "strict",
+        });
+        toast.success("Login successful! Redirecting...");
+        setTimeout(() => push("/home"), 1000);
+      } else {
+        toast.error("Invalid credentials. Please try again.");
+      }
+    } catch (error) {
+      toast.error("Login failed. Please check your credentials.");
+    } finally {
+      setLoading(false);
     }
 
-    // Show modal
   };
 
   const [showPassword, setShowPassword] = useState(false);
@@ -48,17 +57,19 @@ export default function Login() {
 
   return (
     <div
-      className="flex min-h-screen items-center justify-center bg-cover bg-center bg-no-repeat"
-      style={{
-        backgroundImage:
-          "url(https://source.unsplash.com/1920x1080/?abstract,technology)",
-      }}
+      className="flex min-h-screen items-center justify-center bg-gradient-to-br from-primary-50 to-primary-100"
     >
-      <div className="w-96 rounded-2xl border border-black/20 bg-white bg-opacity-10 p-8 shadow-xl backdrop-blur-lg">
-        <h2 className="mb-6 text-center text-3xl font-bold">Login</h2>
+      <div className="w-full max-w-md rounded-2xl bg-white p-8 shadow-2xl">
+        <div className="mb-8 text-center">
+          <h2 className="text-3xl font-bold text-gray-900">Welcome Back</h2>
+          <p className="mt-2 text-gray-600">Sign in to your account</p>
+        </div>
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Username Input */}
           <div className="relative">
+            <label className="mb-2 block text-sm font-semibold text-gray-700">
+              Email Address
+            </label>
             <input
               type="text"
               id="username"
@@ -66,12 +77,15 @@ export default function Login() {
               value={form.username}
               onChange={handleChange}
               required
-              className="peer w-full rounded-lg border border-black/30 bg-transparent px-3 pb-2 pt-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder={form.username ? "" : "Username"}
+              className="w-full rounded-lg border border-gray-300 px-4 py-3 text-gray-900 placeholder-gray-400 transition-colors focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-opacity-50"
+              placeholder="Enter your email"
             />
           </div>
 
           <div className="relative">
+            <label className="mb-2 block text-sm font-semibold text-gray-700">
+              Password
+            </label>
             <input
               type={showPassword ? "text" : "password"}
               id="password"
@@ -79,15 +93,15 @@ export default function Login() {
               value={form.password}
               onChange={handleChange}
               required
-              className="peer w-full rounded-lg border border-black/30 bg-transparent px-3 pb-2 pt-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder={form.password ? "" : "Password"}
+              className="w-full rounded-lg border border-gray-300 px-4 py-3 pr-12 text-gray-900 placeholder-gray-400 transition-colors focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-opacity-50"
+              placeholder="Enter your password"
             />
 
             {/* Toggle Icon */}
             <button
               type="button"
               onClick={togglePassword}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-black"
+              className="absolute right-3 top-9 text-gray-400 hover:text-gray-600"
             >
               {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
             </button>
@@ -101,40 +115,24 @@ export default function Login() {
               name="remember"
               checked={form.remember}
               onChange={handleChange}
-              className="h-4 w-4 accent-blue-500"
+              className="h-4 w-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500"
             />
-            <label htmlFor="remember" className="text-sm">
+            <label htmlFor="remember" className="text-sm text-gray-700">
               Remember Me
             </label>
           </div>
 
           {/* Login Button */}
-          <button
+          <Button
             type="submit"
-            className="w-full rounded-lg bg-blue-600 p-3 font-semibold text-white shadow-md transition hover:bg-blue-700"
+            className="w-full"
+            loading={loading}
+            disabled={loading}
           >
-            Login
-          </button>
+            {loading ? "Signing in..." : "Sign In"}
+          </Button>
         </form>
       </div>
-
-      {/* Success Modal */}
-      {showModal && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="rounded-lg bg-white p-6 text-center shadow-lg">
-            <div className="text-4xl text-green-500">✔</div>
-            <h2 className="mt-2 text-xl font-semibold">
-              Successfully Logged In!
-            </h2>
-            <button
-              onClick={() => push("/home")}
-              className="mt-4 rounded-lg bg-blue-600 px-4 py-2 text-white transition hover:bg-blue-700"
-            >
-              OK
-            </button>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

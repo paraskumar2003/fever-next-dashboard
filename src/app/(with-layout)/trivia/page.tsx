@@ -20,7 +20,7 @@ import { ContestServices, TriviaServices } from "@/services";
 import { QuestionSetServices } from "@/services/trivia/sets.service";
 import { useRouter, useSearchParams } from "next/navigation";
 import moment from "moment";
-import Notiflix from "notiflix";
+import { toast } from "react-toastify";
 import {
   buildContestFormData,
   buildInstructionFormData,
@@ -308,7 +308,7 @@ export default function CreateContest() {
   const goNext = (force = false) => {
     if (!force) {
       if (currentStep === 0 && !formSubmissionStatus.contestDetails) {
-        Notiflix.Notify.warning(
+        toast.warning(
           "Please save Contest Details before proceeding.",
         );
         return;
@@ -318,7 +318,7 @@ export default function CreateContest() {
         !formSubmissionStatus.winnersAndRewards &&
         !editMode.winners
       ) {
-        Notiflix.Notify.warning(
+        toast.warning(
           "Please save Winners & Rewards before proceeding.",
         );
         return;
@@ -328,7 +328,7 @@ export default function CreateContest() {
         !formSubmissionStatus.instructions &&
         !editMode.instruction
       ) {
-        Notiflix.Notify.warning("Please save Instructions before proceeding.");
+        toast.warning("Please save Instructions before proceeding.");
         return;
       }
       if (
@@ -336,7 +336,7 @@ export default function CreateContest() {
         !formSubmissionStatus.gameQuestions &&
         !editMode.questions
       ) {
-        Notiflix.Notify.warning(
+        toast.warning(
           "Please save Game Questions before proceeding.",
         );
         return;
@@ -349,25 +349,25 @@ export default function CreateContest() {
   const goToStep = (e: number) => {
     // Prevent jumping to steps if previous forms are not submitted
     if (e > 0 && !formSubmissionStatus.contestDetails) {
-      Notiflix.Notify.warning(
+      toast.warning(
         "Please save Contest Details before navigating to other steps.",
       );
       return;
     }
     if (e > 1 && !formSubmissionStatus.winnersAndRewards) {
-      Notiflix.Notify.warning(
+      toast.warning(
         "Please save Winners & Rewards before navigating to other steps.",
       );
       return;
     }
     if (e > 2 && !formSubmissionStatus.instructions) {
-      Notiflix.Notify.warning(
+      toast.warning(
         "Please save Instructions before navigating to other steps.",
       );
       return;
     }
     if (e > 3 && !formSubmissionStatus.gameQuestions) {
-      Notiflix.Notify.warning(
+      toast.warning(
         "Please save Game Questions before navigating to other steps.",
       );
       return;
@@ -401,13 +401,12 @@ export default function CreateContest() {
   };
 
   const handleContestSave = async () => {
-    Notiflix.Loading.circle();
     try {
       // Validate form data
       let { isValid } = await checkContestForm();
 
       if (!isValid) {
-        Notiflix.Notify.warning(
+        toast.warning(
           "Please fix the validation errors before proceeding.",
         );
         return false;
@@ -421,28 +420,25 @@ export default function CreateContest() {
       // Assuming the new contest_id is returned and should be set
       if (data?.data?.id) {
         updateFormData({ contest_id: data.data.id });
-        Notiflix.Notify.success("Contest Details saved successfully!");
+        toast.success("Contest Details saved successfully!");
         setFormSubmissionStatus((prev) => ({ ...prev, contestDetails: true }));
         push(`/trivia?contest_id=${data?.data.id}`);
         return true; // Indicate success
       }
       return false;
     } catch (error: any) {
-      Notiflix.Notify.failure("Failed to save Contest Details.");
+      toast.error("Failed to save Contest Details.");
       console.error("Error saving contest:", error);
       return false; // Indicate failure
-    } finally {
-      Notiflix.Loading.remove();
     }
   };
 
   const handleInstructionSave = async () => {
-    Notiflix.Loading.circle();
     try {
       let { isValid } = await checkInstructionForm();
 
       if (!isValid) {
-        Notiflix.Notify.warning(
+        toast.warning(
           "Please fix the validation errors before proceeding.",
         );
         return false;
@@ -453,26 +449,23 @@ export default function CreateContest() {
       let { data } = await TriviaServices.createInstruction(form);
       if (data) {
         setFormSubmissionStatus((prev) => ({ ...prev, instructions: true }));
-        Notiflix.Notify.success("Instructions saved successfully!");
+        toast.success("Instructions saved successfully!");
         return true; // Indicate success
       }
       return false; // Indicate failure
     } catch (error: any) {
-      Notiflix.Notify.failure("Failed to save Instructions.");
+      toast.error("Failed to save Instructions.");
       console.error("Error saving contest:", error);
       return false; // Indicate failure
-    } finally {
-      Notiflix.Loading.remove();
     }
   };
 
   const handleGameQuestionSave = async () => {
-    Notiflix.Loading.circle();
     try {
       let { isValid, errors } = await checkQuestionsForm();
 
       if (!isValid) {
-        Notiflix.Notify.warning(
+        toast.warning(
           "Please fix the validation errors before proceeding.",
         );
         return false;
@@ -483,31 +476,28 @@ export default function CreateContest() {
       let { data } = await TriviaServices.postGameQuestionForm(form);
       if (data) {
         setFormSubmissionStatus((prev) => ({ ...prev, gameQuestions: true }));
-        Notiflix.Notify.success("Game Questions saved successfully!");
+        toast.success("Game Questions saved successfully!");
         fetchPreviewQuestions();
         return true; // Indicate success
       }
       return false; // Indicate failure
     } catch (error: any) {
-      Notiflix.Notify.failure("Failed to save Game Questions.");
+      toast.error("Failed to save Game Questions.");
       console.error("Error saving contest:", error);
       return false; // Indicate failure
-    } finally {
-      Notiflix.Loading.remove();
     }
   };
 
   const handleWinnersSave = async () => {
-    Notiflix.Loading.circle();
     try {
       if (!formData.contest_id || !formData.winners?.length) {
-        Notiflix.Notify.failure("Atleast one winner is required");
+        toast.error("At least one winner is required");
         return false;
       }
 
       let { isValid } = await checkWinnersForm();
       if (!isValid) {
-        Notiflix.Notify.warning(
+        toast.warning(
           "Please fix the validation errors before proceeding.",
         );
         return false;
@@ -524,14 +514,12 @@ export default function CreateContest() {
 
       await ContestServices.createContestPrize(payload);
       setFormSubmissionStatus((prev) => ({ ...prev, winnersAndRewards: true }));
-      Notiflix.Notify.success("Contest prizes saved successfully!");
+      toast.success("Contest prizes saved successfully!");
       return true; // Indicate success
     } catch (error) {
       console.error("Error saving contest prizes:", error);
-      Notiflix.Notify.failure("Failed to save contest prizes");
+      toast.error("Failed to save contest prizes");
       return false; // Indicate failure
-    } finally {
-      Notiflix.Loading.remove();
     }
   };
 
@@ -561,7 +549,7 @@ export default function CreateContest() {
   };
 
   const handlePublish = () => {
-    Notiflix.Notify.success("Game Published Successfully!");
+    toast.success("Game Published Successfully!");
     push("/view/trivia?category=upcoming");
   };
 
@@ -644,7 +632,11 @@ export default function CreateContest() {
   }, [formData]);
 
   return (
-    <div className="mx-auto p-6">
+    <div className="mx-auto max-w-7xl p-6">
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-gray-900">Create Trivia Contest</h1>
+        <p className="mt-2 text-gray-600">Follow the steps below to create your trivia contest.</p>
+      </div>
       <Breadcrumb
         currentStep={currentStep}
         steps={steps}

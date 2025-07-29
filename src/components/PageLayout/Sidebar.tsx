@@ -49,8 +49,8 @@ const Sidebar: React.FC<SidebarProps> = ({
               level > 0 ? "ml-4" : ""
             } ${
               isActive
-                ? "bg-[#192847] text-white hover:bg-[#192847]"
-                : "text-blue-900 hover:bg-gray-100"
+                ? "bg-primary-600 text-white hover:bg-primary-700"
+                : "text-gray-700 hover:bg-gray-100"
             }`}
             onClick={onClose}
           >
@@ -59,7 +59,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                 {React.createElement(item.icon, { className: "h-5 w-5" })}
               </span>
             )}
-            <span className="text-md font-bold">{item.label}</span>
+            <span className="text-sm font-semibold">{item.label}</span>
           </Link>
         ) : (
           <button
@@ -68,35 +68,35 @@ const Sidebar: React.FC<SidebarProps> = ({
               level > 0 ? "ml-4" : ""
             } ${
               hasActiveChild
-                ? "bg-blue-100 text-blue-800 hover:bg-blue-200"
-                : "text-blue-900 hover:bg-gray-100"
+                ? "bg-primary-50 text-primary-800 hover:bg-primary-100"
+                : "text-gray-700 hover:bg-gray-100"
             }`}
           >
             <div className="flex items-center gap-2">
               {item.icon && (
                 <span
-                  className={hasActiveChild ? "text-blue-800" : "text-blue-900"}
+                  className={hasActiveChild ? "text-primary-800" : "text-gray-600"}
                 >
                   {React.createElement(item.icon, { className: "h-5 w-5" })}
                 </span>
               )}
-              <span className="text-md font-bold">{item.label}</span>
+              <span className="text-sm font-semibold">{item.label}</span>
             </div>
             {hasChildren &&
               (shouldExpand ? (
                 <ChevronDown
-                  className={`h-4 w-4 ${hasActiveChild ? "text-blue-800" : "text-blue-900"}`}
+                  className={`h-4 w-4 ${hasActiveChild ? "text-primary-800" : "text-gray-600"}`}
                 />
               ) : (
                 <ChevronRight
-                  className={`h-4 w-4 ${hasActiveChild ? "text-blue-800" : "text-blue-900"}`}
+                  className={`h-4 w-4 ${hasActiveChild ? "text-primary-800" : "text-gray-600"}`}
                 />
               ))}
           </button>
         )}
 
         {hasChildren && shouldExpand && (
-          <div className="ml-4 border-l border-blue-100 pl-2">
+          <div className="ml-4 border-l border-gray-200 pl-2">
             {item?.children?.map((child) => renderMenuItem(child, level + 1))}
           </div>
         )}
@@ -150,9 +150,12 @@ const Sidebar: React.FC<SidebarProps> = ({
       <div
         className={`sidebar z-50 max-h-screen w-[250px] transform bg-white shadow-md transition-transform duration-300 ${
           isOpen ? "translate-x-0" : "-translate-x-full"
-        }`}
+        } border-r border-gray-200`}
       >
-        <div className="h-full overflow-y-auto px-2 py-4">
+        <div className="h-full overflow-y-auto px-4 py-6">
+          <div className="mb-8 px-2">
+            <h2 className="text-xl font-bold text-gray-900">Admin Panel</h2>
+          </div>
           <div className="space-y-1">
             {menuItems.map((item) => renderMenuItem(item))}
           </div>

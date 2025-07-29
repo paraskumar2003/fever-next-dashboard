@@ -19,12 +19,12 @@ const FormSection: React.FC<FormSectionProps> = ({
   saveButtonText = "Save",
 }) => {
   return (
-    <div className="mb-8 rounded-lg border border-white/20 bg-white p-6 shadow-xl backdrop-blur-md">
-      <div className="flex items-center justify-between">
-        <h2 className="mb-4 border-b border-white/20 pb-2 text-xl font-bold ">
+    <div className="mb-8 rounded-xl border border-gray-200 bg-white p-8 shadow-lg">
+      <div className="mb-6 flex items-center justify-between border-b border-gray-100 pb-4">
+        <h2 className="text-2xl font-bold text-gray-900">
           {title}
         </h2>
-        <div className="flex gap-2">
+        <div className="flex items-center gap-3">
           {headerAction}
           {onEdit && (
             <Button
@@ -38,7 +38,7 @@ const FormSection: React.FC<FormSectionProps> = ({
           )}
           {onSave && (
             <Button
-              variant="success"
+              variant="primary"
               size="sm"
               type="submit"
               onClick={() => onSave()}
@@ -48,7 +48,7 @@ const FormSection: React.FC<FormSectionProps> = ({
           )}
         </div>
       </div>
-      <div className="space-y-4">{children}</div>
+      <div className="space-y-6">{children}</div>
     </div>
   );
 };

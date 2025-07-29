@@ -308,9 +308,7 @@ export default function CreateContest() {
   const goNext = (force = false) => {
     if (!force) {
       if (currentStep === 0 && !formSubmissionStatus.contestDetails) {
-        toast.warning(
-          "Please save Contest Details before proceeding.",
-        );
+        toast.warning("Please save Contest Details before proceeding.");
         return;
       }
       if (
@@ -318,9 +316,7 @@ export default function CreateContest() {
         !formSubmissionStatus.winnersAndRewards &&
         !editMode.winners
       ) {
-        toast.warning(
-          "Please save Winners & Rewards before proceeding.",
-        );
+        toast.warning("Please save Winners & Rewards before proceeding.");
         return;
       }
       if (
@@ -336,9 +332,7 @@ export default function CreateContest() {
         !formSubmissionStatus.gameQuestions &&
         !editMode.questions
       ) {
-        toast.warning(
-          "Please save Game Questions before proceeding.",
-        );
+        toast.warning("Please save Game Questions before proceeding.");
         return;
       }
     }
@@ -406,9 +400,7 @@ export default function CreateContest() {
       let { isValid } = await checkContestForm();
 
       if (!isValid) {
-        toast.warning(
-          "Please fix the validation errors before proceeding.",
-        );
+        toast.warning("Please fix the validation errors before proceeding.");
         return false;
       }
 
@@ -438,9 +430,7 @@ export default function CreateContest() {
       let { isValid } = await checkInstructionForm();
 
       if (!isValid) {
-        toast.warning(
-          "Please fix the validation errors before proceeding.",
-        );
+        toast.warning("Please fix the validation errors before proceeding.");
         return false;
       }
 
@@ -465,9 +455,7 @@ export default function CreateContest() {
       let { isValid, errors } = await checkQuestionsForm();
 
       if (!isValid) {
-        toast.warning(
-          "Please fix the validation errors before proceeding.",
-        );
+        toast.warning("Please fix the validation errors before proceeding.");
         return false;
       }
 
@@ -490,16 +478,19 @@ export default function CreateContest() {
 
   const handleWinnersSave = async () => {
     try {
+      console.log("trying to save winners");
+
       if (!formData.contest_id || !formData.winners?.length) {
         toast.error("At least one winner is required");
         return false;
       }
 
-      let { isValid } = await checkWinnersForm();
+      let { isValid, errors } = await checkWinnersForm();
+
+      console.log(errors);
+      setContestFormErrors(errors);
       if (!isValid) {
-        toast.warning(
-          "Please fix the validation errors before proceeding.",
-        );
+        toast.warning("Please fix the validation errors before proceeding.");
         return false;
       }
 
@@ -634,8 +625,12 @@ export default function CreateContest() {
   return (
     <div className="mx-auto max-w-7xl p-6">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">Create Trivia Contest</h1>
-        <p className="mt-2 text-gray-600">Follow the steps below to create your trivia contest.</p>
+        <h1 className="text-3xl font-bold text-gray-900">
+          Create Trivia Contest
+        </h1>
+        <p className="mt-2 text-gray-600">
+          Follow the steps below to create your trivia contest.
+        </p>
       </div>
       <Breadcrumb
         currentStep={currentStep}

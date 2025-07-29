@@ -268,21 +268,23 @@ const OnlyQuestionForm: React.FC<OnlyQuestionFormProps> = ({
         />
       ) : (
         <div className="space-y-4">
-          {formData.questions?.map((q, index) => (
+          {formData.questions && (
             <FormInput
-              key={index}
-              label={`Question ${index + 1} Timer (in seconds)`}
+              label="Timer for all Questions (in seconds)"
               type="number"
-              value={q.timer}
+              value={formData?.questions[0]?.timer}
               onChange={(e) => {
-                const questions = [...(formData.questions || [])];
-                questions[index].timer = e.target.value;
+                const newTimer = e.target.value; // ensure a number!
+                const questions = (formData.questions || []).map((q) => ({
+                  ...q,
+                  timer: newTimer,
+                }));
                 updateFormData({ questions });
               }}
-              error={errors[`questions[${index}]`]?.timer}
               required
+              // You may show a general error if you like, e.g. errors.questions?.[0]?.timer
             />
-          ))}
+          )}
         </div>
       )}
 

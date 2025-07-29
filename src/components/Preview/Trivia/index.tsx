@@ -31,9 +31,9 @@ export function TriviaGamePlay({
   const [timer, setTimer] = useState<{ timeOut: number; state: boolean }>({
     state: true,
     timeOut:
-      (formData?.game_time_level === "GAME"
+      formData?.game_time_level === "GAME"
         ? +formData?.game_timer!
-        : +questions[0]?.timer || 10) * 1000,
+        : +questions[0]?.timer || 10,
   });
   const [game, setGame] = useState<{ state: GameState }>({
     state: GameState.PLAYING,

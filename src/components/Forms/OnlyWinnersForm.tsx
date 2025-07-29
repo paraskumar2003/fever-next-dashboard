@@ -68,7 +68,7 @@ const OnlyWinnersForm: React.FC<OnlyWinnersFormProps> = ({
   // Check for duplicates whenever winners array changes
   useEffect(() => {
     if (rewards.length > 0) {
-      checkForDuplicateRewardIds(winners);
+      // checkForDuplicateRewardIds(winners);
     }
   }, [winners, rewards]);
 
@@ -89,7 +89,12 @@ const OnlyWinnersForm: React.FC<OnlyWinnersFormProps> = ({
 
   const updateWinner = (
     index: number,
-    data: Partial<{ reward_id: number; bucks: number; qty: number }>,
+    data: Partial<{
+      reward_id: number;
+      bucks: number;
+      qty: number;
+      reward_type: string;
+    }>,
   ) => {
     if (winners) {
       const updated = [...winners];
@@ -155,7 +160,7 @@ const OnlyWinnersForm: React.FC<OnlyWinnersFormProps> = ({
             }))}
             onChange={handleWinnerCountChange}
             required
-            error={errors?.["winners"]?.[0]}
+            error={errors?.["winners"]}
           />
         )}
       </div>
@@ -192,10 +197,12 @@ const OnlyWinnersForm: React.FC<OnlyWinnersFormProps> = ({
                 onChange={(e) =>
                   updateWinner(index, {
                     reward_id: Number(e.target.value),
+                    reward_type: rewards.find((r) => r.id == e.target.value)
+                      .reward_type,
                   })
                 }
                 required
-                error={errors?.["winners"]?.[index]?.reward_id}
+                error={errors[`winners[${index}].reward_id`]}
               />
 
               <FormInput
@@ -207,7 +214,7 @@ const OnlyWinnersForm: React.FC<OnlyWinnersFormProps> = ({
                   updateWinner(index, { qty: Number(e.target.value) })
                 }
                 required
-                error={errors?.["winners"]?.[index]?.qty}
+                error={errors[`winners[${index}].qty`]}
               />
 
               {rewards.find((r) => r.id == Number(winner.reward_id))
@@ -221,7 +228,7 @@ const OnlyWinnersForm: React.FC<OnlyWinnersFormProps> = ({
                     updateWinner(index, { bucks: Number(e.target.value) })
                   }
                   required
-                  error={errors?.["winners"]?.[index]?.bucks}
+                  error={errors[`winners[${index}].bucks`]}
                 />
               )}
             </div>

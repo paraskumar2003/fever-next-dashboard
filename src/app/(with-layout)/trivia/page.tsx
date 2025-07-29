@@ -549,14 +549,16 @@ export default function CreateContest() {
 
         const response = await ContestServices.updateContestStatus(
           formData.contest_id.toString(),
-          1 // Status 1 for active/published
+          1, // Status 1 for active/published
         );
 
         if (response.data) {
           toast.success("Game Published Successfully!");
           push("/view/trivia?category=upcoming");
         } else {
-          toast.error(response.response?.message || "Failed to publish contest");
+          toast.error(
+            response.response?.message || "Failed to publish contest",
+          );
         }
       } catch (error) {
         console.error("Error publishing contest:", error);

@@ -72,4 +72,16 @@ export class ContestServices extends ApiServices {
       return { data: null, err: err.message, response: err?.response?.data };
     }
   }
+
+  static async updateContestStatus(contestId: string, status: number) {
+    try {
+      const response = await this.post<T>(
+        `/v1/trivia/update-status/${contestId}`,
+        { status },
+      );
+      return response;
+    } catch (err: any) {
+      return { data: null, err: err.message, response: err?.response?.data };
+    }
+  }
 }

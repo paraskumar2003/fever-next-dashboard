@@ -160,7 +160,7 @@ const OnlyWinnersForm: React.FC<OnlyWinnersFormProps> = ({
             }))}
             onChange={handleWinnerCountChange}
             required
-            error={errors?.["winners"]}
+            error={errors["winners"]}
           />
         )}
       </div>

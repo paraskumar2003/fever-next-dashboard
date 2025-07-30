@@ -231,6 +231,7 @@ export default function CreateContest() {
             reward_id: e?.reward?.id,
             bucks: e.fever_bucks,
             qty: e.quantity,
+            reward_type: e.reward?.reward_type,
           })),
           instructions:
             details?.instructions.length > 0

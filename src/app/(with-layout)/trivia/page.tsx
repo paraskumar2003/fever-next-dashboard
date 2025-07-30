@@ -371,21 +371,21 @@ export default function CreateContest() {
   };
 
   const checkInstructionForm = async () => {
-    let { isValid, errors } = await validateInstructionFormData(formData);
-    console.log({ errors });
-    setContestFormErrors(errors);
-    return { isValid, errors };
+    let { isValid, errors: e } = await validateInstructionFormData(formData);
+    setContestFormErrors((prev) => e);
+    return { isValid, errors: e };
   };
 
   const checkWinnersForm = async () => {
-    let { isValid, errors } = await validateWinnersForm(formData);
-    setContestFormErrors(errors);
-    return { isValid, errors };
+    let { isValid, errors: e } = await validateWinnersForm(formData);
+    console.log({ e });
+    setContestFormErrors((prev) => e);
+    return { isValid, errors: e };
   };
 
   const checkQuestionsForm = async () => {
     let { isValid, errors } = await validateQuestionFormData(formData);
-    setContestFormErrors(errors);
+    if (currentStep == 2) setContestFormErrors(errors);
     return { isValid, errors };
   };
 
@@ -406,7 +406,6 @@ export default function CreateContest() {
       }
 
       // Clear any existing errors if validation passes
-      setContestFormErrors({});
 
       const form = buildContestFormData(formData, contest_id);
       const { data } = await ContestServices.createContest(form);
@@ -435,7 +434,6 @@ export default function CreateContest() {
         return false;
       }
 
-      setContestFormErrors({});
       const form = buildInstructionFormData(formData, contest_id);
       let { data } = await TriviaServices.createInstruction(form);
       if (data) {
@@ -460,7 +458,6 @@ export default function CreateContest() {
         return false;
       }
 
-      setContestFormErrors({});
       const form = buildQuestionJsonData(formData, contest_id);
       let { data } = await TriviaServices.postGameQuestionForm(form);
       if (data) {
@@ -486,10 +483,7 @@ export default function CreateContest() {
         return false;
       }
 
-      let { isValid, errors } = await checkWinnersForm();
-
-      console.log(errors);
-      setContestFormErrors(errors);
+      let { isValid } = await checkWinnersForm();
       if (!isValid) {
         toast.warning("Please fix the validation errors before proceeding.");
         return false;
@@ -636,17 +630,24 @@ export default function CreateContest() {
     if (currentStep !== undefined && currentStep !== null) {
       switch (currentStep) {
         case 0:
-          checkContestForm();
+          if (contest_id) checkContestForm();
+          break;
         case 1:
-          checkWinnersForm();
+          if (contest_id && formData.winners) checkWinnersForm();
+          break;
         case 2:
-          checkInstructionForm();
+          if (contest_id && formData.instructions) checkInstructionForm();
+          break;
         case 4:
-          checkQuestionsForm();
+          if (contest_id && formData.questions) checkQuestionsForm();
+          break;
       }
-      console.log({ currentStep });
     }
   }, [formData]);
+
+  useEffect(() => {
+    console.log({ contestFormErrors });
+  }, [contestFormErrors]);
 
   return (
     <div className="mx-auto max-w-7xl p-6">

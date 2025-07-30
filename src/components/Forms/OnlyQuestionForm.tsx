@@ -324,7 +324,8 @@ const OnlyQuestionForm: React.FC<OnlyQuestionFormProps> = ({
             <FormInput
               label="Flip Fee"
               type="number"
-              value={formData.flip_fee || ""}
+              value={formData.flip_fee}
+              defaultValue={0}
               onChange={(e) =>
                 updateFormData({ flip_fee: parseInt(e.target.value) })
               }

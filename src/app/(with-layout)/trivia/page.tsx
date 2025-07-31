@@ -31,6 +31,7 @@ import {
   Question as PreviewQuestion,
   Option as PreviewOption,
 } from "@/components/Preview/Trivia/types";
+import { RewardServices } from "@/services/rewards/reward";
 
 const steps = [
   "Contest Details",
@@ -47,6 +48,7 @@ export default function CreateContest() {
   const contest_id = searchParams.get("contest_id");
 
   const [currentStep, setCurrentStep] = useState(0);
+  const [rewards, setRewards] = useState<any[]>([]);
   const { formData, updateFormData, resetFormData } = useContest();
   const [editMode, setEditMode] = useState<{
     winners: boolean;
@@ -56,7 +58,7 @@ export default function CreateContest() {
     winners: false,
     instruction: false,
     questions: false,
-  }); // New state for edit mode
+  });
 
   // Add state for preview questions
   const [previewQuestions, setPreviewQuestions] = useState<PreviewQuestion[]>(
@@ -92,13 +94,7 @@ export default function CreateContest() {
         );
 
         if (data?.data?.rows) {
-          // Find the specific question set matching formData.set_id
-          // const selectedQuestionSet = data.data.rows.find(
-          //   (set: any) => set.id === formData.set_id,
-          // );
-
           const selectedQuestionSet = data.data.rows[0];
-          console.log({ selectedQuestionSet });
 
           if (selectedQuestionSet && selectedQuestionSet.questions) {
             // Map API questions to preview format
@@ -107,7 +103,6 @@ export default function CreateContest() {
                 .filter((q: any) => q.status === 1) // Only include active questions
                 .slice(0, formData.questions?.length || 10) // Limit to selected number of questions
                 .map((question: any, index: number) => {
-                  // Map question options to preview format
                   const options: PreviewOption[] = question.questionOptions.map(
                     (option: any, optionIndex: number) => ({
                       option_text: option.answer,
@@ -123,11 +118,12 @@ export default function CreateContest() {
                     options: options,
                     timer:
                       formData.game_time_level === "QUESTION"
-                        ? parseInt(formData.questions?.[index]?.timer || "10") *
-                          1000
-                        : parseInt(formData.game_timer || "60") * 1000,
+                        ? parseInt(formData.questions?.[index]?.timer as string)
+                        : parseInt(formData.game_timer as string),
                   };
                 });
+
+            console.log(mappedQuestions);
 
             setPreviewQuestions(mappedQuestions);
           }
@@ -232,6 +228,11 @@ export default function CreateContest() {
             bucks: e.fever_bucks,
             qty: e.quantity,
             reward_type: e.reward?.reward_type,
+            balance_coupons:
+              Number(
+                rewards?.find((r) => r.id == e?.reward?.id).total_coupons -
+                  rewards?.find((r) => r.id == e?.reward?.id).used_coupons,
+              ) || 0,
           })),
           instructions:
             details?.instructions.length > 0
@@ -287,6 +288,12 @@ export default function CreateContest() {
               ? details?.questionSet?.timerValues[0]
               : "0",
           fever_logo: !details?.isSponsored,
+          QuestionCount: details?.questionSet?.noOfQuestions || 1,
+          noOfQuestionInCurrentCategory:
+            details?.questionSet.questionCategory?.count,
+          noOfQuestionInCurrentSet: details?.questionSet?.questionSetCount,
+          noOfQuestionInFlipSet: details?.questionSet?.flipSetQuestionCount,
+          set_id: details?.questionSet?.questionSetId,
         });
         // If contest details are fetched, assume this step is "submitted"
         setFormSubmissionStatus((prev) => ({ ...prev, contestDetails: true }));
@@ -297,14 +304,25 @@ export default function CreateContest() {
   };
 
   useEffect(() => {
-    if (contest_id) {
+    if (contest_id && rewards.length > 0) {
       fetchContestDetails(contest_id);
     }
-  }, [contest_id]);
+  }, [contest_id, rewards]);
 
   useEffect(() => {
-    console.log({ formSubmissionStatus });
-  }, [formSubmissionStatus]);
+    const fetchRewards = async () => {
+      try {
+        const { data } = await RewardServices.getRewards({ pageSize: 100 });
+        if (data?.data?.rows) {
+          setRewards(data.data.rows);
+        }
+      } catch (error) {
+        console.error("Error fetching rewards:", error);
+      }
+    };
+
+    fetchRewards();
+  }, []);
 
   const goNext = (force = false) => {
     if (!force) {
@@ -378,15 +396,14 @@ export default function CreateContest() {
 
   const checkWinnersForm = async () => {
     let { isValid, errors: e } = await validateWinnersForm(formData);
-    console.log({ e });
     setContestFormErrors((prev) => e);
     return { isValid, errors: e };
   };
 
   const checkQuestionsForm = async () => {
-    let { isValid, errors } = await validateQuestionFormData(formData);
-    if (currentStep == 2) setContestFormErrors(errors);
-    return { isValid, errors };
+    let { isValid, errors: e } = await validateQuestionFormData(formData);
+    setContestFormErrors((prev) => e);
+    return { isValid, errors: e };
   };
 
   const checkContestForm = async () => {
@@ -451,7 +468,7 @@ export default function CreateContest() {
 
   const handleGameQuestionSave = async () => {
     try {
-      let { isValid, errors } = await checkQuestionsForm();
+      let { isValid } = await checkQuestionsForm();
 
       if (!isValid) {
         toast.warning("Please fix the validation errors before proceeding.");
@@ -638,7 +655,7 @@ export default function CreateContest() {
         case 2:
           if (contest_id && formData.instructions) checkInstructionForm();
           break;
-        case 4:
+        case 3:
           if (contest_id && formData.questions) checkQuestionsForm();
           break;
       }

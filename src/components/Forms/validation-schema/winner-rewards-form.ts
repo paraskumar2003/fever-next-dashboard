@@ -13,12 +13,15 @@ export const winnersForm = Yup.object().shape({
         reward_type: Yup.string().required("Reward type is required"),
         qty: Yup.number()
           .typeError("Qty must be a number")
-          .min(0, "Qty must be at least 0")
+          .min(1, "Qty must be at least 1")
           .required("Qty is required"),
         bucks: Yup.number()
           .typeError("Bucks must be a number")
           .min(0, "Bucks must be at least 0")
           .required("Bucks are required"),
+        balance_coupons: Yup.number()
+          .min(0)
+          .required("Balance Coupons is required"),
       }),
     )
     .min(1, "At least one winner is required")
@@ -56,6 +59,31 @@ export const winnersForm = Yup.object().shape({
               return false;
             }
             pairs.add(key);
+          }
+        }
+        return true;
+      },
+    )
+    .test(
+      "qty-balance-coupons",
+      "Qty cannot exceed balance coupons for non FEVER_BUCKS rewards.",
+      function (winners) {
+        if (!Array.isArray(winners)) return true;
+        for (const win of winners) {
+          if (win.reward_type !== "FEVER_BUCKS") {
+            if (
+              typeof win.qty === "number" &&
+              typeof win.balance_coupons === "number"
+            ) {
+              if (win.qty > win.balance_coupons) {
+                // Use Yup's context to identify which winner failed, if needed.
+                return this.createError({
+                  path: `winners[${winners.indexOf(win)}].qty`, // mark the specific winner's qty as invalid
+                  message: "Qty cannot exceed available balance coupons",
+                });
+              } else {
+              }
+            }
           }
         }
         return true;

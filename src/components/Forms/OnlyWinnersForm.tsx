@@ -21,7 +21,7 @@ const OnlyWinnersForm: React.FC<OnlyWinnersFormProps> = ({
 }) => {
   const [rewards, setRewards] = useState<any[]>([]);
   const [duplicateError, setDuplicateError] = useState<string | null>(null);
-  const { winners, contestPrizes } = formData;
+  const { winners } = formData;
 
   // Helper function to check for duplicate reward IDs
   const checkForDuplicateRewardIds = (winnersArray: typeof winners) => {
@@ -42,9 +42,6 @@ const OnlyWinnersForm: React.FC<OnlyWinnersFormProps> = ({
         const reward = rewards.find((r) => r.id === id);
         return reward ? reward.name : `ID: ${id}`;
       });
-      // setDuplicateError(
-      //   `Duplicate rewards detected: ${duplicateRewardNames.join(", ")}. Each reward can only be assigned once.`,
-      // );
     } else {
       setDuplicateError(null);
     }
@@ -80,6 +77,13 @@ const OnlyWinnersForm: React.FC<OnlyWinnersFormProps> = ({
         bucks: winners[index]?.bucks || 0,
         qty: winners[index]?.qty,
         fever_bucks: false,
+        reward_type: rewards.find((r) => r.id == winners[index]?.reward_id)
+          ?.reward_type,
+        balance_coupons:
+          rewards.find((r) => r.id == winners[index]?.reward_id)
+            ?.total_coupons -
+            rewards.find((r) => r.id == winners[index]?.reward_id)
+              ?.used_coupons || winners[index]?.balance_coupons,
       }));
       updateFormData({ winners: newWinners });
       // Check for duplicates after updating winners array
@@ -94,6 +98,7 @@ const OnlyWinnersForm: React.FC<OnlyWinnersFormProps> = ({
       bucks: number;
       qty: number;
       reward_type: string;
+      balance_coupons: number;
     }>,
   ) => {
     if (winners) {
@@ -189,7 +194,7 @@ const OnlyWinnersForm: React.FC<OnlyWinnersFormProps> = ({
                       );
                     return {
                       value: reward.id.toString(),
-                      label: `${reward.name} (${reward.reward_type})`,
+                      label: `${reward.name} (${reward.reward_type}) - Balance Coupons (${reward?.total_coupons - reward?.used_coupons})`,
                     };
                   }),
                 ]}
@@ -198,6 +203,17 @@ const OnlyWinnersForm: React.FC<OnlyWinnersFormProps> = ({
                     reward_id: Number(e.target.value),
                     reward_type: rewards.find((r) => r.id == e.target.value)
                       .reward_type,
+                    balance_coupons:
+                      Number(
+                        Number(
+                          rewards.find((r) => r.id == e.target.value)
+                            ?.total_coupons,
+                        ) -
+                          Number(
+                            rewards.find((r) => r.id == e.target.value)
+                              ?.used_coupons,
+                          ),
+                      ) || 0,
                   })
                 }
                 required

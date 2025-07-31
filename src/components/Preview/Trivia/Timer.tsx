@@ -5,10 +5,12 @@ export function Timer({
   timeToCount,
   start = false,
   onEnd,
+  shift,
 }: {
   timeToCount: number;
   start?: boolean;
   onEnd?: () => void;
+  shift: number;
 }) {
   const [timeLeft, setTimeLeft] = useState<number>(timeToCount);
   const [intervalId, setIntervalId] = useState<NodeJS.Timeout | null>(null);
@@ -20,6 +22,10 @@ export function Timer({
       clearInterval(intervalId);
     }
   }, [timeToCount]);
+
+  useEffect(() => {
+    console.log("props in timer", timeToCount, start, onEnd);
+  }, [timeToCount, start, onEnd]);
 
   // Start countdown
   useEffect(() => {
@@ -39,7 +45,7 @@ export function Timer({
     setIntervalId(interval);
 
     return () => clearInterval(interval);
-  }, [start, timeLeft, onEnd]);
+  }, [start, timeLeft, onEnd, shift]);
 
   const formatTime = (seconds: number) => {
     const minutes = Math.floor(seconds / 60);

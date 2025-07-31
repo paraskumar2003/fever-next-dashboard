@@ -16,7 +16,7 @@ import { setGlobalLoadingHandler } from "@/services/interceptor.base";
 
 function LayoutContent({ children }: { children: React.ReactNode }) {
   const { isLoading, setLoading } = useLoading();
-  
+
   useEffect(() => {
     setGlobalLoadingHandler(setLoading);
   }, [setLoading]);
@@ -58,13 +58,13 @@ export default function RootLayout({
   useEffect(() => {
     // Check for authentication token in cookies
     const token = Cookies.get("authToken");
-    
+
     if (!token) {
       // No token found, redirect to login
       router.push("/login");
       return;
     }
-    
+
     // Token found, user is authenticated
     setIsAuthenticated(true);
     setTimeout(() => setLoading(false), 1000);

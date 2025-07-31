@@ -28,12 +28,16 @@ export function TriviaGamePlay({
   const [currentQuestion, setCurrentQuestion] = useState<QuestionType>(
     questions[0] || ({} as QuestionType),
   );
-  const [timer, setTimer] = useState<{ timeOut: number; state: boolean }>({
+  const [timer, setTimer] = useState<{
+    timeOut: number;
+    state: boolean;
+    shift?: number;
+  }>({
     state: true,
     timeOut:
       formData?.game_time_level === "GAME"
         ? +formData?.game_timer!
-        : +questions[0]?.timer || 10,
+        : +questions[0]?.timer * 1000 || 10000,
   });
   const [game, setGame] = useState<{ state: GameState }>({
     state: GameState.PLAYING,
@@ -68,11 +72,14 @@ export function TriviaGamePlay({
           setTimer({
             timeOut: +nextQuestion?.timer * 1000 || 10000,
             state: true,
+            shift: (timer?.shift || 0) + 1,
           });
         }
 
         if (questions[newIndex]) {
           setCurrentQuestion(questions[newIndex]);
+        } else {
+          setGame({ state: GameState.ENDED });
         }
 
         return newIndex;
@@ -83,6 +90,7 @@ export function TriviaGamePlay({
   const handleAnswer = async (id: number, answer: string): Promise<boolean> => {
     const selectedOption = currentQuestion.options[id];
     const isCorrect = selectedOption?.is_correct || false;
+
     displayNextQuestion(1000);
     if (currentQIndex + 1 === questions.length) {
       setTimeout(() => {
@@ -100,6 +108,10 @@ export function TriviaGamePlay({
           rewardGiven: null,
         },
       };
+      setTimer({
+        timeOut: 1 * 1000 || 10000,
+        state: false,
+      });
       displayNextQuestion(1000);
       return data.data.correct;
     }
@@ -144,6 +156,7 @@ export function TriviaGamePlay({
                   timeToCount={timer.timeOut}
                   start={timer.state}
                   onEnd={() => handleMissedQuestion()}
+                  shift={timer?.shift || 0}
                 />
               )}
               <Options

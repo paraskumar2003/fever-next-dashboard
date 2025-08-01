@@ -44,33 +44,36 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
   }, [error]);
 
   return (
-    <div className="mb-4">
-      <label className="mb-1  block text-sm font-medium">
+    <div className="mb-6">
+      <label className="mb-2 block text-sm font-semibold text-gray-700">
         <span>{label}</span>
-        {required && <span className="text-red-500">*</span>}
+        {required && <span className="ml-1 text-red-500">*</span>}
       </label>
-      <div className="rounded-md border border-dashed border-black/20 bg-white/5 p-4">
+      <div className="rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 p-6 transition-colors hover:border-primary-400 hover:bg-primary-50">
         <div className="relative flex flex-col items-center justify-center">
           {value ? (
             <div className="relative w-full">
               <img
                 src={value}
                 alt="Preview"
-                className="mx-auto max-h-40 rounded-md object-contain"
+                className="mx-auto max-h-48 rounded-lg object-contain shadow-sm"
               />
               <button
                 type="button"
                 onClick={() => onChange("")}
-                className="absolute right-0 top-0 -translate-y-1/2  translate-x-1/2 transform rounded-md bg-red-500 p-1 px-3 text-white"
+                className="absolute -right-2 -top-2 flex h-8 w-8 items-center justify-center rounded-full bg-red-500 text-white shadow-lg transition-colors hover:bg-red-600"
               >
                 ×
               </button>
             </div>
           ) : (
             <div className="text-center" onClick={handleButtonClick}>
-              <Upload className="/50 mx-auto h-12 w-12" />
-              <p className="/70 mt-1 text-sm">
-                {isLoading ? "Loading..." : "Click or drag to upload an image"}
+              <Upload className="mx-auto h-12 w-12 text-gray-400" />
+              <p className="mt-3 text-sm font-medium text-gray-600">
+                {isLoading ? "Uploading..." : "Click to upload an image"}
+              </p>
+              <p className="mt-1 text-xs text-gray-500">
+                PNG, JPG, GIF up to 10MB
               </p>
             </div>
           )}
@@ -79,11 +82,11 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
             accept="image/*"
             onChange={handleFileChange}
             ref={fileInputRef}
-            className="absolute inset-0 z-[-1] h-full w-full cursor-pointer opacity-0"
+            className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
           />
         </div>
       </div>
-      {error && <p className="mt-1 text-sm text-red-500">{error}</p>}
+      {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
     </div>
   );
 };

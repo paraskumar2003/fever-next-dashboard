@@ -112,58 +112,60 @@ const ContestRow: React.FC<ContestRowProps> = ({
     category === "live" || category === "upcoming" || category === "draft";
 
   return (
-    <tr className="transition-colors hover:bg-gray-50">
-      <td className="px-4 py-3 text-sm text-gray-600">
+    <tr className="transition-colors hover:bg-gray-50/50">
+      <td className="px-6 py-4 text-sm font-medium text-gray-900">
         #{(page - 1) * pageSize + index + 1}
       </td>
-      <td className="px-4 py-3 text-sm text-gray-600">
-        <div className="max-w-[200px] truncate font-medium">{contest.name}</div>
+      <td className="px-6 py-4 text-sm text-gray-900">
+        <div className="max-w-[200px] truncate font-semibold">{contest.name}</div>
       </td>
-      <td className="px-4 py-3 text-sm text-gray-600">
-        ₹{contest.contestFee || 0}
+      <td className="px-6 py-4 text-sm text-gray-900">
+        <span className="font-semibold">₹{contest.contestFee || 0}</span>
       </td>
-      <td className="px-4 py-3 text-sm text-gray-600">
+      <td className="px-6 py-4 text-sm text-gray-600">
         {contest.sponsored_logo ? (
           <img
             src={contest.sponsored_logo}
             alt="Sponsor Logo"
-            className="h-10 w-15 object-contain"
+            className="h-12 w-16 rounded-lg object-contain shadow-sm"
           />
         ) : (
-          <span className="text-gray-400">No logo</span>
+          <div className="flex h-12 w-16 items-center justify-center rounded-lg bg-gray-100">
+            <span className="text-xs text-gray-400">No logo</span>
+          </div>
         )}
       </td>
-      <td className="px-4 py-3 text-sm text-gray-600">
+      <td className="px-6 py-4 text-sm font-medium text-gray-900">
         {moment(contest.startDate).format("YYYY-MM-DD")}
       </td>
-      <td className="px-4 py-3 text-sm text-gray-600">
+      <td className="px-6 py-4 text-sm font-medium text-gray-900">
         {moment(contest.startDate).format("HH:mm")}
       </td>
-      <td className="px-4 py-3 text-sm text-gray-600">
+      <td className="px-6 py-4 text-sm font-medium text-gray-900">
         {moment(contest.endDate).format("YYYY-MM-DD")}
       </td>
-      <td className="px-4 py-3 text-sm text-gray-600">
+      <td className="px-6 py-4 text-sm font-medium text-gray-900">
         {moment(contest.endDate).format("HH:mm")}
       </td>
-      <td className="px-4 py-3 text-sm text-gray-600">
-        <span className="inline-flex items-center rounded-full bg-blue-100 px-2 py-1 text-xs font-medium text-blue-800">
+      <td className="px-6 py-4 text-sm text-gray-600">
+        <span className="inline-flex items-center rounded-full bg-primary-100 px-3 py-1 text-xs font-semibold text-primary-800">
           {contest.contestTypeName}
         </span>
       </td>
-      <td className="px-4 py-3 text-sm text-gray-600">
+      <td className="px-6 py-4 text-sm font-medium text-gray-900">
         {contest.total_contest_played}
       </td>
-      <td className="px-4 py-3 text-sm text-gray-600">
+      <td className="px-6 py-4 text-sm font-medium text-gray-900">
         {contest.winners_announced}
       </td>
-      <td className="px-4 py-3 text-sm">
+      <td className="px-6 py-4 text-sm">
         {canChangeStatus ? (
           <button
             onClick={handleStatusToggle}
             disabled={loadingStatus}
-            className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-medium transition-colors ${
+            className={`inline-flex items-center rounded-full px-3 py-1.5 text-xs font-semibold transition-all duration-200 ${
               loadingStatus
-                ? "cursor-wait bg-gray-100 text-gray-400"
+                ? "cursor-wait bg-gray-100 text-gray-500"
                 : statusInfo.color
             }`}
           >
@@ -171,17 +173,17 @@ const ContestRow: React.FC<ContestRowProps> = ({
           </button>
         ) : (
           <span
-            className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-medium ${statusInfo.color.replace("hover:", "")}`}
+            className={`inline-flex items-center rounded-full px-3 py-1.5 text-xs font-semibold ${statusInfo.color.replace("hover:", "")}`}
           >
             {statusInfo.displayLabel}
           </span>
         )}
       </td>
-      <td className="px-4 py-3 text-sm text-gray-600">
-        <div className="max-w-[150px] truncate">{contest.sponsored_name}</div>
+      <td className="px-6 py-4 text-sm text-gray-900">
+        <div className="max-w-[150px] truncate font-medium">{contest.sponsored_name}</div>
       </td>
-      <td className="px-4 py-3 text-sm">
-        <div className="flex items-center justify-center space-x-2">
+      <td className="px-6 py-4 text-sm">
+        <div className="flex items-center justify-center space-x-1">
           <Button
             variant="primary"
             size="sm"
@@ -215,7 +217,7 @@ const ContestRow: React.FC<ContestRowProps> = ({
 
           {category === "old" && (
             <Button
-              variant="primary"
+              variant="secondary"
               size="sm"
               onClick={() => onDuplicate?.(contest)}
               title="Duplicate Contest"

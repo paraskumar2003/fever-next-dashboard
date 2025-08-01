@@ -3,11 +3,7 @@ import FormSection from "@/components/FormSection";
 import FormInput from "@/components/FormInput";
 import FormSelect from "@/components/FormSelect";
 import { ContestFormData, QuestionSet } from "@/types";
-import {
-  CategoryServices,
-  QuestionSetServices,
-  TriviaServices,
-} from "@/services";
+import { CategoryServices, QuestionSetServices } from "@/services";
 
 interface OnlyQuestionFormProps {
   formData: Partial<ContestFormData>;
@@ -26,12 +22,8 @@ const OnlyQuestionForm: React.FC<OnlyQuestionFormProps> = ({
   const [selectedCategory, setSelectedCategory] = useState<string | null>(
     String(formData.QuestionCategoryId)! || null,
   );
-  const [selectedSet, setSelectedSet] = useState<string | null>(null);
   const [categories, setCategories] = useState<QuestionSet[]>([]);
   const [sets, setSets] = useState<QuestionSet[]>([]);
-  const [selectedFlipSet, setSelectedFlipSet] = useState<string | null>(null);
-  const [error, setError] = useState<string>("");
-  const [flipSetError, setFlipSetError] = useState<string>("");
 
   const handleQuestionCountChange = (
     e: React.ChangeEvent<HTMLSelectElement>,
@@ -54,26 +46,13 @@ const OnlyQuestionForm: React.FC<OnlyQuestionFormProps> = ({
           timer: "10",
         },
     );
-
-    const selected = categories.find(
-      (c: any) => c.id == formData?.QuestionCategoryId,
-    );
-    if (selected) setSelectedCategory(String(selected.id));
-    if (formData.questions && selected) {
-      if (parseInt(selected.questions) < updatedQuestions?.length)
-        setError(`Please choose a set with at least ${count} questions.`);
-      else {
-        updateFormData({ questions: updatedQuestions });
-        setError("");
-      }
-    } else {
-      setError("");
-    }
+    updateFormData({
+      questions: updatedQuestions,
+      QuestionCount: updatedQuestions.length,
+    });
   };
 
-  // Example fetch function for question sets
-  const fetchQuestionSets = async () => {
-    // Replace with actual API call to fetch sets
+  const fetchQuestionCategories = async () => {
     const res = await CategoryServices.getCategoroiesWithCount();
     let categoriesData = res.data?.data;
     if (categoriesData) {
@@ -85,11 +64,14 @@ const OnlyQuestionForm: React.FC<OnlyQuestionFormProps> = ({
       );
       formData.QuestionCategoryId ??= categoriesData[0].id;
       formData.QuestionCount ??= Number(categoriesData[0].questions);
+      formData.noOfQuestionInCurrentCategory ??= Number(
+        categoriesData[0].questions,
+      );
     }
   };
 
   useEffect(() => {
-    fetchQuestionSets();
+    fetchQuestionCategories();
   }, []);
 
   useEffect(() => {
@@ -97,10 +79,10 @@ const OnlyQuestionForm: React.FC<OnlyQuestionFormProps> = ({
   }, [selectedCategory]);
 
   const fetchSets = async () => {
-    // Replace with actual API call to fetch sets
     const res = await QuestionSetServices.getQuestionSetsByCategoryId(
       +selectedCategory!,
     );
+
     let setsData = res.data?.data?.rows;
     if (setsData) {
       setSets(
@@ -109,8 +91,8 @@ const OnlyQuestionForm: React.FC<OnlyQuestionFormProps> = ({
           name: e.name,
         })),
       );
-      formData.QuestionCategoryId ??= setsData[0].id;
       formData.QuestionCount ??= setsData[0].questions.length;
+      formData.noOfQuestionInCurrentSet ??= setsData[0].questions.length;
     }
   };
 
@@ -123,70 +105,32 @@ const OnlyQuestionForm: React.FC<OnlyQuestionFormProps> = ({
     if (!formData.questions) {
       throw new Error("Invalid question value in form!!");
     }
+
     if (formData.questions && selected) {
-      if (parseInt(selected.questions as string) < formData.questions?.length)
-        setError(
-          `Please choose a set with at least ${formData.questions?.length} questions.`,
-        );
-      else {
-        updateFormData({
-          QuestionCategoryId: selected.id,
-          QuestionCount: Number(selected.questions),
-        });
-        setSelectedCategory(String(selected.id));
-      }
-    } else {
-      setError("");
+      updateFormData({
+        QuestionCategoryId: selected.id,
+        noOfQuestionInCurrentCategory: Number(selected.questions),
+      });
+      setSelectedCategory(String(selected.id));
     }
   };
 
   const handleSetSelection = (setId: string) => {
     const selected = sets.find((set: any) => set.id == setId);
-    if (!selected) {
-      throw new Error("Invalid setId!!");
-    }
-
-    if (!formData.questions) {
-      throw new Error("Invalid question value in form!!");
-    }
-    console.log(
-      formData.questions,
-      selected,
-      parseInt(selected?.questions as string) < formData?.questions?.length,
-    );
     if (formData.questions && selected) {
-      if (parseInt(selected.questions as string) < formData.questions?.length)
-        setError(
-          `Please choose a set with at least ${formData.questions?.length} questions.`,
-        );
-      else {
-        updateFormData({
-          set_id: selected.id,
-        });
-        setSelectedSet(String(selected.id));
-      }
-    } else {
-      setError("");
+      updateFormData({
+        set_id: selected.id,
+        noOfQuestionInCurrentSet: selected.questions.length,
+      });
     }
   };
 
   const handleFlipSetSelection = (setId: string) => {
     const selected = sets.find((set: any) => set.id == setId);
-    if (
-      formData.questions &&
-      selected &&
-      selected.id === formData.QuestionCategoryId
-    ) {
-      setFlipSetError(
-        `Please choose a set different from set selected for questions.`,
-      );
-    } else {
-      setFlipSetError("");
-      setSelectedFlipSet(setId); // Valid set, proceed to set it
-      updateFormData({
-        flipSet: parseInt(setId),
-      });
-    }
+    updateFormData({
+      flipSet: parseInt(setId),
+      noOfQuestionInFlipSet: selected?.questions?.length || 0,
+    });
   };
 
   return (
@@ -200,7 +144,7 @@ const OnlyQuestionForm: React.FC<OnlyQuestionFormProps> = ({
             label: `${i + 1}`,
           }))}
           onChange={handleQuestionCountChange}
-          error={errors.questions}
+          error={errors.QuestionCount}
           required
         />
       </div>
@@ -219,7 +163,6 @@ const OnlyQuestionForm: React.FC<OnlyQuestionFormProps> = ({
           error={errors.QuestionCategoryId}
           required
         />
-        {error && <p className="mt-2 text-xs text-red-500">{error}</p>}
       </div>
 
       <div className="mb-6">
@@ -229,14 +172,13 @@ const OnlyQuestionForm: React.FC<OnlyQuestionFormProps> = ({
           options={[{ value: "", label: "Select Question Set" }].concat(
             sets.map((set: any) => ({
               value: set.id,
-              label: `${set.name}`,
+              label: `${set.name} (${set?.questions?.length} - Questions)`,
             })),
           )}
           onChange={(e) => handleSetSelection(e.target.value)}
           error={errors.set_id}
           required
         />
-        {error && <p className="mt-2 text-xs text-red-500">{error}</p>}
       </div>
 
       <div className="mb-6">
@@ -268,21 +210,23 @@ const OnlyQuestionForm: React.FC<OnlyQuestionFormProps> = ({
         />
       ) : (
         <div className="space-y-4">
-          {formData.questions?.map((q, index) => (
+          {formData.questions && (
             <FormInput
-              key={index}
-              label={`Question ${index + 1} Timer (in seconds)`}
+              label="Timer for all Questions (in seconds)"
               type="number"
-              value={q.timer}
+              value={formData?.questions[0]?.timer}
               onChange={(e) => {
-                const questions = [...(formData.questions || [])];
-                questions[index].timer = e.target.value;
+                const newTimer = e.target.value; // ensure a number!
+                const questions = (formData.questions || []).map((q) => ({
+                  ...q,
+                  timer: newTimer,
+                }));
                 updateFormData({ questions });
               }}
-              error={errors[`questions[${index}]`]?.timer}
               required
+              // You may show a general error if you like, e.g. errors.questions?.[0]?.timer
             />
-          ))}
+          )}
         </div>
       )}
 
@@ -322,7 +266,8 @@ const OnlyQuestionForm: React.FC<OnlyQuestionFormProps> = ({
             <FormInput
               label="Flip Fee"
               type="number"
-              value={formData.flip_fee || ""}
+              value={formData.flip_fee}
+              defaultValue={0}
               onChange={(e) =>
                 updateFormData({ flip_fee: parseInt(e.target.value) })
               }
@@ -335,20 +280,15 @@ const OnlyQuestionForm: React.FC<OnlyQuestionFormProps> = ({
                 label="Choose Flip Set"
                 value={formData.flipSet || ""}
                 options={[{ value: "", label: "Choose Flip Set" }].concat(
-                  sets
-                    .filter((e) => e.id != formData.QuestionCategoryId)
-                    .map((set: any) => ({
-                      value: set.id,
-                      label: `${set.name}`,
-                    })),
+                  sets.map((set: any) => ({
+                    value: set.id,
+                    label: `${set.name} (${set?.questions?.length} - Questions)`,
+                  })),
                 )}
                 onChange={(e) => handleFlipSetSelection(e.target.value)}
                 error={errors.flipSet}
                 required
               />
-              {flipSetError && (
-                <p className="mt-2 text-xs text-red-500">{flipSetError}</p>
-              )}
             </div>
           </div>
         )}

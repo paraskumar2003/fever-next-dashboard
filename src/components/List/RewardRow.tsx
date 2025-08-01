@@ -41,8 +41,10 @@ const RewardRow: React.FC<RewardRowProps> = ({
         <div className="font-medium">{reward.brand_name}</div>
       </td>
       <td className="px-4 py-3 text-sm text-gray-600">{reward.reward_type}</td>
-      <td className="px-4 py-3 text-sm text-gray-600">{10}</td>
-      <td className="px-4 py-3 text-sm text-gray-600">{2}</td>
+      <td className="px-4 py-3 text-sm text-gray-600">
+        {reward.total_coupons}
+      </td>
+      <td className="px-4 py-3 text-sm text-gray-600">{reward.used_coupons}</td>
       {/* <td className="px-4 py-3 text-sm">
         <button
           onClick={handleStatusToggle}

@@ -8,4 +8,6 @@ export interface Reward {
   name: string;
   status: number;
   description: string;
+  total_coupons: number;
+  used_coupons: number;
 }

@@ -67,6 +67,7 @@ export interface WinnerReward {
   reward_id: number;
   bucks: number;
   qty: number;
+  balance_coupons: number;
 }
 
 export interface ContestFormData {
@@ -111,6 +112,9 @@ export interface ContestFormData {
   contestPrizes: ContestPrizeItem[];
   fever_logo: boolean;
   QuestionCount: number;
+  noOfQuestionInCurrentCategory: number;
+  noOfQuestionInCurrentSet: number;
+  noOfQuestionInFlipSet: number;
 }
 
 export interface ContestPrizeItem {

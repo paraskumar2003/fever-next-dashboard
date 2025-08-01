@@ -1,7 +1,13 @@
 import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
 import Cookies from "js-cookie";
-import Notiflix from "notiflix";
+import { toast } from "react-toastify";
 
+// Global loading state
+let globalLoadingState: ((loading: boolean) => void) | null = null;
+
+export const setGlobalLoadingHandler = (handler: (loading: boolean) => void) => {
+  globalLoadingState = handler;
+};
 class ApiServices {
   private static instance = axios.create({
     baseURL: process.env.api_url,
@@ -16,7 +22,9 @@ class ApiServices {
     this.instance.interceptors.request.use(
       (config) => {
         // Add token or any other modifications here
-        Notiflix.Loading.circle();
+        if (globalLoadingState) {
+          globalLoadingState(true);
+        }
         // Get token from cookies (client-side) or from headers (server-side)
         let token: string | undefined;
 
@@ -36,7 +44,9 @@ class ApiServices {
         return config;
       },
       (error) => {
-        Notiflix.Loading.remove();
+        if (globalLoadingState) {
+          globalLoadingState(false);
+        }
         return Promise.reject(error);
       },
     );
@@ -46,11 +56,15 @@ class ApiServices {
   static initializeResponseInterceptor() {
     this.instance.interceptors.response.use(
       (response) => {
-        Notiflix.Loading.remove();
+        if (globalLoadingState) {
+          globalLoadingState(false);
+        }
         return response;
       },
       (error) => {
-        Notiflix.Loading.remove();
+        if (globalLoadingState) {
+          globalLoadingState(false);
+        }
 
         if (error.response?.status === 401) {
           console.error("Unauthorized! Redirecting to login...");
@@ -60,7 +74,7 @@ class ApiServices {
             window.location.href = "/login";
           }
         } else {
-          Notiflix.Notify.failure(
+          toast.error(
             typeof error?.response?.data?.message == "string"
               ? error?.response?.data?.message
               : error.response.data.message[0] || error?.message,

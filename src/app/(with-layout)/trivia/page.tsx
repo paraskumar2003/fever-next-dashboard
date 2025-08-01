@@ -20,7 +20,7 @@ import { ContestServices, TriviaServices } from "@/services";
 import { QuestionSetServices } from "@/services/trivia/sets.service";
 import { useRouter, useSearchParams } from "next/navigation";
 import moment from "moment";
-import Notiflix from "notiflix";
+import { toast } from "react-toastify";
 import {
   buildContestFormData,
   buildInstructionFormData,
@@ -31,6 +31,7 @@ import {
   Question as PreviewQuestion,
   Option as PreviewOption,
 } from "@/components/Preview/Trivia/types";
+import { RewardServices } from "@/services/rewards/reward";
 
 const steps = [
   "Contest Details",
@@ -47,6 +48,7 @@ export default function CreateContest() {
   const contest_id = searchParams.get("contest_id");
 
   const [currentStep, setCurrentStep] = useState(0);
+  const [rewards, setRewards] = useState<any[]>([]);
   const { formData, updateFormData, resetFormData } = useContest();
   const [editMode, setEditMode] = useState<{
     winners: boolean;
@@ -56,7 +58,7 @@ export default function CreateContest() {
     winners: false,
     instruction: false,
     questions: false,
-  }); // New state for edit mode
+  });
 
   // Add state for preview questions
   const [previewQuestions, setPreviewQuestions] = useState<PreviewQuestion[]>(
@@ -92,13 +94,7 @@ export default function CreateContest() {
         );
 
         if (data?.data?.rows) {
-          // Find the specific question set matching formData.set_id
-          // const selectedQuestionSet = data.data.rows.find(
-          //   (set: any) => set.id === formData.set_id,
-          // );
-
           const selectedQuestionSet = data.data.rows[0];
-          console.log({ selectedQuestionSet });
 
           if (selectedQuestionSet && selectedQuestionSet.questions) {
             // Map API questions to preview format
@@ -107,7 +103,6 @@ export default function CreateContest() {
                 .filter((q: any) => q.status === 1) // Only include active questions
                 .slice(0, formData.questions?.length || 10) // Limit to selected number of questions
                 .map((question: any, index: number) => {
-                  // Map question options to preview format
                   const options: PreviewOption[] = question.questionOptions.map(
                     (option: any, optionIndex: number) => ({
                       option_text: option.answer,
@@ -123,11 +118,12 @@ export default function CreateContest() {
                     options: options,
                     timer:
                       formData.game_time_level === "QUESTION"
-                        ? parseInt(formData.questions?.[index]?.timer || "10") *
-                          1000
-                        : parseInt(formData.game_timer || "60") * 1000,
+                        ? parseInt(formData.questions?.[index]?.timer as string)
+                        : parseInt(formData.game_timer as string),
                   };
                 });
+
+            console.log(mappedQuestions);
 
             setPreviewQuestions(mappedQuestions);
           }
@@ -231,6 +227,12 @@ export default function CreateContest() {
             reward_id: e?.reward?.id,
             bucks: e.fever_bucks,
             qty: e.quantity,
+            reward_type: e.reward?.reward_type,
+            balance_coupons:
+              Number(
+                rewards?.find((r) => r.id == e?.reward?.id).total_coupons -
+                  rewards?.find((r) => r.id == e?.reward?.id).used_coupons,
+              ) || 0,
           })),
           instructions:
             details?.instructions.length > 0
@@ -286,6 +288,12 @@ export default function CreateContest() {
               ? details?.questionSet?.timerValues[0]
               : "0",
           fever_logo: !details?.isSponsored,
+          QuestionCount: details?.questionSet?.noOfQuestions || 1,
+          noOfQuestionInCurrentCategory:
+            details?.questionSet.questionCategory?.count,
+          noOfQuestionInCurrentSet: details?.questionSet?.questionSetCount,
+          noOfQuestionInFlipSet: details?.questionSet?.flipSetQuestionCount,
+          set_id: details?.questionSet?.questionSetId,
         });
         // If contest details are fetched, assume this step is "submitted"
         setFormSubmissionStatus((prev) => ({ ...prev, contestDetails: true }));
@@ -296,21 +304,30 @@ export default function CreateContest() {
   };
 
   useEffect(() => {
-    if (contest_id) {
+    if (contest_id && rewards.length > 0) {
       fetchContestDetails(contest_id);
     }
-  }, [contest_id]);
+  }, [contest_id, rewards]);
 
   useEffect(() => {
-    console.log({ formSubmissionStatus });
-  }, [formSubmissionStatus]);
+    const fetchRewards = async () => {
+      try {
+        const { data } = await RewardServices.getRewards({ pageSize: 100 });
+        if (data?.data?.rows) {
+          setRewards(data.data.rows);
+        }
+      } catch (error) {
+        console.error("Error fetching rewards:", error);
+      }
+    };
+
+    fetchRewards();
+  }, []);
 
   const goNext = (force = false) => {
     if (!force) {
       if (currentStep === 0 && !formSubmissionStatus.contestDetails) {
-        Notiflix.Notify.warning(
-          "Please save Contest Details before proceeding.",
-        );
+        toast.warning("Please save Contest Details before proceeding.");
         return;
       }
       if (
@@ -318,9 +335,7 @@ export default function CreateContest() {
         !formSubmissionStatus.winnersAndRewards &&
         !editMode.winners
       ) {
-        Notiflix.Notify.warning(
-          "Please save Winners & Rewards before proceeding.",
-        );
+        toast.warning("Please save Winners & Rewards before proceeding.");
         return;
       }
       if (
@@ -328,7 +343,7 @@ export default function CreateContest() {
         !formSubmissionStatus.instructions &&
         !editMode.instruction
       ) {
-        Notiflix.Notify.warning("Please save Instructions before proceeding.");
+        toast.warning("Please save Instructions before proceeding.");
         return;
       }
       if (
@@ -336,9 +351,7 @@ export default function CreateContest() {
         !formSubmissionStatus.gameQuestions &&
         !editMode.questions
       ) {
-        Notiflix.Notify.warning(
-          "Please save Game Questions before proceeding.",
-        );
+        toast.warning("Please save Game Questions before proceeding.");
         return;
       }
     }
@@ -349,25 +362,25 @@ export default function CreateContest() {
   const goToStep = (e: number) => {
     // Prevent jumping to steps if previous forms are not submitted
     if (e > 0 && !formSubmissionStatus.contestDetails) {
-      Notiflix.Notify.warning(
+      toast.warning(
         "Please save Contest Details before navigating to other steps.",
       );
       return;
     }
     if (e > 1 && !formSubmissionStatus.winnersAndRewards) {
-      Notiflix.Notify.warning(
+      toast.warning(
         "Please save Winners & Rewards before navigating to other steps.",
       );
       return;
     }
     if (e > 2 && !formSubmissionStatus.instructions) {
-      Notiflix.Notify.warning(
+      toast.warning(
         "Please save Instructions before navigating to other steps.",
       );
       return;
     }
     if (e > 3 && !formSubmissionStatus.gameQuestions) {
-      Notiflix.Notify.warning(
+      toast.warning(
         "Please save Game Questions before navigating to other steps.",
       );
       return;
@@ -376,22 +389,21 @@ export default function CreateContest() {
   };
 
   const checkInstructionForm = async () => {
-    let { isValid, errors } = await validateInstructionFormData(formData);
-    console.log({ errors });
-    setContestFormErrors(errors);
-    return { isValid, errors };
+    let { isValid, errors: e } = await validateInstructionFormData(formData);
+    setContestFormErrors((prev) => e);
+    return { isValid, errors: e };
   };
 
   const checkWinnersForm = async () => {
-    let { isValid, errors } = await validateWinnersForm(formData);
-    setContestFormErrors(errors);
-    return { isValid, errors };
+    let { isValid, errors: e } = await validateWinnersForm(formData);
+    setContestFormErrors((prev) => e);
+    return { isValid, errors: e };
   };
 
   const checkQuestionsForm = async () => {
-    let { isValid, errors } = await validateQuestionFormData(formData);
-    setContestFormErrors(errors);
-    return { isValid, errors };
+    let { isValid, errors: e } = await validateQuestionFormData(formData);
+    setContestFormErrors((prev) => e);
+    return { isValid, errors: e };
   };
 
   const checkContestForm = async () => {
@@ -401,115 +413,96 @@ export default function CreateContest() {
   };
 
   const handleContestSave = async () => {
-    Notiflix.Loading.circle();
     try {
       // Validate form data
       let { isValid } = await checkContestForm();
 
       if (!isValid) {
-        Notiflix.Notify.warning(
-          "Please fix the validation errors before proceeding.",
-        );
+        toast.warning("Please fix the validation errors before proceeding.");
         return false;
       }
 
       // Clear any existing errors if validation passes
-      setContestFormErrors({});
 
       const form = buildContestFormData(formData, contest_id);
       const { data } = await ContestServices.createContest(form);
       // Assuming the new contest_id is returned and should be set
       if (data?.data?.id) {
         updateFormData({ contest_id: data.data.id });
-        Notiflix.Notify.success("Contest Details saved successfully!");
+        toast.success("Contest Details saved successfully!");
         setFormSubmissionStatus((prev) => ({ ...prev, contestDetails: true }));
         push(`/trivia?contest_id=${data?.data.id}`);
         return true; // Indicate success
       }
       return false;
     } catch (error: any) {
-      Notiflix.Notify.failure("Failed to save Contest Details.");
+      toast.error("Failed to save Contest Details.");
       console.error("Error saving contest:", error);
       return false; // Indicate failure
-    } finally {
-      Notiflix.Loading.remove();
     }
   };
 
   const handleInstructionSave = async () => {
-    Notiflix.Loading.circle();
     try {
       let { isValid } = await checkInstructionForm();
 
       if (!isValid) {
-        Notiflix.Notify.warning(
-          "Please fix the validation errors before proceeding.",
-        );
+        toast.warning("Please fix the validation errors before proceeding.");
         return false;
       }
 
-      setContestFormErrors({});
       const form = buildInstructionFormData(formData, contest_id);
       let { data } = await TriviaServices.createInstruction(form);
       if (data) {
         setFormSubmissionStatus((prev) => ({ ...prev, instructions: true }));
-        Notiflix.Notify.success("Instructions saved successfully!");
+        toast.success("Instructions saved successfully!");
         return true; // Indicate success
       }
       return false; // Indicate failure
     } catch (error: any) {
-      Notiflix.Notify.failure("Failed to save Instructions.");
+      toast.error("Failed to save Instructions.");
       console.error("Error saving contest:", error);
       return false; // Indicate failure
-    } finally {
-      Notiflix.Loading.remove();
     }
   };
 
   const handleGameQuestionSave = async () => {
-    Notiflix.Loading.circle();
     try {
-      let { isValid, errors } = await checkQuestionsForm();
+      let { isValid } = await checkQuestionsForm();
 
       if (!isValid) {
-        Notiflix.Notify.warning(
-          "Please fix the validation errors before proceeding.",
-        );
+        toast.warning("Please fix the validation errors before proceeding.");
         return false;
       }
 
-      setContestFormErrors({});
       const form = buildQuestionJsonData(formData, contest_id);
       let { data } = await TriviaServices.postGameQuestionForm(form);
       if (data) {
         setFormSubmissionStatus((prev) => ({ ...prev, gameQuestions: true }));
-        Notiflix.Notify.success("Game Questions saved successfully!");
+        toast.success("Game Questions saved successfully!");
         fetchPreviewQuestions();
         return true; // Indicate success
       }
       return false; // Indicate failure
     } catch (error: any) {
-      Notiflix.Notify.failure("Failed to save Game Questions.");
+      toast.error("Failed to save Game Questions.");
       console.error("Error saving contest:", error);
       return false; // Indicate failure
-    } finally {
-      Notiflix.Loading.remove();
     }
   };
 
   const handleWinnersSave = async () => {
-    Notiflix.Loading.circle();
     try {
+      console.log("trying to save winners");
+
       if (!formData.contest_id || !formData.winners?.length) {
-        Notiflix.Notify.failure("Atleast one winner is required");
+        toast.error("At least one winner is required");
         return false;
       }
 
       let { isValid } = await checkWinnersForm();
       if (!isValid) {
-        Notiflix.Notify.warning(
-          "Please fix the validation errors before proceeding.",
-        );
+        toast.warning("Please fix the validation errors before proceeding.");
         return false;
       }
 
@@ -524,14 +517,12 @@ export default function CreateContest() {
 
       await ContestServices.createContestPrize(payload);
       setFormSubmissionStatus((prev) => ({ ...prev, winnersAndRewards: true }));
-      Notiflix.Notify.success("Contest prizes saved successfully!");
+      toast.success("Contest prizes saved successfully!");
       return true; // Indicate success
     } catch (error) {
       console.error("Error saving contest prizes:", error);
-      Notiflix.Notify.failure("Failed to save contest prizes");
+      toast.error("Failed to save contest prizes");
       return false; // Indicate failure
-    } finally {
-      Notiflix.Loading.remove();
     }
   };
 
@@ -561,8 +552,33 @@ export default function CreateContest() {
   };
 
   const handlePublish = () => {
-    Notiflix.Notify.success("Game Published Successfully!");
-    push("/view/trivia?category=upcoming");
+    const publishContest = async () => {
+      try {
+        if (!formData.contest_id) {
+          toast.error("Contest ID is required to publish");
+          return;
+        }
+
+        const response = await ContestServices.updateContestStatus(
+          formData.contest_id.toString(),
+          1, // Status 1 for active/published
+        );
+
+        if (response.data) {
+          toast.success("Game Published Successfully!");
+          push("/view/trivia?category=upcoming");
+        } else {
+          toast.error(
+            response.response?.message || "Failed to publish contest",
+          );
+        }
+      } catch (error) {
+        console.error("Error publishing contest:", error);
+        toast.error("An error occurred while publishing the contest");
+      }
+    };
+
+    publishContest();
   };
 
   const renderStep = () => {
@@ -631,20 +647,35 @@ export default function CreateContest() {
     if (currentStep !== undefined && currentStep !== null) {
       switch (currentStep) {
         case 0:
-          checkContestForm();
+          if (contest_id) checkContestForm();
+          break;
         case 1:
-          checkWinnersForm();
+          if (contest_id && formData.winners) checkWinnersForm();
+          break;
         case 2:
-          checkInstructionForm();
-        case 4:
-          checkQuestionsForm();
+          if (contest_id && formData.instructions) checkInstructionForm();
+          break;
+        case 3:
+          if (contest_id && formData.questions) checkQuestionsForm();
+          break;
       }
-      console.log({ currentStep });
     }
   }, [formData]);
 
+  useEffect(() => {
+    console.log({ contestFormErrors });
+  }, [contestFormErrors]);
+
   return (
-    <div className="mx-auto p-6">
+    <div className="mx-auto max-w-7xl p-6">
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-gray-900">
+          Create Trivia Contest
+        </h1>
+        <p className="mt-2 text-gray-600">
+          Follow the steps below to create your trivia contest.
+        </p>
+      </div>
       <Breadcrumb
         currentStep={currentStep}
         steps={steps}

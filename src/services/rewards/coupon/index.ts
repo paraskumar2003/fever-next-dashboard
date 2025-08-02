@@ -16,6 +16,7 @@ export class CouponServices extends ApiServices {
           page,
           limit: pageSize,
           ...filter,
+          type: "digital",
         },
       });
       return response;

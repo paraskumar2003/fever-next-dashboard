@@ -194,7 +194,7 @@ const OnlyWinnersForm: React.FC<OnlyWinnersFormProps> = ({
                       );
                     return {
                       value: reward.id.toString(),
-                      label: `${reward.name} (${reward.reward_type}) - Balance Coupons (${reward?.total_coupons - reward?.used_coupons})`,
+                      label: `${reward.name} - ${reward?.brand_name} (${reward.reward_type}) ${reward.reward_type === "DIGITAL" ? `- Balance Coupons (${reward?.total_coupons - reward?.used_coupons})` : ""}`,
                     };
                   }),
                 ]}

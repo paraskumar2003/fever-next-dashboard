@@ -33,7 +33,10 @@ const BulkUploadCoupons: React.FC<BulkUploadCouponsProps> = ({
   useEffect(() => {
     const fetchRewards = async () => {
       try {
-        const { data } = await RewardServices.getRewards({ pageSize: 100 });
+        const { data } = await RewardServices.getRewards({
+          pageSize: 100,
+          reward_type: "DIGITAL",
+        });
         if (data?.data?.rows) {
           setRewards(data.data.rows);
           // Set first reward as default
@@ -231,7 +234,7 @@ const BulkUploadCoupons: React.FC<BulkUploadCouponsProps> = ({
                       { value: "", label: "Select a reward" },
                       ...rewards.map((reward) => ({
                         value: reward.id,
-                        label: `${reward.name} (${reward.reward_type})`,
+                        label: `${reward.name} - ${reward?.brand_name} (${reward.reward_type}) ${reward.reward_type === "DIGITAL" ? `- Balance Coupons (${reward?.total_coupons - reward?.used_coupons})` : ""}`,
                       })),
                     ]}
                     disabled={isUploading}

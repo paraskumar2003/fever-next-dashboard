@@ -70,7 +70,7 @@ export const winnersForm = Yup.object().shape({
       function (winners) {
         if (!Array.isArray(winners)) return true;
         for (const win of winners) {
-          if (win.reward_type !== "FEVER_BUCKS") {
+          if (win.reward_type == "DIGITAL") {
             if (
               typeof win.qty === "number" &&
               typeof win.balance_coupons === "number"

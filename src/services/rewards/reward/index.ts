@@ -7,6 +7,7 @@ interface RewardsFilter {
   q?: string;
   page?: number;
   pageSize?: number;
+  reward_type?: string;
 }
 
 export class RewardServices extends ApiServices {
@@ -16,7 +17,7 @@ export class RewardServices extends ApiServices {
         params: {
           page: props?.page || 1,
           limit: props?.pageSize || 10,
-          ...(props?.q ? { q: props.q } : {}),
+          ...props,
         },
       });
       return response;

@@ -191,6 +191,7 @@ export const ContestProvider: React.FC<{ children: ReactNode }> = ({
       game_time_level: "GAME",
       flip_allowed: 1,
       flip_count: 0,
+      flip_fee: 0,
       isPopular: 0,
       fever_logo: false,
     });

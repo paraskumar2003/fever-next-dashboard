@@ -37,7 +37,7 @@ export function TriviaGamePlay({
     timeOut:
       formData?.game_time_level === "GAME"
         ? +formData?.game_timer!
-        : +questions[0]?.timer * 1000 || 10000,
+        : +questions[0]?.timer * 1000 || 100000,
   });
   const [game, setGame] = useState<{ state: GameState }>({
     state: GameState.PLAYING,
@@ -69,11 +69,19 @@ export function TriviaGamePlay({
 
         if (formData?.game_time_level === "QUESTION") {
           const nextQuestion = questions[newIndex];
-          setTimer({
-            timeOut: +nextQuestion?.timer * 1000 || 10000,
-            state: true,
-            shift: (timer?.shift || 0) + 1,
-          });
+          setTimer((prev) => ({
+            ...prev,
+            state: false,
+          }));
+
+          setTimeout(() => {
+            setTimer((prev) => ({
+              ...prev,
+              timeOut: +nextQuestion?.timer * 1000 || 10000,
+              state: true,
+              shift: (prev?.shift || 0) + 1,
+            }));
+          }, 10); // delay can be small, just enough to defer batching
         }
 
         if (questions[newIndex]) {

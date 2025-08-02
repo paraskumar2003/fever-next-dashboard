@@ -23,10 +23,6 @@ export function Timer({
     }
   }, [timeToCount]);
 
-  useEffect(() => {
-    console.log("props in timer", timeToCount, start, onEnd);
-  }, [timeToCount, start, onEnd]);
-
   // Start countdown
   useEffect(() => {
     if (!start || timeLeft <= 0) return;

@@ -94,7 +94,9 @@ export default function CreateContest() {
         );
 
         if (data?.data?.rows) {
-          const selectedQuestionSet = data.data.rows[0];
+          const selectedQuestionSet = data.data.rows.find(
+            (e: any) => e.id === formData.set_id,
+          );
 
           if (selectedQuestionSet && selectedQuestionSet.questions) {
             // Map API questions to preview format

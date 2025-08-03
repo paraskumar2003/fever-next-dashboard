@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import ContestRow from "./ContestRow";
 import ListWrapper from "./ListWrapper";
 import { Contest } from "@/types/contest";
@@ -34,6 +34,10 @@ const ContestList: React.FC<ContestListProps> = ({
     setPageSize(newPageSize);
     onPaginationModelChange(1, newPageSize);
   };
+
+  useEffect(() => {
+    setPageSize(paginationModel.pageSize);
+  }, [paginationModel.pageSize]);
 
   const handleNextPage = () => {
     const nextPage = paginationModel.page + 1;
@@ -177,7 +181,7 @@ const ContestList: React.FC<ContestListProps> = ({
               <label className="text-sm font-medium text-gray-700">Show:</label>
               <select
                 id="pageSize"
-                value={pageSize}
+                value={paginationModel.pageSize}
                 onChange={(e) => handlePageSizeChange(Number(e.target.value))}
                 className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm font-medium focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
               >

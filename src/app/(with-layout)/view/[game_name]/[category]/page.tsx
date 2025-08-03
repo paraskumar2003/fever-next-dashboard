@@ -141,7 +141,7 @@ export default function ViewContest() {
   if (loading) return <div>Loading...</div>;
 
   return (
-    <div className="mx-auto py-8">
+    <div className="mx-auto pt-8">
       <div className="mb-6 flex items-center justify-between">
         <h1 className="text-3xl font-bold">
           Contest Overview - (

@@ -27,7 +27,9 @@ export default function ViewContest() {
     pageSize: 10,
   });
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-  const [contestToDeleteId, setContestToDeleteId] = useState<string | null>(null);
+  const [contestToDeleteId, setContestToDeleteId] = useState<string | null>(
+    null,
+  );
 
   const handleView = (contest: Contest) => {
     router.push(`/${params.game_name}?contest_id=${contest.id}`);
@@ -44,7 +46,7 @@ export default function ViewContest() {
 
   const confirmContestDelete = async () => {
     if (contestToDeleteId === null) return;
-    
+
     try {
       // TODO: Implement actual delete API call when available
       // await ContestServices.deleteContest(contestToDeleteId);

@@ -132,6 +132,17 @@ export default function Login() {
             {loading ? "Signing in..." : "Sign In"}
           </Button>
         </form>
+
+        <div className="text-center text-sm">
+          <p className="mb-2 text-gray-600">
+            <Link
+              href="/forgot-password"
+              className="font-medium text-primary-600 hover:text-primary-500"
+            >
+              Forgot your password?
+            </Link>
+          </p>
+        </div>
       </div>
     </div>
   );

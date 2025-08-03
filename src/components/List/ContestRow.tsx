@@ -16,6 +16,7 @@ interface ContestRowProps {
   onStatusChange?: (id: string, status: number) => void;
   page: number;
   pageSize: number;
+  isEditable?: boolean;
 }
 
 const ContestRow: React.FC<ContestRowProps> = ({
@@ -27,6 +28,7 @@ const ContestRow: React.FC<ContestRowProps> = ({
   onDelete,
   onDuplicate,
   onStatusChange,
+  isEditable = true,
   page,
   pageSize,
 }) => {
@@ -45,17 +47,17 @@ const ContestRow: React.FC<ContestRowProps> = ({
 
       case "live":
         // For live page: toggle between Active (status: 1) and Inactive (status: 2)
-        return contest.status === 1
+        return contest.isPublished
           ? {
               displayLabel: "Active",
               buttonLabel: "Deactivate",
-              color: "bg-green-100 text-green-700 hover:bg-red-200",
+              color: "bg-red-100 text-red-700 hover:bg-green-200",
               nextStatus: 2, // Set to inactive
             }
           : {
               displayLabel: "Inactive",
               buttonLabel: "Activate",
-              color: "bg-red-100 text-red-700 hover:bg-green-200",
+              color: "bg-green-100 text-green-700 hover:bg-red-200",
               nextStatus: 1, // Set to active
             };
 
@@ -117,7 +119,9 @@ const ContestRow: React.FC<ContestRowProps> = ({
         #{(page - 1) * pageSize + index + 1}
       </td>
       <td className="px-6 py-4 text-sm text-gray-900">
-        <div className="max-w-[200px] truncate font-semibold">{contest.name}</div>
+        <div className="max-w-[200px] truncate font-semibold">
+          {contest.name}
+        </div>
       </td>
       <td className="px-6 py-4 text-sm text-gray-900">
         <span className="font-semibold">₹{contest.contestFee || 0}</span>
@@ -180,7 +184,9 @@ const ContestRow: React.FC<ContestRowProps> = ({
         )}
       </td>
       <td className="px-6 py-4 text-sm text-gray-900">
-        <div className="max-w-[150px] truncate font-medium">{contest.sponsored_name}</div>
+        <div className="max-w-[150px] truncate font-medium">
+          {contest.sponsored_name}
+        </div>
       </td>
       <td className="px-6 py-4 text-sm">
         <div className="flex items-center justify-center space-x-1">
@@ -193,7 +199,7 @@ const ContestRow: React.FC<ContestRowProps> = ({
             <Eye className="h-4 w-4" />
           </Button>
 
-          {category !== "live" && (
+          {["upcoming", "draft"].includes(category || "") && (
             <Button
               variant="secondary"
               size="sm"

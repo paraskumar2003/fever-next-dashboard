@@ -6,6 +6,7 @@ export function buildContestFormData(
 ): FormData {
   const fd = new FormData();
 
+  console.log(formData);
   fd.append("name", formData.contest_name || "");
   fd.append("rewards", formData.reward_name || "");
 

@@ -140,13 +140,13 @@ const ContestRow: React.FC<ContestRowProps> = ({
         )}
       </td>
       <td className="px-6 py-4 text-sm font-medium text-gray-900">
-        {moment(contest.startDate).format("YYYY-MM-DD")}
+        {moment(contest.startDate).format("DD-MM-YYYY")}
       </td>
       <td className="px-6 py-4 text-sm font-medium text-gray-900">
         {moment(contest.startDate).format("HH:mm")}
       </td>
       <td className="px-6 py-4 text-sm font-medium text-gray-900">
-        {moment(contest.endDate).format("YYYY-MM-DD")}
+        {moment(contest.endDate).format("DD-MM-YYYY")}
       </td>
       <td className="px-6 py-4 text-sm font-medium text-gray-900">
         {moment(contest.endDate).format("HH:mm")}

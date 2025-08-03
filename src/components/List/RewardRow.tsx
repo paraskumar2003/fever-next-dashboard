@@ -66,7 +66,7 @@ const RewardRow: React.FC<RewardRowProps> = ({
       </td> */}
       <td className="px-4 py-3 text-sm text-gray-600">{reward.description}</td>
       <td className="px-4 py-3 text-sm text-gray-600">
-        {moment(reward.createdAt).format("YYYY-MM-DD HH:mm")}
+        {moment(reward.createdAt).format("DD-MM-YYYY HH:mm")}
       </td>
       <td className="px-4 py-3 text-sm">
         <div className="flex items-center justify-center space-x-2">

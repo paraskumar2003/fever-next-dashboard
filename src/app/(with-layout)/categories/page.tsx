@@ -8,6 +8,7 @@ import CategoryModal from "@/components/Modal/CategoryModal";
 import { useModal } from "@/hooks/useModal";
 import { Category } from "@/components/List/CategoryList";
 import { CategoryFormData } from "@/types/category";
+import ConfirmationModal from "@/components/Modal/ConfirmationModal";
 
 type fetchCategoriesArgs =
   | { q?: string; page?: number; limit?: number }
@@ -22,6 +23,8 @@ const CategoriesPage = () => {
   const [searchString, setSearchString] = useState("");
   const [rowCount, setRowCount] = useState(0);
   const modal = useModal();
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [categoryToDeleteId, setCategoryToDeleteId] = useState<number | null>(null);
 
   const [paginationModel, setPaginationModel] = useState<{
     page: number;
@@ -78,11 +81,20 @@ const CategoriesPage = () => {
   };
 
   const handleCategoryDelete = async (id: number) => {
+    setCategoryToDeleteId(id);
+    setShowDeleteConfirm(true);
+  };
+
+  const confirmCategoryDelete = async () => {
+    if (categoryToDeleteId === null) return;
+    
     try {
-      await CategoryServices.deleteCategory(id.toString());
+      await CategoryServices.deleteCategory(categoryToDeleteId.toString());
       fetchCategories();
     } catch (err) {
       console.error("Error deleting category:", err);
+    } finally {
+      setCategoryToDeleteId(null);
     }
   };
 
@@ -132,6 +144,20 @@ const CategoriesPage = () => {
             }}
           />
         </div>
+
+        <ConfirmationModal
+          isOpen={showDeleteConfirm}
+          onClose={() => {
+            setShowDeleteConfirm(false);
+            setCategoryToDeleteId(null);
+          }}
+          onConfirm={confirmCategoryDelete}
+          title="Delete Category"
+          message="Are you sure you want to delete this category? This action cannot be undone and will also delete all associated questions."
+          confirmText="Delete"
+          cancelText="Cancel"
+          variant="danger"
+        />
       </div>
     </>
   );

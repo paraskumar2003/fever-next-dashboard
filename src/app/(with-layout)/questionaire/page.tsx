@@ -9,6 +9,7 @@ import { useModal } from "@/hooks/useModal";
 import QuestionSection from "@/components/Section/QuestionSection";
 import { Question } from "@/types/question";
 import { BulkUploadQuestions } from "@/components/BulkUpload";
+import ConfirmationModal from "@/components/Modal/ConfirmationModal";
 
 type fetchQuestionAgrs =
   | { q?: string; page?: number; limit?: number }
@@ -36,6 +37,8 @@ const TriviaPage = () => {
 
   const [selectedQuestion, setSelectedQuestion] = useState<any>(null);
   const [isViewMode, setIsViewMode] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [questionToDeleteId, setQuestionToDeleteId] = useState<number | null>(null);
 
   const fetchContestQuestions = async (contest_id: string): Promise<any> => {
     try {
@@ -148,11 +151,20 @@ const TriviaPage = () => {
   };
 
   const handleQuestionDelete = async (id: number) => {
+    setQuestionToDeleteId(id);
+    setShowDeleteConfirm(true);
+  };
+
+  const confirmQuestionDelete = async () => {
+    if (questionToDeleteId === null) return;
+    
     try {
-      await TriviaServices.deleteQuestion(id.toString());
+      await TriviaServices.deleteQuestion(questionToDeleteId.toString());
       fetchQuestions();
     } catch (err) {
       console.error("Error deleting question:", err);
+    } finally {
+      setQuestionToDeleteId(null);
     }
   };
 
@@ -214,6 +226,20 @@ const TriviaPage = () => {
             }}
           />
         </div>
+
+        <ConfirmationModal
+          isOpen={showDeleteConfirm}
+          onClose={() => {
+            setShowDeleteConfirm(false);
+            setQuestionToDeleteId(null);
+          }}
+          onConfirm={confirmQuestionDelete}
+          title="Delete Question"
+          message="Are you sure you want to delete this question? This action cannot be undone."
+          confirmText="Delete"
+          cancelText="Cancel"
+          variant="danger"
+        />
       </div>
     </>
   );

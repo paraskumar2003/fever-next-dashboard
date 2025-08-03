@@ -7,6 +7,7 @@ import QuestionSetSection from "@/components/Section/QuestionSetSection";
 import QuestionSetModal from "@/components/Modal/QuestionSetModal";
 import { useModal } from "@/hooks/useModal";
 import { QuestionSet, QuestionSetFormData } from "@/types/questionSet";
+import ConfirmationModal from "@/components/Modal/ConfirmationModal";
 
 type fetchQuestionSetsArgs =
   | { q?: string; page?: number; limit?: number }
@@ -20,6 +21,8 @@ const QuestionSetsPage = () => {
   const [searchString, setSearchString] = useState("");
   const [rowCount, setRowCount] = useState(0);
   const modal = useModal();
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [questionSetToDeleteId, setQuestionSetToDeleteId] = useState<number | null>(null);
 
   const [paginationModel, setPaginationModel] = useState<{
     page: number;
@@ -77,12 +80,20 @@ const QuestionSetsPage = () => {
   };
 
   const handleQuestionSetDelete = async (id: number) => {
+    setQuestionSetToDeleteId(id);
+    setShowDeleteConfirm(true);
+  };
+
+  const confirmQuestionSetDelete = async () => {
+    if (questionSetToDeleteId === null) return;
+    
     try {
-      await QuestionSetServices.deleteQuestionSet(id.toString());
+      await QuestionSetServices.deleteQuestionSet(questionSetToDeleteId.toString());
       fetchQuestionSets();
     } catch (err) {
       console.error("Error deleting question set:", err);
-      console.error("Error deleting question set:", err);
+    } finally {
+      setQuestionSetToDeleteId(null);
     }
   };
 
@@ -132,6 +143,20 @@ const QuestionSetsPage = () => {
             }}
           />
         </div>
+
+        <ConfirmationModal
+          isOpen={showDeleteConfirm}
+          onClose={() => {
+            setShowDeleteConfirm(false);
+            setQuestionSetToDeleteId(null);
+          }}
+          onConfirm={confirmQuestionSetDelete}
+          title="Delete Question Set"
+          message="Are you sure you want to delete this question set? This action cannot be undone and will affect all associated questions."
+          confirmText="Delete"
+          cancelText="Cancel"
+          variant="danger"
+        />
       </div>
     </>
   );

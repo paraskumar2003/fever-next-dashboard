@@ -42,6 +42,7 @@ const BulkUploadCoupons: React.FC<BulkUploadCouponsProps> = ({
           // Set first reward as default
           if (data.data.rows.length > 0) {
             setSelectedRewardId(data.data.rows[0].id);
+            setBrandName(data.data.rows[0].brand_name);
           }
         }
       } catch (error) {
@@ -53,6 +54,7 @@ const BulkUploadCoupons: React.FC<BulkUploadCouponsProps> = ({
 
   const handleBulkUploadClick = () => {
     setShowBulkUploadModal(true);
+    setUploadSuccess(false);
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {

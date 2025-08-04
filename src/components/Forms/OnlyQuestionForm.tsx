@@ -62,11 +62,11 @@ const OnlyQuestionForm: React.FC<OnlyQuestionFormProps> = ({
           name: e.category,
         })),
       );
-      formData.QuestionCategoryId ??= categoriesData[0].id;
-      formData.QuestionCount ??= Number(categoriesData[0].questions);
-      formData.noOfQuestionInCurrentCategory ??= Number(
-        categoriesData[0].questions,
-      );
+      // formData.QuestionCategoryId ??= categoriesData[0].id;
+      // formData.QuestionCount ??= Number(categoriesData[0].questions);
+      // formData.noOfQuestionInCurrentCategory ??= Number(
+      // categoriesData[0].questions,
+      // );
     }
   };
 

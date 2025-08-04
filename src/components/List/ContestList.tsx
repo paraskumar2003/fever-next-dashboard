@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import ContestRow from "./ContestRow";
 import ListWrapper from "./ListWrapper";
 import { Contest } from "@/types/contest";
@@ -34,6 +34,10 @@ const ContestList: React.FC<ContestListProps> = ({
     setPageSize(newPageSize);
     onPaginationModelChange(1, newPageSize);
   };
+
+  useEffect(() => {
+    setPageSize(paginationModel.pageSize);
+  }, [paginationModel.pageSize]);
 
   const handleNextPage = () => {
     const nextPage = paginationModel.page + 1;
@@ -126,11 +130,20 @@ const ContestList: React.FC<ContestListProps> = ({
             <div className="py-12 text-center">
               <div className="mx-auto h-12 w-12 text-gray-300">
                 <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={1}
+                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                  />
                 </svg>
               </div>
-              <h3 className="mt-4 text-lg font-semibold text-gray-900">No contests found</h3>
-              <p className="mt-2 text-gray-500">Get started by creating your first contest.</p>
+              <h3 className="mt-4 text-lg font-semibold text-gray-900">
+                No contests found
+              </h3>
+              <p className="mt-2 text-gray-500">
+                Get started by creating your first contest.
+              </p>
             </div>
           )}
         </div>
@@ -168,7 +181,7 @@ const ContestList: React.FC<ContestListProps> = ({
               <label className="text-sm font-medium text-gray-700">Show:</label>
               <select
                 id="pageSize"
-                value={pageSize}
+                value={paginationModel.pageSize}
                 onChange={(e) => handlePageSizeChange(Number(e.target.value))}
                 className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm font-medium focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
               >

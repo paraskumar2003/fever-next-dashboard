@@ -122,6 +122,9 @@ const OnlyWinnersForm: React.FC<OnlyWinnersFormProps> = ({
       Notiflix.Notify.failure("Failed to save contest prizes");
     }
   };
+  // Calculate totals for overview
+  const totalWinners = winners?.length || 0;
+  const totalRewardsQuantity = winners?.reduce((sum, winner) => sum + (winner.qty || 0), 0) || 0;
 
   return (
     <FormSection title="Winners & Rewards" onSave={handleSubmit}>
@@ -153,6 +156,23 @@ const OnlyWinnersForm: React.FC<OnlyWinnersFormProps> = ({
           </div>
         </div>
       )}
+
+      {/* Winners and Rewards Overview */}
+      <div className="mb-6 rounded-lg border-2 border-primary-200 bg-primary-50 p-4">
+        <h3 className="mb-3 text-lg font-semibold text-primary-800">
+          Winners & Rewards Overview
+        </h3>
+        <div className="grid grid-cols-2 gap-4">
+          <div className="text-center">
+            <div className="text-2xl font-bold text-primary-700">{totalWinners}</div>
+            <div className="text-sm font-medium text-primary-600">Total Winners</div>
+          </div>
+          <div className="text-center">
+            <div className="text-2xl font-bold text-primary-700">{totalRewardsQuantity}</div>
+            <div className="text-sm font-medium text-primary-600">Total Rewards Quantity</div>
+          </div>
+        </div>
+      </div>
 
       <div className="mb-6">
         {winners && (

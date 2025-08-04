@@ -1,5 +1,6 @@
 import { AxiosResponse } from "axios";
 import { ApiServices } from "../interceptor.base";
+export * from "./password-recovery";
 
 interface LoginPayload {
   email: string;

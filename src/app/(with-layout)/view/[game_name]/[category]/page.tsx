@@ -8,6 +8,8 @@ import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import FormSection from "@/components/FormSection";
 import Notiflix from "notiflix";
+import ConfirmationModal from "@/components/Modal/ConfirmationModal";
+import { toast } from "react-toastify";
 
 export default function ViewContest() {
   const router = useRouter();
@@ -24,6 +26,10 @@ export default function ViewContest() {
     page: 1,
     pageSize: 10,
   });
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [contestToDeleteId, setContestToDeleteId] = useState<string | null>(
+    null,
+  );
 
   const handleView = (contest: Contest) => {
     router.push(`/${params.game_name}?contest_id=${contest.id}`);
@@ -34,8 +40,25 @@ export default function ViewContest() {
   };
 
   const handleDelete = async (id: string) => {
-    // TODO: Implement delete functionality
-    console.log("Delete contest:", id);
+    setContestToDeleteId(id);
+    setShowDeleteConfirm(true);
+  };
+
+  const confirmContestDelete = async () => {
+    if (contestToDeleteId === null) return;
+
+    try {
+      // TODO: Implement actual delete API call when available
+      // await ContestServices.deleteContest(contestToDeleteId);
+      console.log("Delete contest:", contestToDeleteId);
+      toast.success("Contest deleted successfully!");
+      await fetchContests();
+    } catch (err) {
+      console.error("Error deleting contest:", err);
+      toast.error("Failed to delete contest");
+    } finally {
+      setContestToDeleteId(null);
+    }
   };
 
   const handleDuplicate = async (contest: Contest) => {
@@ -141,7 +164,7 @@ export default function ViewContest() {
   if (loading) return <div>Loading...</div>;
 
   return (
-    <div className="mx-auto py-8">
+    <div className="mx-auto pt-8">
       <div className="mb-6 flex items-center justify-between">
         <h1 className="text-3xl font-bold">
           Contest Overview - (
@@ -175,6 +198,20 @@ export default function ViewContest() {
           paginationModel={paginationModel}
         />
       </FormSection>
+
+      <ConfirmationModal
+        isOpen={showDeleteConfirm}
+        onClose={() => {
+          setShowDeleteConfirm(false);
+          setContestToDeleteId(null);
+        }}
+        onConfirm={confirmContestDelete}
+        title="Delete Contest"
+        message="Are you sure you want to delete this contest? This action cannot be undone and will remove all associated data."
+        confirmText="Delete"
+        cancelText="Cancel"
+        variant="danger"
+      />
     </div>
   );
 }

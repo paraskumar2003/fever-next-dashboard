@@ -18,7 +18,7 @@ interface OnlyContestFormProps {
 const getTodayDate = () => {
   const today = new Date();
   today.setDate(today.getDate());
-  return today.toISOString().split("T")[0]; // returns YYYY-MM-DD
+  return today.toISOString().split("T")[0]; // returns DD-MM-YYYY
 };
 
 const OnlyContestForm: React.FC<OnlyContestFormProps> = ({

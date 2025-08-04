@@ -6,6 +6,7 @@ import { Eye, EyeOff } from "lucide-react";
 import Cookies from "js-cookie";
 import { toast } from "react-toastify";
 import Button from "@/components/Button";
+import Link from "next/link";
 
 export default function Login() {
   const [form, setForm] = useState({
@@ -48,7 +49,6 @@ export default function Login() {
     } finally {
       setLoading(false);
     }
-
   };
 
   const [showPassword, setShowPassword] = useState(false);
@@ -56,9 +56,7 @@ export default function Login() {
   const togglePassword = () => setShowPassword((prev) => !prev);
 
   return (
-    <div
-      className="flex min-h-screen items-center justify-center bg-gradient-to-br from-primary-50 to-primary-100"
-    >
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-primary-50 to-primary-100">
       <div className="w-full max-w-md rounded-2xl bg-white p-8 shadow-2xl">
         <div className="mb-8 text-center">
           <h2 className="text-3xl font-bold text-gray-900">Welcome Back</h2>
@@ -132,6 +130,17 @@ export default function Login() {
             {loading ? "Signing in..." : "Sign In"}
           </Button>
         </form>
+
+        <div className="text-center text-sm">
+          <p className="mb-2 text-gray-600">
+            <Link
+              href="/forgot-password"
+              className="font-medium text-primary-600 hover:text-primary-500"
+            >
+              Forgot your password?
+            </Link>
+          </p>
+        </div>
       </div>
     </div>
   );

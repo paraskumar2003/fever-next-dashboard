@@ -185,6 +185,11 @@ const ContestRow: React.FC<ContestRowProps> = ({
       </td>
       <td className="px-6 py-4 text-sm text-gray-900">
         <div className="max-w-[150px] truncate font-medium">
+          {contest.flip_amount}
+        </div>
+      </td>
+      <td className="px-6 py-4 text-sm text-gray-900">
+        <div className="max-w-[150px] truncate font-medium">
           {contest.sponsored_name}
         </div>
       </td>

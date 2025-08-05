@@ -80,6 +80,8 @@ const RewardList: React.FC<RewardListProps> = ({
               <RewardRow
                 key={reward.id}
                 index={index}
+                page={currentPage}
+                pageSize={pageSize}
                 reward={reward}
                 onView={onView}
                 onEdit={onEdit}

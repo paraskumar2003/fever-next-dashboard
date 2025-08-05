@@ -70,6 +70,8 @@ const CouponList: React.FC<CouponListProps> = ({
               <CouponRow
                 key={coupon.id}
                 index={index}
+                page={currentPage}
+                pageSize={pageSize}
                 coupon={coupon}
                 onView={onView}
                 onEdit={onEdit}

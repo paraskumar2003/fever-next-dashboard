@@ -124,7 +124,8 @@ const OnlyWinnersForm: React.FC<OnlyWinnersFormProps> = ({
   };
   // Calculate totals for overview
   const totalWinners = winners?.length || 0;
-  const totalRewardsQuantity = winners?.reduce((sum, winner) => sum + (winner.qty || 0), 0) || 0;
+  const totalRewardsQuantity =
+    winners?.reduce((sum, winner) => sum + (winner.qty || 0), 0) || 0;
 
   return (
     <FormSection title="Winners & Rewards" onSave={handleSubmit}>
@@ -164,12 +165,20 @@ const OnlyWinnersForm: React.FC<OnlyWinnersFormProps> = ({
         </h3>
         <div className="grid grid-cols-2 gap-4">
           <div className="text-center">
-            <div className="text-2xl font-bold text-primary-700">{totalWinners}</div>
-            <div className="text-sm font-medium text-primary-600">Total Winners</div>
+            <div className="text-2xl font-bold text-primary-700">
+              {totalWinners}
+            </div>
+            <div className="text-sm font-medium text-primary-600">
+              Total Winner Type
+            </div>
           </div>
           <div className="text-center">
-            <div className="text-2xl font-bold text-primary-700">{totalRewardsQuantity}</div>
-            <div className="text-sm font-medium text-primary-600">Total Rewards Quantity</div>
+            <div className="text-2xl font-bold text-primary-700">
+              {totalRewardsQuantity}
+            </div>
+            <div className="text-sm font-medium text-primary-600">
+              Total Rewards Quantity
+            </div>
           </div>
         </div>
       </div>

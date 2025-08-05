@@ -10,15 +10,18 @@ interface CouponRowProps {
   onDelete?: (id: number) => void;
   onView?: (coupon: Coupon) => void;
   onStatusChange?: (id: number, status: number) => void;
+  page: number;
+  pageSize: number;
 }
 
 const CouponRow: React.FC<CouponRowProps> = ({
   coupon,
   index,
   onEdit,
-  onDelete,
   onView,
   onStatusChange,
+  page,
+  pageSize,
 }) => {
   const [loadingStatus, setLoadingStatus] = useState(false);
 
@@ -35,7 +38,9 @@ const CouponRow: React.FC<CouponRowProps> = ({
 
   return (
     <tr className="transition-colors hover:bg-gray-50">
-      <td className="px-4 py-3 text-sm text-gray-600">#{index + 1}</td>
+      <td className="px-4 py-3 text-sm text-gray-600">
+        #{(page - 1) * pageSize + index + 1}
+      </td>
       <td className="px-4 py-3 text-sm text-gray-600">
         <div className="font-medium">{coupon?.reward?.brand_name}</div>
       </td>

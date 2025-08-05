@@ -11,6 +11,8 @@ interface RewardRowProps {
   onDelete?: (id: string) => void;
   onView?: (reward: Reward) => void;
   onStatusChange?: (id: string, status: number) => void;
+  page: number;
+  pageSize: number;
 }
 
 const RewardRow: React.FC<RewardRowProps> = ({
@@ -20,6 +22,8 @@ const RewardRow: React.FC<RewardRowProps> = ({
   onDelete,
   onView,
   onStatusChange,
+  page,
+  pageSize,
 }) => {
   const [loadingStatus, setLoadingStatus] = useState(false);
 
@@ -33,7 +37,9 @@ const RewardRow: React.FC<RewardRowProps> = ({
 
   return (
     <tr className="transition-colors hover:bg-gray-50">
-      <td className="px-4 py-3 text-sm text-gray-600">#{index + 1}</td>
+      <td className="px-4 py-3 text-sm text-gray-600">
+        #{(page - 1) * pageSize + index + 1}
+      </td>
       <td className="px-4 py-3 text-sm text-gray-600">
         <div className="font-medium">{reward.name}</div>
       </td>

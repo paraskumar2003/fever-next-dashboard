@@ -97,7 +97,7 @@ const ContestList: React.FC<ContestListProps> = ({
                   Winners Announced
                 </th>
                 <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
-                  Status
+                  Action
                 </th>
                 <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
                   Flip Amount
@@ -106,7 +106,7 @@ const ContestList: React.FC<ContestListProps> = ({
                   Sponsor Name
                 </th>
                 <th className="px-6 py-4 text-center text-xs font-semibold uppercase tracking-wider text-gray-500">
-                  Actions
+                  View/Delete
                 </th>
               </tr>
             </thead>

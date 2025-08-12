@@ -24,4 +24,5 @@ export interface Contest {
   total_contest_played: number;
   winners_announced: number;
   flip_amount: number;
+  contestQuestionAssignments: any[];
 }

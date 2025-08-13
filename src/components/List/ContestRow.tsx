@@ -192,7 +192,7 @@ const ContestRow: React.FC<ContestRowProps> = ({
       </td>
       <td className="px-6 py-4 text-sm text-gray-900">
         <div className="max-w-[150px] truncate font-medium">
-          {contest?.contestQuestionAssignments[0]?.flipFee || 0}
+          {contest?.contestQuestionAssignments?.[0]?.flipFee || 0}
         </div>
       </td>
       <td className="px-6 py-4 text-sm text-gray-900">

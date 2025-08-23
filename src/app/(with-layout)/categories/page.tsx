@@ -24,7 +24,9 @@ const CategoriesPage = () => {
   const [rowCount, setRowCount] = useState(0);
   const modal = useModal();
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-  const [categoryToDeleteId, setCategoryToDeleteId] = useState<number | null>(null);
+  const [categoryToDeleteId, setCategoryToDeleteId] = useState<number | null>(
+    null,
+  );
 
   const [paginationModel, setPaginationModel] = useState<{
     page: number;
@@ -87,7 +89,7 @@ const CategoriesPage = () => {
 
   const confirmCategoryDelete = async () => {
     if (categoryToDeleteId === null) return;
-    
+
     try {
       await CategoryServices.deleteCategory(categoryToDeleteId.toString());
       fetchCategories();

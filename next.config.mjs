@@ -4,6 +4,7 @@ const nextConfig = {
   env: {
     api_url: "https://v3api.countrygame.live",
     // api_url: "http://localhost:3002",
+    // api_url: "https://api.playwithfever.com",
   },
 };
 

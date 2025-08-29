@@ -10,4 +10,5 @@ export interface Reward {
   description: string;
   total_coupons: number;
   used_coupons: number;
+  logo: string | null;
 }

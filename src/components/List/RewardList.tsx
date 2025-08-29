@@ -56,6 +56,9 @@ const RewardList: React.FC<RewardListProps> = ({
                 Reward Type
               </th>
               <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">
+                Image
+              </th>
+              <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">
                 Total Coupons
               </th>
               <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">

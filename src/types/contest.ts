@@ -23,4 +23,6 @@ export interface Contest {
   status: number; // 0 for Draft, 1 for Active, 2 for Inactive
   total_contest_played: number;
   winners_announced: number;
+  flip_amount: number;
+  contestQuestionAssignments: any[];
 }

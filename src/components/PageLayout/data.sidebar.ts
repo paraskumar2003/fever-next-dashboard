@@ -29,16 +29,16 @@ export const menuItems = [
     path: "/categories",
   },
   {
-    id: "questionaire",
-    label: "Questionaire",
-    icon: CircleHelp,
-    path: "/questionaire",
-  },
-  {
     id: "question-sets",
     label: "Question Sets",
     icon: FileQuestion,
     path: "/question-sets",
+  },
+  {
+    id: "questionaire",
+    label: "Questionaire",
+    icon: CircleHelp,
+    path: "/questionaire",
   },
   {
     id: "trivia",

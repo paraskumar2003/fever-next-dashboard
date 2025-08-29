@@ -77,6 +77,14 @@ const ContestRow: React.FC<ContestRowProps> = ({
               nextStatus: 1, // Set to active
             };
 
+      case "old":
+        return {
+          displayLabel: "Activate",
+          buttonLabel: "Activate",
+          color: "bg-green-100 text-green-700",
+          nextStatus: 1,
+        };
+
       default:
         // For other categories (like "old") - read-only display
         return isPublished
@@ -110,8 +118,7 @@ const ContestRow: React.FC<ContestRowProps> = ({
   };
 
   const statusInfo = getStatusInfo(contest.isPublished, category);
-  const canChangeStatus =
-    category === "live" || category === "upcoming" || category === "draft";
+  const canChangeStatus = true;
 
   return (
     <tr className="transition-colors hover:bg-gray-50/50">
@@ -182,6 +189,11 @@ const ContestRow: React.FC<ContestRowProps> = ({
             {statusInfo.displayLabel}
           </span>
         )}
+      </td>
+      <td className="px-6 py-4 text-sm text-gray-900">
+        <div className="max-w-[150px] truncate font-medium">
+          {contest?.contestQuestionAssignments?.[0]?.flipFee || 0}
+        </div>
       </td>
       <td className="px-6 py-4 text-sm text-gray-900">
         <div className="max-w-[150px] truncate font-medium">

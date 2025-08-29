@@ -47,6 +47,19 @@ const RewardRow: React.FC<RewardRowProps> = ({
         <div className="font-medium">{reward.brand_name}</div>
       </td>
       <td className="px-4 py-3 text-sm text-gray-600">{reward.reward_type}</td>
+      <td className="px-6 py-4 text-sm text-gray-600">
+        {reward.logo ? (
+          <img
+            src={reward.logo}
+            alt="Sponsor Logo"
+            className="h-12 w-16 rounded-lg object-contain shadow-sm"
+          />
+        ) : (
+          <div className="flex h-12 w-16 items-center justify-center rounded-lg bg-gray-100">
+            <span className="text-xs text-gray-400">No logo</span>
+          </div>
+        )}
+      </td>
       <td className="px-4 py-3 text-sm text-gray-600">
         {reward.total_coupons}
       </td>

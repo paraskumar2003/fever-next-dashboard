@@ -42,13 +42,6 @@ const OnlyContestForm: React.FC<OnlyContestFormProps> = ({
           error={errors.contest_name}
           required
         />
-        {/* <FormInput
-          label="Reward Name"
-          placeholder="Enter reward name"
-          value={formData.reward_name || ""}
-          onChange={(e) => updateFormData({ reward_name: e.target.value })}
-          error={errors.reward_name}
-        /> */}
       </div>
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <div>

@@ -7,6 +7,9 @@ import FormTextarea from "../FormTextarea";
 import { Save, X } from "lucide-react";
 import { RewardServices } from "@/services/rewards/reward";
 import Notiflix from "notiflix";
+import { strict } from "assert";
+import { string } from "yup";
+import ImageUpload from "../ImageUpload";
 
 interface RewardModalProps {
   isOpen: boolean;
@@ -23,11 +26,20 @@ const RewardModal: React.FC<RewardModalProps> = ({
   isViewMode = false,
   onSave,
 }) => {
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<{
+    name: string;
+    reward_type: string;
+    brand_name: string;
+    description: string;
+    logo?: File | null;
+    logo_preview?: string;
+  }>({
     name: "",
     reward_type: "DIGITAL",
     brand_name: "",
     description: "",
+    logo: null as File | null, // 👈 store File here,
+    logo_preview: "",
   });
 
   const [loading, setLoading] = useState(false);
@@ -63,6 +75,7 @@ const RewardModal: React.FC<RewardModalProps> = ({
           reward_type: formData.reward_type as "DIGITAL" | "PHYSICAL",
           brand_name: formData.brand_name,
           description: formData.description,
+          logo: formData.logo as File,
         });
         Notiflix.Notify.success("Reward updated successfully!");
       } else {
@@ -72,6 +85,7 @@ const RewardModal: React.FC<RewardModalProps> = ({
           reward_type: formData.reward_type as "DIGITAL" | "PHYSICAL",
           brand_name: formData.brand_name,
           description: formData.description,
+          logo: formData.logo as File,
         });
         // Notiflix.Notify.success("Reward created successfully!");
       }
@@ -94,6 +108,27 @@ const RewardModal: React.FC<RewardModalProps> = ({
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleImageChange = (field: "logo", base64: string) => {
+    const byteString = atob(base64.split(",")[1]);
+    const mimeString = base64.split(",")[0].split(":")[1].split(";")[0];
+    const ab = new ArrayBuffer(byteString.length);
+    const ia = new Uint8Array(ab);
+
+    for (let i = 0; i < byteString.length; i++) {
+      ia[i] = byteString.charCodeAt(i);
+    }
+
+    const file = new File([ab], `${field}.${mimeString.split("/")[1]}`, {
+      type: mimeString,
+    });
+
+    setFormData((prev) => ({
+      ...prev,
+      [field]: file,
+      [`${field}_preview`]: base64,
+    }));
   };
 
   return (
@@ -170,6 +205,13 @@ const RewardModal: React.FC<RewardModalProps> = ({
               disabled={isViewMode}
             />
           </div>
+
+          <ImageUpload
+            label="logo"
+            value={formData.logo_preview || ""}
+            onChange={(base64) => handleImageChange("logo", base64)}
+            required
+          />
 
           <div className="mt-6 flex justify-end space-x-3">
             <Button type="button" variant="secondary" onClick={onClose}>

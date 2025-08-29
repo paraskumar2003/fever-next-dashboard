@@ -40,6 +40,7 @@ export class RewardServices extends ApiServices {
     name: string;
     brand_name: string;
     description: string;
+    logo: File;
   }) {
     try {
       const response = await this.post<T>(`/v1/rewards/create-reward`, payload);
@@ -56,6 +57,7 @@ export class RewardServices extends ApiServices {
       name: string;
       brand_name: string;
       description: string;
+      logo: File;
     },
   ) {
     try {

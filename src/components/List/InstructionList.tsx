@@ -46,9 +46,10 @@ const InstructionList: React.FC<InstructionListProps> = ({
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200">
-            {instructions.map((instruction) => (
+            {instructions.map((instruction, index) => (
               <InstructionRow
                 key={instruction.id}
+                index={index}
                 instruction={instruction}
                 onView={onView}
                 onEdit={onEdit}

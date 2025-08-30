@@ -1,6 +1,39 @@
 import { AxiosResponse } from "axios";
 import { ApiServices } from "../interceptor.base";
 
+interface AnswerPayload {
+  answer: string;
+  isCorrect: boolean;
+}
+
+interface QuestionPayload {
+  question: string;
+  status: number; // Assuming 1 means active, 0 means inactive, etc.
+  answers: AnswerPayload[];
+  timer: string; // Assuming this is in milliseconds as a string
+}
+
+interface QuestionFilter {
+  q?: string;
+  page?: number;
+  limit?: number;
+}
+
+export interface InstructionPayload {
+  contestId: string; // UUID format
+  instructions: string;
+  megaPrizeName: string;
+  sponsored_logo: File;
+}
+
+interface UpdateContestQuestionPayload {
+  contestId: number;
+  questionIds: number[];
+}
+
+interface ContestSearchFilter {
+  category?: string;
+}
 interface T extends AxiosResponse<any, any> {}
 export class TriviaServices extends ApiServices {
   static async fetchQuestions(contest_id: string, game_slug: string) {
@@ -41,9 +74,12 @@ export class TriviaServices extends ApiServices {
     }
   }
 
-  static async getContests(): Promise<any> {
+  static async getContests(filter?: ContestSearchFilter): Promise<any> {
     try {
-      const response = await this.get<T>(`/v1/trivia/contests`);
+      const queryString = filter
+        ? `?${new URLSearchParams(filter as any).toString()}`
+        : "";
+      const response = await this.get<T>(`/v1/trivia/contests${queryString}`);
       return response;
     } catch (err: any) {
       return { data: null, err: err.message, response: err?.response?.data };
@@ -61,10 +97,47 @@ export class TriviaServices extends ApiServices {
     }
   }
 
+  static async postGameQuestionForm(form: any): Promise<any> {
+    try {
+      const response = await this.post<T>(`/v1/trivia/contest-questions`, form);
+      return response;
+    } catch (err: any) {
+      return { data: null, err: err.message, response: err?.response?.data };
+    }
+  }
+
+  static async createQuestion(payload: QuestionPayload): Promise<any> {
+    try {
+      const response = await this.post<T>(
+        `/v1/questions/create-question`,
+        payload,
+      );
+      return response;
+    } catch (err: any) {
+      return { data: null, err: err.message, response: err?.response?.data };
+    }
+  }
+
+  static async updateQuestion(
+    payload: QuestionPayload,
+    id: string | number,
+  ): Promise<any> {
+    try {
+      const response = await this.post<T>(
+        `/v1/questions/update-question/${id}`,
+        payload,
+      );
+      return response;
+    } catch (err: any) {
+      return { data: null, err: err.message, response: err?.response?.data };
+    }
+  }
+
   static async deleteQuestion(question_id: string): Promise<any> {
     try {
-      const response = await this.get<T>(
-        `/v1/trivia/delete-question/${question_id}`,
+      const response = await this.post<T>(
+        `/v1/questions/delete-question/${question_id}`,
+        {},
       );
       return response;
     } catch (err: any) {
@@ -74,7 +147,9 @@ export class TriviaServices extends ApiServices {
 
   static async getQuestionById(question_id: string): Promise<any> {
     try {
-      const response = await this.get<T>(`/v1/trivia/questions/${question_id}`);
+      const response = await this.get<T>(
+        `/v1/questions/questions/${question_id}`,
+      );
       return response;
     } catch (err: any) {
       return { data: null, err: err.message, response: err?.response?.data };
@@ -85,6 +160,124 @@ export class TriviaServices extends ApiServices {
     try {
       const response = await this.get<T>(
         `/v1/trivia/instructions/${contest_id}`,
+      );
+      return response;
+    } catch (err: any) {
+      return { data: null, err: err.message, response: err?.response?.data };
+    }
+  }
+
+  static async createInstruction(payload: any): Promise<any> {
+    try {
+      const response = await this.post<T>(
+        `/v1/trivia/create-instructions`,
+        payload,
+      );
+      return response;
+    } catch (err: any) {
+      return { data: null, err: err.message, response: err?.response?.data };
+    }
+  }
+
+  static async getAllQuestions({
+    page = 1,
+    limit = 10,
+    ...filter
+  }: QuestionFilter) {
+    try {
+      const response = await this.get<T>(`/v1/questions/list`, {
+        params: {
+          page: page,
+          limit: limit,
+          ...(filter.q ? { q: filter.q } : {}),
+        },
+      });
+      return response;
+    } catch (err: any) {
+      return { data: null, err: err.message, response: err?.response?.data };
+    }
+  }
+
+  static async updateContestQuestions(
+    contestQuestionIds: number[],
+    contest_id: number,
+  ) {
+    try {
+      let payload: UpdateContestQuestionPayload = {
+        questionIds: contestQuestionIds,
+        contestId: contest_id,
+      };
+      const response = await this.post<T>(
+        `/v1/trivia/update-contest-questions`,
+        payload,
+      );
+      return response;
+    } catch (err: any) {
+      return { data: null, err: err.message, response: err?.response?.data };
+    }
+  }
+
+  /**
+   * Bulk upload questions from Excel file
+   * @param formData - FormData containing the Excel file with key 'excel', category_id, and set_id
+   * @returns Promise with API response
+   */
+  static async bulkUploadQuestions(formData: FormData): Promise<any> {
+    try {
+      const response = await this.post<T>(
+        `/v1/questions/bulk-upload`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        },
+      );
+      return response;
+    } catch (err: any) {
+      return { data: null, err: err.message, response: err?.response?.data };
+    }
+  }
+
+  /**
+   * Activate or deactivate a question
+   * @param question_id - ID of the question to activate or deactivate
+   * @param status - 1 to activate, 0 to deactivate
+   * @returns Promise with API response
+   */
+  static async activateOrDeactivateQuestion(
+    question_id: string,
+    status: number,
+  ) {
+    try {
+      const response = await this.post<T>(
+        `/v1/questions/activation/${question_id}`,
+        {
+          status: status,
+        },
+      );
+      return response;
+    } catch (err: any) {
+      return { data: null, err: err.message, response: err?.response?.data };
+    }
+  }
+
+  /**
+   * Update contest status
+   * @param contest_id - ID of the contest to update
+   * @param status - 0 for Draft, 1 for Active, 2 for Inactive
+   * @returns Promise with API response
+   */
+  static async updateContestStatus(
+    contest_id: string,
+    status: number,
+  ): Promise<any> {
+    try {
+      const response = await this.post<T>(
+        `/v1/trivia/update-status/${contest_id}`,
+        {
+          status: status,
+        },
       );
       return response;
     } catch (err: any) {

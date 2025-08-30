@@ -5,35 +5,44 @@ import FormInput from "@/components/FormInput";
 import FormSelect from "@/components/FormSelect";
 import ImageUpload from "@/components/ImageUpload";
 import { ContestFormData } from "@/types";
+import { SubscriptionBadge } from "../GliderOverlay";
+import FormCheckbox from "../FormCheckbox";
 
 interface OnlyContestFormProps {
   formData: Partial<ContestFormData>;
   updateFormData: (data: Partial<ContestFormData>) => void;
   onSave: Function;
+  errors?: Record<string, string>;
 }
+
+const getTodayDate = () => {
+  const today = new Date();
+  today.setDate(today.getDate());
+  return today.toISOString().split("T")[0]; // returns DD-MM-YYYY
+};
 
 const OnlyContestForm: React.FC<OnlyContestFormProps> = ({
   formData,
   updateFormData,
   onSave,
+  errors = {},
 }) => {
   return (
     <FormSection title="Contest Details" onSave={() => onSave(formData)}>
+      {formData.contest_type_name === "MAHABONANZA" && (
+        <SubscriptionBadge text="Maha Bonanza" level="premium" />
+      )}
+
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <FormInput
           label="Contest Name"
           placeholder="Enter contest name"
           value={formData.contest_name || ""}
           onChange={(e) => updateFormData({ contest_name: e.target.value })}
-        />
-        <FormInput
-          label="Reward Name"
-          placeholder="Enter reward name"
-          value={formData.reward_name || ""}
-          onChange={(e) => updateFormData({ reward_name: e.target.value })}
+          error={errors.contest_name}
+          required
         />
       </div>
-
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <div>
           <FormInput
@@ -41,6 +50,9 @@ const OnlyContestForm: React.FC<OnlyContestFormProps> = ({
             type="date"
             value={formData.start_date || ""}
             onChange={(e) => updateFormData({ start_date: e.target.value })}
+            error={errors.start_date}
+            required
+            min={getTodayDate()}
           />
         </div>
         <div>
@@ -49,10 +61,11 @@ const OnlyContestForm: React.FC<OnlyContestFormProps> = ({
             type="time"
             value={formData.start_time || ""}
             onChange={(e) => updateFormData({ start_time: e.target.value })}
+            error={errors.start_time}
+            required
           />
         </div>
       </div>
-
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <div>
           <FormInput
@@ -60,6 +73,9 @@ const OnlyContestForm: React.FC<OnlyContestFormProps> = ({
             type="date"
             value={formData.end_date || ""}
             onChange={(e) => updateFormData({ end_date: e.target.value })}
+            error={errors.end_date}
+            required
+            min={getTodayDate()}
           />
         </div>
         <div>
@@ -68,10 +84,11 @@ const OnlyContestForm: React.FC<OnlyContestFormProps> = ({
             type="time"
             value={formData.end_time || ""}
             onChange={(e) => updateFormData({ end_time: e.target.value })}
+            error={errors.end_time}
+            required
           />
         </div>
       </div>
-
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <FormSelect
           label="Contest Type"
@@ -83,6 +100,7 @@ const OnlyContestForm: React.FC<OnlyContestFormProps> = ({
           onChange={(e) =>
             updateFormData({ contest_type: e.target.value as "FREE" | "PAID" })
           }
+          required
         />
         {formData.contest_type === "PAID" && (
           <FormInput
@@ -94,58 +112,68 @@ const OnlyContestForm: React.FC<OnlyContestFormProps> = ({
             onChange={(e) =>
               updateFormData({ contest_fee: parseInt(e.target.value) })
             }
+            error={errors.contest_fee}
+            required
           />
         )}
       </div>
-
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-        <FormInput
-          label="Contest Type Name (Optional)"
-          placeholder="E.g., Premium, Standard"
-          value={formData.contest_type_name || ""}
+        <FormSelect
+          label="Contest Type Name"
+          options={[
+            { value: "", label: "" },
+            { value: "REGULAR", label: "Regular" },
+            { value: "MAHA_BONANZA", label: "Maha Bonanza" },
+          ]}
+          value={formData.contest_type_name}
           onChange={(e) =>
-            updateFormData({ contest_type_name: e.target.value })
+            updateFormData({
+              contest_type_name: e.target.value as "MAHABONANZA" | "REGULAR",
+            })
           }
-        />
-        <FormInput
-          label="Contest Variant Name (Optional)"
-          placeholder="E.g., Summer Edition"
-          value={formData.contest_variant_name || ""}
-          onChange={(e) =>
-            updateFormData({ contest_variant_name: e.target.value })
-          }
+          error={errors.contest_type_name}
+          required
         />
       </div>
-
-      <FormInput
-        label="Sponsor Name"
-        placeholder="Enter sponsor name"
-        value={formData.sponsor_name || ""}
-        onChange={(e) => updateFormData({ sponsor_name: e.target.value })}
-      />
 
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
         <ImageUpload
-          label="Sponsor Logo"
-          value={formData.sponsor_logo_preview || ""}
-          onChange={(base64) => updateFormData({ sponsor_logo: base64 })}
-        />
-        <ImageUpload
           label="Thumbnail"
-          value={formData.thumbnail_preview || ""}
+          value={formData.thumbnail_preview || formData.thumbnail || ""}
           onChange={(base64) => updateFormData({ thumbnail: base64 })}
+          error={errors.thumbnail}
+          required
         />
         <ImageUpload
           label="Contest Image"
-          value={formData.contest_image_preview || ""}
+          value={formData.contest_image_preview || formData.contest_image || ""}
           onChange={(base64) => updateFormData({ contest_image: base64 })}
+          error={errors.contest_image}
+          required
         />
         <ImageUpload
           label="Contest Hero Logo"
-          value={formData.contest_hero_logo_preview || ""}
+          value={
+            formData.contest_hero_logo_preview ||
+            formData.contest_hero_logo ||
+            ""
+          }
           onChange={(base64) => updateFormData({ contest_hero_logo: base64 })}
+          error={errors.contest_hero_logo}
         />
       </div>
+
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+        <FormCheckbox
+          label="Enable Popular Contest"
+          checked={!!formData.isPopular}
+          onChange={(e) =>
+            updateFormData({ isPopular: (e.target.checked as boolean) ? 1 : 0 })
+          }
+          error={errors.isPopular}
+        />
+      </div>
+      <div className="py-2"></div>
     </FormSection>
   );
 };

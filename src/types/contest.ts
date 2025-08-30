@@ -1,6 +1,4 @@
-export interface Reward {
-  name: string;
-}
+import { Reward } from "./rewards";
 
 export interface Contest {
   id: string;
@@ -22,4 +20,9 @@ export interface Contest {
   isSponsored: boolean;
   sponsored_name: string;
   sponsored_logo: string;
+  status: number; // 0 for Draft, 1 for Active, 2 for Inactive
+  total_contest_played: number;
+  winners_announced: number;
+  flip_amount: number;
+  contestQuestionAssignments: any[];
 }

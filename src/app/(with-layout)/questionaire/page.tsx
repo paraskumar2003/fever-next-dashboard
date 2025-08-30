@@ -1,0 +1,248 @@
+"use client";
+
+import React, { useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { useContest } from "@/context/ContestContext";
+import { TriviaServices } from "@/services";
+import QuestionModal from "@/components/Modal/QuestionModal";
+import { useModal } from "@/hooks/useModal";
+import QuestionSection from "@/components/Section/QuestionSection";
+import { Question } from "@/types/question";
+import { BulkUploadQuestions } from "@/components/BulkUpload";
+import ConfirmationModal from "@/components/Modal/ConfirmationModal";
+
+type fetchQuestionAgrs =
+  | { q?: string; page?: number; limit?: number }
+  | undefined;
+
+const TriviaPage = () => {
+  const router = useSearchParams();
+  const contest_id = router.get("contest_id");
+
+  const { updateFormData } = useContest();
+  const [questions, setQuestions] = useState<Question[]>([]);
+  const [rowCount, setRowCount] = useState(0);
+  const [paginationModel, setPaginationModel] = useState<{
+    page: number;
+    pageSize: number;
+  }>({
+    page: 1,
+    pageSize: 10,
+  });
+  const [contestQuestionIds, setContestQuestionIds] = useState<number[]>([]);
+
+  const [searchString, setSearchString] = useState<string>("");
+
+  const modal = useModal();
+
+  const [selectedQuestion, setSelectedQuestion] = useState<any>(null);
+  const [isViewMode, setIsViewMode] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [questionToDeleteId, setQuestionToDeleteId] = useState<number | null>(null);
+
+  const fetchContestQuestions = async (contest_id: string): Promise<any> => {
+    try {
+      const { data } = await TriviaServices.getQuestionsByContestId(contest_id);
+      if (data?.data?.contest?.questions) {
+        const questionIds = data.data.contest.questions.map((q: any) => q.id);
+        setContestQuestionIds((prevIds) => questionIds);
+      }
+      return true;
+    } catch (err) {
+      console.error("Error fetching contest questions:", err);
+    }
+  };
+
+  const fetchQuestions = async (args?: fetchQuestionAgrs) => {
+    try {
+      if (contestQuestionIds) {
+        const { data } = await TriviaServices.getAllQuestions({
+          page: args?.page || paginationModel.page,
+          limit: args?.limit || paginationModel.pageSize,
+          ...(args?.q ? { q: args.q } : {}),
+        });
+        if (data?.data?.rows) {
+          // Map the new API structure to include computed properties
+          const mappedQuestions = data.data.rows.map((q: Question) => ({
+            ...q,
+            status: q.status,
+            categoryName: q.category?.name,
+            categoryId: q.category?.id,
+            setName: q.set?.name,
+          }));
+
+          setQuestions(mappedQuestions);
+          setRowCount(data.data.meta.total);
+
+          // Update context with formatted questions for backward compatibility
+          const contextQuestions = mappedQuestions.map((q: Question) => ({
+            question: q.question,
+            option1: q.questionOptions[0]?.answer || "",
+            option2: q.questionOptions[1]?.answer || "",
+            option3: q.questionOptions[2]?.answer || "",
+            option4: q.questionOptions[3]?.answer || "",
+            correctOption: `option${q.questionOptions.findIndex((a: any) => a.is_correct) + 1}`,
+            timer: "10000", // Default timer
+            status: contestQuestionIds.includes(parseInt(q.id)) ? 1 : 0,
+          }));
+          updateFormData({ questions: contextQuestions });
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching questions:", error);
+    }
+  };
+
+  useEffect(() => {
+    if (searchString) {
+      const timerId = setTimeout(() => {
+        fetchQuestions({
+          q: searchString,
+          page: paginationModel.page,
+          limit: paginationModel.pageSize,
+        });
+      }, 1000);
+      return () => clearTimeout(timerId);
+    } else {
+      fetchQuestions({
+        page: paginationModel.page,
+        limit: paginationModel.pageSize,
+      });
+    }
+  }, [searchString, paginationModel]);
+
+  const fetchQuestionDetails = async (id: number) => {
+    try {
+      const { data } = await TriviaServices.getQuestionById(id.toString());
+      if (data?.data) {
+        const question = data.data;
+        const formattedQuestion = {
+          id: question.id,
+          question: question.question,
+          option1: question.questionOptions[0]?.answer || "",
+          option2: question.questionOptions[1]?.answer || "",
+          option3: question.questionOptions[2]?.answer || "",
+          option4: question.questionOptions[3]?.answer || "",
+          correctOption: `option${question.questionOptions.findIndex((a: any) => a.is_correct) + 1}`,
+          timer: 10000, // Default timer
+          status: question.status,
+          categoryId: question?.category?.id,
+          set_id: question?.set?.id,
+        };
+        setSelectedQuestion(formattedQuestion);
+      }
+    } catch (err) {
+      console.error("Error fetching question details:", err);
+    } finally {
+    }
+  };
+
+  const handleQuestionView = async (question: Question) => {
+    setIsViewMode(true);
+    await fetchQuestionDetails(parseInt(question.id));
+    modal.open();
+  };
+
+  const handleQuestionEdit = async (question: Question) => {
+    setIsViewMode(false);
+    console.log({ question });
+    await fetchQuestionDetails(parseInt(question.id));
+    modal.open();
+  };
+
+  const handleQuestionDelete = async (id: number) => {
+    setQuestionToDeleteId(id);
+    setShowDeleteConfirm(true);
+  };
+
+  const confirmQuestionDelete = async () => {
+    if (questionToDeleteId === null) return;
+    
+    try {
+      await TriviaServices.deleteQuestion(questionToDeleteId.toString());
+      fetchQuestions();
+    } catch (err) {
+      console.error("Error deleting question:", err);
+    } finally {
+      setQuestionToDeleteId(null);
+    }
+  };
+
+  const handleStatusChange = async (id: number, statusToChanged: number) => {
+    try {
+      await TriviaServices.activateOrDeactivateQuestion(
+        id.toString(),
+        statusToChanged,
+      );
+      await fetchQuestions();
+    } catch (err) {
+      console.error("Error updating question status:", err);
+    }
+  };
+
+  const handlePaginationModelChange = (page: number, pageSize: number) => {
+    setPaginationModel({ page, pageSize });
+  };
+
+  const handleUploadSuccess = () => {
+    fetchQuestions();
+  };
+
+  return (
+    <>
+      <div className="mx-auto  py-8">
+        <div className="mb-6 flex items-center justify-between">
+          <h1 className="text-3xl font-bold">Questionaire (Trivia)</h1>
+        </div>
+
+        <BulkUploadQuestions
+          searchString={searchString}
+          onSearchChange={(text: string) => setSearchString(text)}
+          onUploadSuccess={handleUploadSuccess}
+        />
+
+        <div className="space-y-6">
+          <QuestionSection
+            questions={questions}
+            onView={handleQuestionView}
+            onEdit={handleQuestionEdit}
+            onDelete={handleQuestionDelete}
+            onStatusChange={handleStatusChange}
+            onPagninationModelChange={handlePaginationModelChange}
+            rowCount={rowCount}
+            paginationModel={paginationModel}
+            onSave={async () => {
+              await fetchQuestions();
+            }}
+          />
+          <QuestionModal
+            isOpen={modal.isOpen}
+            onClose={modal.close}
+            questionData={selectedQuestion}
+            isViewMode={isViewMode}
+            onSave={async () => {
+              await fetchQuestions();
+              modal.close();
+            }}
+          />
+        </div>
+
+        <ConfirmationModal
+          isOpen={showDeleteConfirm}
+          onClose={() => {
+            setShowDeleteConfirm(false);
+            setQuestionToDeleteId(null);
+          }}
+          onConfirm={confirmQuestionDelete}
+          title="Delete Question"
+          message="Are you sure you want to delete this question? This action cannot be undone."
+          confirmText="Delete"
+          cancelText="Cancel"
+          variant="danger"
+        />
+      </div>
+    </>
+  );
+};
+
+export default TriviaPage;

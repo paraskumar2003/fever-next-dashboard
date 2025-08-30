@@ -27,10 +27,48 @@ export const ContestProvider: React.FC<{ children: ReactNode }> = ({
     game_proceed: {
       submitBtn: "Proceed to Game",
     },
-    instructions: [],
+    instructions: [
+      {
+        title: "",
+        description: "Get a Tambola ticket and wait for contestto begin",
+      },
+      {
+        title: "",
+        description:
+          "Ensure that you mark the numbers onyour ticket that have been called out",
+      },
+      {
+        title: "",
+        description:
+          "The number will be marked in RED incase automatically in case you missedto mark",
+      },
+      {
+        title: "",
+        description:
+          "Categories to win:- Full House, Lines, Corners, and early 5",
+      },
+    ],
     prize_catalogue: [],
-    questions: [],
+    questions: [
+      {
+        question: "",
+        option1: "",
+        option2: "",
+        option3: "",
+        option4: "",
+        correctOption: "option1",
+        timer: "10",
+      },
+    ],
+    winners: [],
+    game_time_level: "GAME",
+    flip_allowed: 1,
+    flip_count: 1,
+    isPopular: 0,
+    fever_logo: false,
+    QuestionCount: 1,
   });
+
   const [tambolaFormData, setTambolaFormData] = useState<
     Partial<TambolaFormData>
   >({
@@ -64,6 +102,21 @@ export const ContestProvider: React.FC<{ children: ReactNode }> = ({
         [`${field}_preview`]: base64,
       }));
     };
+
+    // Check if any image field is a empty string
+
+    let imageFields: (keyof ContestFormData)[] = [
+      "contest_hero_logo",
+      "contest_image",
+      "sponsor_logo",
+      "thumbnail",
+    ];
+
+    imageFields.forEach((field) => {
+      if (data[field] === "") {
+        setFormData((prev) => ({ ...prev, [`${field}_preview`]: "" }));
+      }
+    });
 
     if (
       data.contest_hero_logo ||
@@ -102,9 +155,47 @@ export const ContestProvider: React.FC<{ children: ReactNode }> = ({
       game_proceed: {
         submitBtn: "Proceed to Game",
       },
-      instructions: [],
+      instructions: [
+        {
+          title: "",
+          description: "Get a Tambola ticket and wait for contestto begin",
+        },
+        {
+          title: "",
+          description:
+            "Ensure that you mark the numbers onyour ticket that have been called out",
+        },
+        {
+          title: "",
+          description:
+            "The number will be marked in RED incase automatically in case you missedto mark",
+        },
+        {
+          title: "",
+          description:
+            "Categories to win:- Full House, Lines, Corners, and early 5",
+        },
+      ],
       prize_catalogue: [],
-      questions: [],
+      questions: [
+        {
+          question: "",
+          option1: "",
+          option2: "",
+          option3: "",
+          option4: "",
+          correctOption: "option1",
+          timer: "10",
+        },
+      ],
+      winners: [],
+      game_time_level: "GAME",
+      flip_allowed: 1,
+      flip_count: 0,
+      flip_fee: 0,
+      isPopular: 0,
+      fever_logo: false,
+      QuestionCount: 1,
     });
   };
 

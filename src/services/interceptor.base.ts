@@ -1,11 +1,17 @@
 import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
 import Cookies from "js-cookie";
-import Notiflix from "notiflix";
+import { toast } from "react-toastify";
 
+// Global loading state
+let globalLoadingState: ((loading: boolean) => void) | null = null;
+
+export const setGlobalLoadingHandler = (handler: (loading: boolean) => void) => {
+  globalLoadingState = handler;
+};
 class ApiServices {
   private static instance = axios.create({
     baseURL: process.env.api_url,
-    timeout: 10000,
+    timeout: 60000,
     headers: {
       // "Content-Type": "application/json",
     },
@@ -16,16 +22,31 @@ class ApiServices {
     this.instance.interceptors.request.use(
       (config) => {
         // Add token or any other modifications here
-        Notiflix.Loading.circle();
-        const token = Cookies.get("authToken");
+        if (globalLoadingState) {
+          globalLoadingState(true);
+        }
+        // Get token from cookies (client-side) or from headers (server-side)
+        let token: string | undefined;
+
+        if (typeof window !== "undefined") {
+          // Client-side: get from cookies
+          token = Cookies.get("authToken");
+        } else {
+          // Server-side: get from request headers if available
+          token = config.headers?.["Authorization"]
+            ?.toString()
+            .replace("Bearer ", "");
+        }
+
         if (token) {
           config.headers["Authorization"] = `Bearer ${token}`;
         }
-        // Notiflix.Loading.dots();
         return config;
       },
       (error) => {
-        Notiflix.Loading.remove();
+        if (globalLoadingState) {
+          globalLoadingState(false);
+        }
         return Promise.reject(error);
       },
     );
@@ -35,18 +56,28 @@ class ApiServices {
   static initializeResponseInterceptor() {
     this.instance.interceptors.response.use(
       (response) => {
-        Notiflix.Loading.remove();
+        if (globalLoadingState) {
+          globalLoadingState(false);
+        }
         return response;
       },
       (error) => {
-        Notiflix.Loading.remove();
+        if (globalLoadingState) {
+          globalLoadingState(false);
+        }
 
         if (error.response?.status === 401) {
           console.error("Unauthorized! Redirecting to login...");
-          Cookies.remove("authToken");
+          // Remove token from cookies and redirect to login
+          if (typeof window !== "undefined") {
+            Cookies.remove("authToken");
+            window.location.href = "/login";
+          }
         } else {
-          Notiflix.Notify.info(
-            error?.response?.data?.message || error?.message,
+          toast.error(
+            typeof error?.response?.data?.message == "string"
+              ? error?.response?.data?.message
+              : error.response.data.message[0] || error?.message,
           );
         }
         return Promise.reject(error);

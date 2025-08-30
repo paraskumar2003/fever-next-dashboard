@@ -1,3 +1,5 @@
+import { Reward } from "./types/rewards";
+
 export interface GradientColor {
   direction: "to-right" | "to-left" | "to-top" | "to-bottom";
   start: string;
@@ -53,7 +55,23 @@ export interface Question {
   timer: string;
 }
 
+export interface QuestionSet {
+  id: number;
+  name: string;
+  questions: string;
+}
+
+export type RewardType = "PHYSICAL" | "COUPON_PDF" | "CODE";
+
+export interface WinnerReward {
+  reward_id: number;
+  bucks: number;
+  qty: number;
+  balance_coupons: number;
+}
+
 export interface ContestFormData {
+  contest_id: number;
   contest_name: string;
   reward_name: string;
   start_date: string;
@@ -74,11 +92,39 @@ export interface ContestFormData {
   contest_hero_logo: string;
   contest_hero_logo_preview: string;
   game_proceed: GameProceed;
-  instructions?: Instruction[];
+  instructions: Instruction[];
   prize_catalogue: PrizeCatalogue[];
   questions: Question[];
   title: string;
   description: string;
+  winners: WinnerReward[];
+  mega_prize_name: string;
+  game_timer: string;
+  game_time_level: "GAME" | "QUESTION";
+  flip_allowed: number;
+  flip_count: number;
+  flip_fee: number;
+  flip_set: { name: string; questions: Question[] };
+  QuestionCategoryId: number;
+  flipSet: number;
+  isPopular: number;
+  set_id: number;
+  contestPrizes: ContestPrizeItem[];
+  fever_logo: boolean;
+  QuestionCount: number;
+  noOfQuestionInCurrentCategory: number;
+  noOfQuestionInCurrentSet: number;
+  noOfQuestionInFlipSet: number;
+}
+
+export interface ContestPrizeItem {
+  id: number;
+  prize_name: string;
+  current_quantity: number;
+  quantity: number;
+  fever_bucks: number;
+  reward: Reward;
+  coupon_type: string | null;
 }
 
 export interface TambolaFormData {

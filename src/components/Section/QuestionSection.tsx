@@ -8,6 +8,9 @@ import { useModal } from "@/hooks/useModal";
 
 interface QuestionSectionProps {
   questions: any[];
+  rowCount: number;
+  onPagninationModelChange: (page: number, pageSize: number) => void;
+  paginationModel: { page: number; pageSize: number };
   onView: (question: any) => void;
   onEdit: (question: any) => void;
   onDelete: (id: number) => void;
@@ -17,11 +20,14 @@ interface QuestionSectionProps {
 
 const QuestionSection: React.FC<QuestionSectionProps> = ({
   questions,
+  rowCount,
+  paginationModel,
   onView,
   onEdit,
   onDelete,
   onStatusChange,
   onSave,
+  onPagninationModelChange,
 }) => {
   const addQuestionModal = useModal();
 
@@ -36,6 +42,9 @@ const QuestionSection: React.FC<QuestionSectionProps> = ({
       }
     >
       <QuestionList
+        rowCount={rowCount}
+        onPaginationModelChange={onPagninationModelChange}
+        paginationModel={paginationModel}
         questions={questions}
         onView={onView}
         onEdit={onEdit}

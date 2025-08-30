@@ -1,15 +1,17 @@
-import { useEffect, useState } from "react";
+import { JSX, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Cookies from "js-cookie";
 
 const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
   const { push } = useRouter();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
-    const token =
-      typeof window !== "undefined" ? localStorage.getItem("token") : null;
+    // Get token from cookies instead of localStorage
+    const token = Cookies.get("authToken");
+    
     if (!token) {
-      push("/");
+      push("/login");
     } else {
       setIsAuthenticated(true);
     }

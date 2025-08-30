@@ -2,36 +2,52 @@
 
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { Paper } from "@mui/material";
-import React, { useEffect, useState } from "react";
+import React from "react";
 
 type DataTableProps<T> = {
   rows: any;
   columns: GridColDef[];
   totalCount: number;
+  onPaginationModelChange?: (paginationModel: any) => void;
+  paginationModel: { page: number; pageSize: number };
 };
 
-const Table = <T,>({ rows, columns, totalCount }: DataTableProps<T>) => {
-  const [paginationModel, setPaginationModel] = useState({
-    page: 0,
-    pageSize: 10,
-  });
-
+const Table = <T,>({
+  rows,
+  columns,
+  totalCount,
+  onPaginationModelChange,
+  paginationModel,
+}: DataTableProps<T>) => {
   return (
     <Paper
       style={{ height: 500, width: "100%" }}
       className="dark:bg-boxdark dark:text-white"
     >
-      <DataGrid
-        rows={rows}
-        columns={columns}
-        rowCount={totalCount}
-        pagination
-        paginationMode="client"
-        paginationModel={paginationModel}
-        onPaginationModelChange={setPaginationModel}
-        pageSizeOptions={[5, 10, 25, 50]}
-        className="dark:bg-boxdark dark:text-white"
-      />
+      <div style={{ height: "100%", width: "100%" }}>
+        <DataGrid
+          rows={rows}
+          columns={columns}
+          rowCount={totalCount}
+          pagination
+          paginationMode="server"
+          paginationModel={paginationModel}
+          onPaginationModelChange={onPaginationModelChange}
+          pageSizeOptions={[5, 10, 25, 50]}
+          className="dark:bg-boxdark dark:text-white"
+          columnVisibilityModel={{
+            seq_no: true,
+            contest_name: true,
+            contest_fee: true,
+            contest_sponsor_logo: true,
+            contest_time: true,
+            contest_date: true,
+            contest_type: true,
+            sponsored_name: true,
+            metrics: true,
+          }}
+        />
+      </div>
     </Paper>
   );
 };

@@ -1,24 +1,11 @@
 import React, { useState } from "react";
 import { Eye, Pencil, Trash2 } from "lucide-react";
 import Button from "../Button";
-
-interface Answer {
-  id: number;
-  answer: string;
-  is_correct: boolean;
-  status: string;
-}
-
-interface Question {
-  id: number;
-  question: string;
-  correct_answer: string;
-  status: number;
-  answers: Answer[];
-}
+import { Question } from "@/types/question";
 
 interface QuestionRowProps {
   question: Question;
+  index: number;
   onEdit?: (question: Question) => void;
   onDelete?: (id: number) => void;
   onView?: (question: Question) => void;
@@ -27,6 +14,7 @@ interface QuestionRowProps {
 
 const QuestionRow: React.FC<QuestionRowProps> = ({
   question,
+  index,
   onEdit,
   onDelete,
   onView,
@@ -38,20 +26,30 @@ const QuestionRow: React.FC<QuestionRowProps> = ({
     try {
       setLoadingStatus(true);
       const newStatus = question.status === 1 ? 0 : 1;
-      await onStatusChange?.(question.id, newStatus);
+      await onStatusChange?.(parseInt(question.id), newStatus);
     } finally {
       setLoadingStatus(false);
     }
   };
 
+  if (question.status === 0) {
+    console.log({ question });
+  }
+
   return (
     <tr className="transition-colors hover:bg-gray-50">
-      <td className="px-4 py-3 text-sm text-gray-600">#{question.id}</td>
+      <td className="px-4 py-3 text-sm text-gray-600">#{index + 1}</td>
       <td className="px-4 py-3 text-sm text-gray-600">
         <div className="max-w-md truncate">{question.question}</div>
       </td>
       <td className="px-4 py-3 text-sm text-gray-600">
         {question.correct_answer}
+      </td>
+      <td className="px-4 py-3 text-sm text-gray-600">
+        {question.category?.name || question.categoryName || "N/A"}
+      </td>
+      <td className="px-4 py-3 text-sm text-gray-600">
+        {question.set?.name || question.setName || "N/A"}
       </td>
       <td className="px-4 py-3 text-sm">
         <button
@@ -93,7 +91,7 @@ const QuestionRow: React.FC<QuestionRowProps> = ({
           <Button
             variant="danger"
             size="sm"
-            onClick={() => onDelete?.(question.id)}
+            onClick={() => onDelete?.(parseInt(question.id))}
             title="Delete Question"
           >
             <Trash2 className="h-4 w-4" />

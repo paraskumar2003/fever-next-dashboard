@@ -45,12 +45,17 @@ const RewardModal: React.FC<RewardModalProps> = ({
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
+    console.log({ formData });
+  }, [formData]);
+
+  useEffect(() => {
     if (rewardData) {
       setFormData({
         name: rewardData.name || "",
         reward_type: rewardData.reward_type || "DIGITAL",
         brand_name: rewardData.brand_name || "",
         description: rewardData.description || "",
+        logo_preview: rewardData.logo || "",
       });
     } else {
       setFormData({
@@ -62,32 +67,37 @@ const RewardModal: React.FC<RewardModalProps> = ({
     }
   }, [rewardData]);
 
+  // ✅ Utility to build FormData
+  function buildRewardFormData(formData: any) {
+    const fd = new FormData();
+
+    if (formData.name) fd.append("name", formData.name);
+    if (formData.reward_type) fd.append("reward_type", formData.reward_type);
+    if (formData.brand_name) fd.append("brand_name", formData.brand_name);
+    if (formData.description) fd.append("description", formData.description);
+    if (formData.logo instanceof File)
+      fd.append("logo", formData.logo, formData.logo.name);
+
+    return fd;
+  }
+
+  // ✅ Submit handler
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (isViewMode) return;
 
     setLoading(true);
     try {
+      const fd = buildRewardFormData(formData);
+
       if (rewardData?.id) {
         // Update existing reward
-        await RewardServices.updateReward(rewardData.id, {
-          name: formData.name,
-          reward_type: formData.reward_type as "DIGITAL" | "PHYSICAL",
-          brand_name: formData.brand_name,
-          description: formData.description,
-          logo: formData.logo as File,
-        });
+        await RewardServices.updateReward(rewardData.id, fd);
         Notiflix.Notify.success("Reward updated successfully!");
       } else {
         // Create new reward
-        await RewardServices.createReward({
-          name: formData.name,
-          reward_type: formData.reward_type as "DIGITAL" | "PHYSICAL",
-          brand_name: formData.brand_name,
-          description: formData.description,
-          logo: formData.logo as File,
-        });
-        // Notiflix.Notify.success("Reward created successfully!");
+        await RewardServices.createReward(fd);
+        Notiflix.Notify.success("Reward created successfully!");
       }
 
       if (onSave) {
@@ -206,12 +216,14 @@ const RewardModal: React.FC<RewardModalProps> = ({
             />
           </div>
 
-          <ImageUpload
-            label="logo"
-            value={formData.logo_preview || ""}
-            onChange={(base64) => handleImageChange("logo", base64)}
-            required
-          />
+          <div className="mt-6">
+            <ImageUpload
+              label="Reward Logo"
+              value={formData.logo_preview || ""}
+              onChange={(base64) => handleImageChange("logo", base64)}
+              required
+            />
+          </div>
 
           <div className="mt-6 flex justify-end space-x-3">
             <Button type="button" variant="secondary" onClick={onClose}>

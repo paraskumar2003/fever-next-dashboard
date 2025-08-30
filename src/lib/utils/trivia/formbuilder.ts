@@ -145,3 +145,16 @@ export function buildQuestionJsonData(
 
   return json;
 }
+
+export function buildRewardFormData(formData: any) {
+  const fd = new FormData();
+
+  fd.append("name", formData.name);
+  fd.append("reward_type", formData.reward_type);
+  fd.append("brand_name", formData.brand_name);
+  fd.append("description", formData.description);
+  if (formData.logo instanceof File)
+    fd.append("logo", formData.logo, formData.logo.name);
+
+  return fd;
+}
